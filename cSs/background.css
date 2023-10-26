@@ -1,0 +1,11 @@
+body {
+    background-color:#f0f8ff;
+}
+h1 {
+    color:rgb(64, 31, 255);
+    text-align:center;
+}
+p {
+    font-family:"Times New Roman";
+    font-size:20px;
+}
