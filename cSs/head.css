@@ -1,79 +1,116 @@
-/* css样式初始化 */
+/* 清除浏览器默认样式 */
 * {
-    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    outline: none;
-    border: none;
+  }
+  
+  /* 移除链接的下划线 */
+  a {
     text-decoration: none;
-    text-transform: capitalize;
-    transition: .2s linear;
-}
-
-html {
-    font-size: 62.5%;
-}
-/* header样式初始化*/
-.header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background: #489ce1;
+  }
+  
+  /* 去除列表元素的默认样式 */
+  ul, ol {
+    list-style: none;
+  }
+  
+  /* ul li前无小点 */
+  ul li:before {
+    content: "";
+  }
+/* 标志 */
+.container {
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
-
-.header .logo {
-    color: white;
-    padding: 0 1rem;
+.item {
+    flex: 1;
+    padding: 10px;
+    background-color: lightgray;
 }
-/* 导航样式 */
-.navbar ul{
+/* logo栏 */
+.head-top {
+    background: #1b5b90cc;
     display: flex;
+    text-align: left;
+    flex-direction: row;
+    align-items: center;
+    color: #5bc67e;
 }
-
-.navbar ul li{
+.head-top p{
+    color: #ffffff;
     font-weight: bold;
-    width: 128px;
-    list-style: none;
-    text-align:center;
 }
-.navbar ul li a {
-    width: 128px;
-    line-height: 45px;
-    font-size: 1.7rem;
-    color: white;
+.head-top a p{
+    color: #ffffffff;
+    font-size: 1.8rem ;
+    font-family: Times, '黑体';
+} 
+ /* 导航样式 */
+ .head-bottom {
+    background: rgba(27, 91, 144, 0.677);
 }
-.navbar ul li a:hover{
-    color: #009933;
+.head-bottom ul{
+    margin-left:10%;
+    margin-right:10%;
+    display:flex;
+    justify-content: space-between;
+    text-align: center;
 }
-/* 二级菜单样式 */
-.navbar ul li ul{
-    position: absolute;
-    display: none;
-    width: 128px;
-    line-height: 45px;
+.head-bottom ul li{
+    font-size: 20px;
+    color: #ffffff;
+    width: 120px;
+    padding-right:20px;
+    padding-left:10px;
+    padding-top:15px;
+    padding-bottom:15px;
+    display: inline-block;
 }
-
-.navbar ul li ul li{
-    background-color: #3F3D56;
+.head-bottom ul li a{
+    font-size: 20px;
+    color: #ffffff;
+    font-family: '黑体';
 }
-/* 悬浮展开二级菜单 */
-.navbar ul li ul li a:hover{
-    color: white;
+.head-bottom ul li ul{
+    display:none;
 }
-.navbar ul li ul li:hover{
-    background-color: #009933;
-}
-
-.navbar ul li:hover ul{
-    display: block;
-}
-/* 网站内容*/
-.content{
-    margin-top:50px;
-}
+.head-bottom ul li:hover{
+    position:relative;
+    background: #357cb6;
+} 
+.head-bottom ul li:hover ul{
+    position:absolute;
+    display:block;
+    display:flex;
+    justify-content: space-between;
+    flex-direction: column;
+    background: #357cb6;
+    padding-left:10px;
+    margin-left:-10px;
+    margin-right:0%;
+    text-align: left;
+} 
+.head-bottom ul li ul li:hover{
+    background: #0000009c;
+} 
+.head-bottom ul li a{
+    font-size: 1.4rem ;
+} 
+.head-bottom ul li:hover ul{
+    margin-top:15px;
+    margin-bottom:10px;
+} 
+.head-bottom ul li:hover ul li{
+    padding-top:5px;
+    padding-bottom:5px;
+    margin-top:2px;
+    margin-bottom:2px;
+} 
+.head-bottom ul li:hover ul li a{
+    font-size: 1.2rem ;
+} 
+.head-bottom ul li:hover ul li:hover a{
+    font-size: 1.3rem ;
+} 
