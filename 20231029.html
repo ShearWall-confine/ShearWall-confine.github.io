@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CSV转换为HTML页面</title>
+</head>
+<body>
+    <h1>CSV转换为HTML页面</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>字段1</th>
+                <th>字段2</th>
+                <th>字段3</th>
+                <!-- 添加更多表头字段 -->
+            </tr>
+        </thead>
+        <tbody id="data">
+            <!-- 使用 JavaScript 动态加载数据行 -->
+        </tbody>
+    </table>
+
+    <script>
+        // 异步加载 CSV 文件
+        function loadCSV(file, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", file, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    callback(xhr.responseText);
+                }
+            };
+            xhr.send(null);
+        }
+
+        // 将 CSV 数据转换为 HTML 行
+        function convertCSVtoHTML(csvData) {
+            var lines = csvData.split("\n");
+            var html = "";
+
+            for (var i = 1; i < lines.length; i++) {
+                var columns = lines[i].split(",");
+                var rowHTML = "<tr onclick='goToPage(" + i + ")'>";
+                for (var j = 0; j < columns.length; j++) {
+                    rowHTML += "<td>" + columns[j] + "</td>";
+                }
+                rowHTML += "</tr>";
+                html += rowHTML;
+            }
+
+            return html;
+        }
+
+        // 根据点击的行进入对应页面
+        function goToPage(row) {
+            window.location.href = "page_" + row + ".html";
+        }
+
+        // 加载 CSV 数据并生成 HTML 表格
+        loadCSV("20231029.csv", function (csvData) {
+            var html = convertCSVtoHTML(csvData);
+            document.getElementById("data").innerHTML = html;
+        });
+    </script>
+</body>
+</html>
