@@ -50,6 +50,7 @@
  /* 导航样式 */
  .head-bottom {
     background: rgba(27, 91, 144, 0.677);
+    z-index: 1000;
 }
 .head-bottom ul{
     margin-left:10%;
@@ -101,6 +102,7 @@
 .head-bottom ul li:hover ul{
     margin-top:15px;
     margin-bottom:10px;
+    z-index: 1000;
 } 
 .head-bottom ul li:hover ul li{
     padding-top:5px;
@@ -113,4 +115,5 @@
 } 
 .head-bottom ul li:hover ul li:hover a{
     font-size: 1.3rem ;
+    z-index: 1000;
 } 
