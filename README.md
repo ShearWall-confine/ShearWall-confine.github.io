@@ -1,2 +1,3 @@
 # ShearWall-confine.github.io
-shearwalldatabase
+a test type for shearwall database and the website or our research group
+
