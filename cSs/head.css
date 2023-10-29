@@ -41,6 +41,8 @@
 .head-top p{
     color: #ffffff;
     font-weight: bold;
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
 .head-top a p{
     color: #ffffffff;

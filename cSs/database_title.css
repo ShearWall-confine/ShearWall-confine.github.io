@@ -1,4 +1,8 @@
-.database_title h1,p{
+.database_title h1{
+    margin-bottom: 20px;
+    text-align: center;
+}
+.database_title p{
     margin-bottom: 20px;
     text-align: center;
 }
