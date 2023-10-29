@@ -14,7 +14,6 @@ $(document).ready(function() {
                 cell1.innerHTML = cells[0];
                 var cell2 = row.insertCell();
                 cell2.innerHTML = cells[1];
-
                 // 添加点击事件
                 row.addEventListener('click', function() {
                     var cellData = this.cells[0].innerHTML;
