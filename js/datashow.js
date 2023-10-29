@@ -21,7 +21,7 @@ $(document).ready(function() {
                 var cells = lines[j].split(',');
                 if (cells[0] === cellData) 
                 {
-                    for (var k = 1; k < cells.length; k++) 
+                    for (var k = 0; k < cells.length; k++) 
                     {
                         var cell2 = table2.rows[k].insertCell();
                         cell2.innerHTML = cells[k];
