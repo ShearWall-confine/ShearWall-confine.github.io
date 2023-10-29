@@ -4,7 +4,7 @@ $(document).ready(function() {
     var cellData = urlParams.get('data');
     // 读取CSV文件
     $.ajax({
-        url: '20231029.csv',
+        url: 'database//20231029.csv',
         dataType: 'text',
         success: function(data) {
             var lines = data.split('\n');
