@@ -1,0 +1,48 @@
+.firstpage_group_photo_container_in{
+    width:1200px;
+	height:600px;
+	/* 轮播图居中 */
+	margin:1rem auto;
+	/* 隐藏超出展示容器的内容 */
+	overflow: hidden;
+	position: relative;
+}
+.firstpage_group_photo_incontainer_out{
+	width:6000px;
+	height:600px;
+	overflow: hidden;
+	position: absolute;
+	/* 开启弹性盒，让图片横向排列 */
+	display: flex;
+	animation: run 10s ease infinite;
+}
+.firstpage_group_photo_container_in .firstpage_group_photo_incontainer_out img{
+	width:1200px;
+	height:100%;
+}
+@keyframes run {
+	0%,10%{
+		/* margin-left: 0; */
+		transform: translateX(0);
+	}
+	20%,30%{
+		/* margin-left: -1200px;; */
+		transform: translateX(-1200px);
+	}
+	40%,50%{
+		/* margin-left: -2400px; */
+		transform: translateX(-2400px);
+	}
+	60%,70%{
+		/* margin-left: -3600px; */
+		transform: translateX(-3600px);
+	}
+	80%,90%{
+		/* margin-left: -4800px; */
+		transform: translateX(-4800px);
+	}
+	100%{
+		/* margin-left: 0; */
+		transform: translateX(0);
+	}
+}
