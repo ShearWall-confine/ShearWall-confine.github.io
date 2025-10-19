@@ -22,6 +22,12 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
+    - name: Install dependencies
+      run: |
+        echo "📦 安装项目依赖..."
+        npm install --package-lock-only
+        echo "✅ 依赖安装完成"
+        
     - name: Generate GitHub Secrets Config
       env:
         ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
