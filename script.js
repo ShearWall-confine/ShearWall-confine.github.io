@@ -96,7 +96,26 @@ function initializeEventListeners() {
 }
 
 // 加载数据
-function loadData() {
+async function loadData() {
+    // 优先从GitHub加载数据
+    if (window.githubSync) {
+        try {
+            console.log('尝试从GitHub加载数据...');
+            const githubData = await window.githubSync.loadData();
+            if (githubData) {
+                projectData = githubData;
+                console.log('从GitHub加载数据成功:', projectData);
+                
+                // 同时保存到localStorage作为备份
+                localStorage.setItem('projectProgressData', JSON.stringify(projectData));
+                return;
+            }
+        } catch (error) {
+            console.error('从GitHub加载数据失败:', error);
+        }
+    }
+    
+    // 如果GitHub加载失败，从localStorage加载
     const savedData = localStorage.getItem('projectProgressData');
     if (savedData) {
         try {
@@ -142,8 +161,28 @@ function loadData() {
 }
 
 // 保存数据
-function saveData() {
+async function saveData() {
+    // 保存到localStorage
     localStorage.setItem('projectProgressData', JSON.stringify(projectData));
+    
+    // 如果GitHub同步可用，同时保存到GitHub
+    if (window.githubSync && window.githubSync.hasUpdatePermission()) {
+        try {
+            console.log('保存数据到GitHub...');
+            const success = await window.githubSync.saveData(projectData);
+            if (success) {
+                console.log('数据已同步到GitHub');
+                showNotification('数据已同步到云端', 'success');
+            } else {
+                console.log('GitHub同步失败，数据已保存到本地');
+                showNotification('数据已保存到本地', 'info');
+            }
+        } catch (error) {
+            console.error('GitHub同步失败:', error);
+            showNotification('数据已保存到本地', 'info');
+        }
+    }
+    
     updateOverallProgress();
 }
 
@@ -1570,6 +1609,50 @@ function importData() {
 // 对比数据
 function compareData() {
     document.getElementById('compareFile').click();
+}
+
+// GitHub同步相关函数
+function setupGitHubSync() {
+    if (window.githubSync) {
+        const success = window.githubSync.showTokenDialog();
+        if (success) {
+            showNotification('GitHub Token设置成功！现在可以同步数据到云端', 'success');
+        }
+    } else {
+        showNotification('GitHub同步模块未加载', 'error');
+    }
+}
+
+async function syncFromGitHub() {
+    if (window.githubSync) {
+        try {
+            showNotification('正在从GitHub同步数据...', 'info');
+            const githubData = await window.githubSync.loadData();
+            if (githubData) {
+                projectData = githubData;
+                saveData();
+                renderAll();
+                showNotification('数据同步成功！', 'success');
+            } else {
+                showNotification('同步失败：无法从GitHub获取数据', 'error');
+            }
+        } catch (error) {
+            console.error('同步失败:', error);
+            showNotification('同步失败：' + error.message, 'error');
+        }
+    } else {
+        showNotification('GitHub同步模块未加载', 'error');
+    }
+}
+
+// 返回课题组页面
+function goToHomePage() {
+    if (confirm('确定要返回课题组页面吗？未保存的数据可能会丢失。')) {
+        // 保存当前数据
+        saveData();
+        // 跳转到课题组首页
+        window.location.href = 'index.html';
+    }
 }
 
 // 处理导入

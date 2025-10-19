@@ -4,15 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>xxx老师课题组 - 课题进度管理系统</title>
-    <link rel="stylesheet" type="text/css" href="cSs/background.css">
-    <link rel="stylesheet" type="text/css" href="cSs/head.css">
-    <link rel="stylesheet" type="text/css" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* 基础样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul, ol {
+            list-style: none;
+        }
+        
+        /* 头部样式 */
+        .head-top {
+            background: #f8f9fa;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .head-top a {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            margin: 0 5px;
+        }
+        
+        .head-top img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .head-top p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .head-bottom {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .head-bottom ul {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .head-bottom li {
+            position: relative;
+        }
+        
+        .head-bottom > ul > li > a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+        
+        .head-bottom > ul > li > a:hover {
+            color: #667eea;
+        }
+        
+        .head-bottom ul ul {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .head-bottom li:hover ul {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .head-bottom ul ul a {
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .head-bottom ul ul a:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        /* 主要内容 */
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px 10px;
+            }
+            
+            .welcome-section {
+                padding: 40px 20px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 2em;
+            }
+            
+            .system-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .user-accounts {
+                grid-template-columns: 1fr;
+            }
         }
         
         .welcome-section {
@@ -124,11 +258,13 @@
         }
         
         .login-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 40px;
             margin-top: 40px;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #dee2e6;
         }
         
         .login-info h3 {
@@ -145,9 +281,16 @@
         
         .account-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
         
         .account-card h4 {
@@ -159,9 +302,74 @@
             color: #666;
             font-size: 0.9em;
         }
+        
+        /* 页面加载动画 */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 滚动动画 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>  
+    <!-- 页面加载器 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h3>xxx老师课题组</h3>
+            <p>正在加载系统...</p>
+        </div>
+    </div>
+    
     <div class="head-top">     
         <a href="https://www.tongji.edu.cn/">
             <img src="figurE/tju.png" />
@@ -211,13 +419,13 @@
     </div>
     
     <div class="main-content">
-        <div class="welcome-section">
+        <div class="welcome-section fade-in">
             <h1><i class="fas fa-graduation-cap"></i> xxx老师课题组</h1>
             <p>结构防灾减灾工程系 | 同济大学</p>
             <p>欢迎使用课题进度管理系统</p>
         </div>
         
-        <div class="system-cards">
+        <div class="system-cards scroll-reveal">
             <div class="system-card">
                 <i class="fas fa-project-diagram"></i>
                 <h3>课题进度管理系统</h3>
@@ -246,7 +454,7 @@
             </div>
         </div>
         
-        <div class="features-grid">
+        <div class="features-grid scroll-reveal">
             <div class="feature-item">
                 <i class="fas fa-tasks"></i>
                 <h4>任务管理</h4>
@@ -284,22 +492,22 @@
             </div>
         </div>
         
-        <div class="login-info">
+        <div class="login-info scroll-reveal">
             <h3><i class="fas fa-key"></i> 系统登录信息</h3>
             <p>请使用以下账户登录课题进度管理系统：</p>
             
             <div class="user-accounts">
                 <div class="account-card">
                     <h4><i class="fas fa-eye"></i> 查看者</h4>
-                    <p><strong>用户名：</strong>viewer</p>
-                    <p><strong>密码：</strong>123456</p>
+                    <p><strong>安全认证：</strong>请联系管理员获取账号</p>
+                    <p><em>系统采用加密存储，保护用户隐私</em></p>
                     <p><em>只能查看项目进度</em></p>
                 </div>
                 
                 <div class="account-card">
                     <h4><i class="fas fa-edit"></i> 编辑者</h4>
-                    <p><strong>用户名：</strong>admin</p>
-                    <p><strong>密码：</strong>admin123</p>
+                    <p><strong>安全认证：</strong>请联系管理员获取账号</p>
+                    <p><em>系统采用加密存储，保护用户隐私</em></p>
                     <p><em>可以查看和编辑所有内容</em></p>
                 </div>
             </div>
@@ -312,6 +520,95 @@
         </div>
     </div>
     
-    <script src="js/illi.js"></script>
+    <script src="js/illi.js" onerror="console.log('illi.js加载失败，使用备用方案')"></script>
+    <!-- 备用JavaScript，防止外部文件加载失败 -->
+    <script>
+        // 备用工具函数
+        window.illi = window.illi || {};
+        
+        // 如果外部文件加载失败，提供基础功能
+        if (!window.illi.showNotification) {
+            window.illi.showNotification = function(message, type = 'info') {
+                console.log(`[${type.toUpperCase()}] ${message}`);
+                // 简单的通知实现
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 10px 15px;
+                    background: #333;
+                    color: white;
+                    border-radius: 4px;
+                    z-index: 10000;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            };
+        }
+    </script>
+    <script>
+        // 页面加载完成后隐藏加载器
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000); // 显示加载器1秒
+        });
+
+        // 滚动动画效果
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.scroll-reveal');
+            
+            reveals.forEach(function(reveal) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveal.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('revealed');
+                }
+            });
+        }
+
+        // 监听滚动事件
+        window.addEventListener('scroll', revealOnScroll);
+        
+        // 页面加载时立即检查一次
+        document.addEventListener('DOMContentLoaded', function() {
+            revealOnScroll();
+        });
+
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 添加页面可见性检测
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面隐藏时暂停动画
+                document.body.style.animationPlayState = 'paused';
+            } else {
+                // 页面显示时恢复动画
+                document.body.style.animationPlayState = 'running';
+            }
+        });
+    </script>
 </body>
 </html>

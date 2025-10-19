@@ -36,6 +36,15 @@
                 <button class="btn btn-info" onclick="compareData()">
                     <i class="fas fa-chart-line"></i> 对比数据
                 </button>
+                <button class="btn btn-success" onclick="setupGitHubSync()">
+                    <i class="fab fa-github"></i> GitHub同步
+                </button>
+                <button class="btn btn-warning" onclick="syncFromGitHub()">
+                    <i class="fas fa-sync"></i> 从云端同步
+                </button>
+                <button class="btn btn-info" onclick="goToHomePage()">
+                    <i class="fas fa-home"></i> 返回课题组
+                </button>
                 <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
                 <input type="file" id="compareFile" accept=".json" style="display: none;" onchange="handleCompare(event)">
             </div>
@@ -729,7 +738,8 @@
 
     <!-- SheetJS for Excel file reading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-    <script src="auth.js" defer></script>
+    <script src="secure-auth.js" defer></script>
+    <script src="github-sync.js" defer></script>
     <script src="script.js" defer></script>
 </body>
 </html>
