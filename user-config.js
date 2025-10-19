@@ -1,45 +1,34 @@
 /**
  * 用户配置文件
  * 用于管理用户账号和权限
- * 注意：此文件应放在服务器端，不应暴露在前端代码中
  * 
- * 安全警告：此文件包含敏感信息，生产环境应该：
- * 1. 移至服务器端
- * 2. 使用环境变量
- * 3. 实现真正的密码加密
+ * 安全警告：此文件已移除所有敏感信息
+ * 在GitHub Pages环境中，所有用户数据应通过以下方式管理：
+ * 1. 使用GitHub Secrets存储敏感信息
+ * 2. 通过GitHub Actions动态生成配置文件
+ * 3. 使用外部认证服务
  */
 
-// 用户数据库配置
+// 用户数据库配置（已移除敏感信息）
 const USER_CONFIG = {
-    // 默认用户（仅用于开发测试）
-    // 生产环境应该从服务器获取
+    // 默认用户（仅用于开发测试，无敏感信息）
     defaultUsers: {
         'admin': {
-            // 注意：这是开发环境的临时哈希，生产环境必须使用bcrypt
-            passwordHash: 'dev_hash_admin_2024', 
-            role: 'admin', // 修正角色为admin
+            role: 'admin',
             name: '系统管理员',
-            email: 'admin@system.local', // 使用本地邮箱
             created: '2024-01-01',
-            lastLogin: null,
             isActive: true
         },
         'viewer': {
-            passwordHash: 'dev_hash_viewer_2024',
             role: 'viewer',
             name: '查看用户',
-            email: 'viewer@system.local',
             created: '2024-01-01',
-            lastLogin: null,
             isActive: true
         },
         'editor': {
-            passwordHash: 'dev_hash_editor_2024',
             role: 'editor',
             name: '编辑用户',
-            email: 'editor@system.local',
             created: '2024-01-01',
-            lastLogin: null,
             isActive: true
         }
     },
@@ -74,15 +63,13 @@ const USER_CONFIG = {
 };
 
 /**
- * 添加新用户
+ * 添加新用户（仅用于开发环境）
  * @param {string} username - 用户名
- * @param {string} password - 明文密码
  * @param {string} role - 角色
  * @param {string} name - 真实姓名
- * @param {string} email - 邮箱
  * @returns {boolean} 是否添加成功
  */
-function addUser(username, password, role, name, email) {
+function addUser(username, role, name) {
     // 检查用户名是否已存在
     if (USER_CONFIG.defaultUsers[username]) {
         console.error('用户名已存在');
@@ -95,14 +82,11 @@ function addUser(username, password, role, name, email) {
         return false;
     }
     
-    // 添加新用户
+    // 添加新用户（无敏感信息）
     USER_CONFIG.defaultUsers[username] = {
-        passwordHash: hashPassword(password),
         role: role,
         name: name,
-        email: email,
         created: new Date().toISOString(),
-        lastLogin: null,
         isActive: true
     };
     
@@ -146,20 +130,13 @@ function deleteUser(username) {
 }
 
 /**
- * 重置用户密码
+ * 重置用户密码（已移除，密码管理应在服务器端）
  * @param {string} username - 用户名
- * @param {string} newPassword - 新密码
  * @returns {boolean} 是否重置成功
  */
-function resetPassword(username, newPassword) {
-    if (!USER_CONFIG.defaultUsers[username]) {
-        console.error('用户不存在');
-        return false;
-    }
-    
-    USER_CONFIG.defaultUsers[username].passwordHash = hashPassword(newPassword);
-    console.log(`用户 ${username} 密码重置成功`);
-    return true;
+function resetPassword(username) {
+    console.warn('密码重置功能已移除，请在服务器端管理密码');
+    return false;
 }
 
 /**
@@ -182,55 +159,21 @@ function getUserList() {
 }
 
 /**
- * 密码哈希函数（开发环境）
- * 警告：生产环境必须使用bcrypt等安全哈希算法
- * @param {string} password - 明文密码
- * @returns {string} 哈希值
+ * 密码哈希函数（已移除）
+ * 警告：密码管理应在服务器端进行
  */
 function hashPassword(password) {
-    // 输入验证
-    if (typeof password !== 'string' || password.length === 0) {
-        throw new Error('密码不能为空');
-    }
-    
-    if (password.length < 6) {
-        throw new Error('密码长度至少6位');
-    }
-    
-    // 开发环境：使用盐值增强安全性
-    const salt = 'dev_salt_2024_secure';
-    const saltedPassword = password + salt;
-    
-    let hash = 0;
-    for (let i = 0; i < saltedPassword.length; i++) {
-        const char = saltedPassword.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // 转换为32位整数
-    }
-    
-    // 添加时间戳和随机数增加随机性
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2);
-    
-    return 'dev_hash_' + Math.abs(hash).toString(36) + '_' + timestamp + '_' + random;
+    console.warn('密码哈希功能已移除，请在服务器端管理密码');
+    throw new Error('密码管理应在服务器端进行');
 }
 
 /**
- * 验证密码（开发环境）
- * 警告：生产环境应使用bcrypt.compare()
- * @param {string} password - 明文密码
- * @param {string} hash - 哈希值
- * @returns {boolean} 是否匹配
+ * 验证密码（已移除）
+ * 警告：密码验证应在服务器端进行
  */
 function verifyPassword(password, hash) {
-    try {
-        // 开发环境：重新计算哈希进行比较
-        const computedHash = hashPassword(password);
-        return computedHash === hash;
-    } catch (error) {
-        console.error('密码验证失败:', error.message);
-        return false;
-    }
+    console.warn('密码验证功能已移除，请在服务器端进行密码验证');
+    return false;
 }
 
 // 导出配置（如果使用模块系统）

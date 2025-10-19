@@ -97,22 +97,37 @@ function initializeEventListeners() {
 
 // 加载数据
 async function loadData() {
+    // 等待GitHub同步模块加载完成
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    while (!window.githubSync && retryCount < maxRetries) {
+        console.log(`等待GitHub同步模块加载... (${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retryCount++;
+    }
+    
     // 优先从GitHub加载数据
     if (window.githubSync) {
         try {
             console.log('尝试从GitHub加载数据...');
             const githubData = await window.githubSync.loadData();
-            if (githubData) {
+            if (githubData && githubData.projectName) {
                 projectData = githubData;
                 console.log('从GitHub加载数据成功:', projectData);
                 
                 // 同时保存到localStorage作为备份
                 localStorage.setItem('projectProgressData', JSON.stringify(projectData));
                 return;
+            } else {
+                console.log('GitHub数据无效，使用本地数据');
             }
         } catch (error) {
             console.error('从GitHub加载数据失败:', error);
+            console.log('将使用本地存储的数据');
         }
+    } else {
+        console.log('GitHub同步模块未加载，使用本地数据');
     }
     
     // 如果GitHub加载失败，从localStorage加载
@@ -195,23 +210,45 @@ async function performGitHubSync() {
         return;
     }
     
-    // 如果GitHub同步可用，同时保存到GitHub
-    if (window.githubSync && window.githubSync.hasUpdatePermission()) {
-        try {
-            console.log('保存数据到GitHub...');
-            const success = await window.githubSync.saveData(projectData);
-            if (success) {
-                console.log('数据已同步到GitHub');
-                lastGitHubSync = now;
-                showNotification('数据已同步到云端', 'success');
-            } else {
-                console.log('GitHub同步失败，数据已保存到本地');
-                showNotification('数据已保存到本地', 'info');
-            }
-        } catch (error) {
-            console.error('GitHub同步失败:', error);
-            showNotification('数据已保存到本地', 'info');
+    // 检查GitHub同步模块是否可用
+    if (!window.githubSync) {
+        console.log('GitHub同步模块未加载');
+        return;
+    }
+    
+    // 检查是否有更新权限
+    if (!window.githubSync.hasUpdatePermission()) {
+        console.log('没有GitHub更新权限，请先配置API参数');
+        return;
+    }
+    
+    try {
+        console.log('保存数据到GitHub...');
+        const success = await window.githubSync.saveData(projectData);
+        if (success) {
+            console.log('数据已同步到GitHub');
+            lastGitHubSync = now;
+            showNotification('数据已同步到云端', 'success');
+        } else {
+            console.log('GitHub同步失败，数据已保存到本地');
+            showNotification('GitHub同步失败，数据已保存到本地', 'warning');
         }
+    } catch (error) {
+        console.error('GitHub同步失败:', error);
+        let errorMessage = '数据已保存到本地';
+        
+        // 根据错误类型提供更详细的提示
+        if (error.message.includes('rate limit')) {
+            errorMessage = 'GitHub API调用频率超限，数据已保存到本地';
+        } else if (error.message.includes('401')) {
+            errorMessage = 'GitHub Token无效，请重新配置API参数';
+        } else if (error.message.includes('403')) {
+            errorMessage = 'GitHub权限不足，请检查Token权限';
+        } else if (error.message.includes('404')) {
+            errorMessage = 'GitHub仓库或文件不存在，请检查配置';
+        }
+        
+        showNotification(errorMessage, 'warning');
     }
 }
 
@@ -1159,6 +1196,7 @@ function editTask(taskId) {
     }
     
     modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
 }
 
 // 保存任务 - 已改为自动保存，此函数不再需要手动调用
@@ -1170,7 +1208,9 @@ function saveTask() {
 
 // 关闭任务模态框
 function closeTaskModal() {
-    document.getElementById('taskModal').style.display = 'none';
+    const modal = document.getElementById('taskModal');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
     currentEditingTask = null;
 }
 
@@ -1648,45 +1688,81 @@ function compareData() {
 }
 
 // GitHub同步相关函数
-function configureGitHubAPI() {
-    if (window.githubSync) {
-        const success = window.githubSync.showTokenDialog();
+async function configureGitHubAPI() {
+    if (!window.githubSync) {
+        showNotification('GitHub同步模块未加载，请刷新页面重试', 'error');
+        return;
+    }
+    
+    try {
+        showNotification('正在配置GitHub API参数...', 'info');
+        const success = await window.githubSync.showTokenDialog();
         if (success) {
             showNotification('GitHub API参数配置成功！现在可以同步数据到云端', 'success');
+        } else {
+            showNotification('GitHub API参数配置失败', 'warning');
         }
-    } else {
-        showNotification('GitHub同步模块未加载', 'error');
+    } catch (error) {
+        console.error('配置GitHub API失败:', error);
+        showNotification('配置失败：' + error.message, 'error');
     }
 }
 
 function syncToGitHub() {
-    if (window.githubSync && window.githubSync.hasUpdatePermission()) {
-        showNotification('正在同步数据到GitHub...', 'info');
-        saveData(); // 这会触发GitHub同步
-    } else {
-        showNotification('请先配置GitHub API参数', 'warning');
+    if (!window.githubSync) {
+        showNotification('GitHub同步模块未加载，请刷新页面重试', 'error');
+        return;
     }
+    
+    if (!window.githubSync.hasUpdatePermission()) {
+        showNotification('请先配置GitHub API参数', 'warning');
+        return;
+    }
+    
+    showNotification('正在同步数据到GitHub...', 'info');
+    
+    // 直接调用GitHub同步，不依赖防抖机制
+    performGitHubSync().catch(error => {
+        console.error('同步到GitHub失败:', error);
+        showNotification('同步失败：' + error.message, 'error');
+    });
 }
 
 async function syncFromGitHub() {
-    if (window.githubSync) {
-        try {
-            showNotification('正在从GitHub同步数据...', 'info');
-            const githubData = await window.githubSync.loadData();
-            if (githubData) {
-                projectData = githubData;
-                saveData();
-                renderAll();
-                showNotification('数据同步成功！', 'success');
-            } else {
-                showNotification('同步失败：无法从GitHub获取数据', 'error');
-            }
-        } catch (error) {
-            console.error('同步失败:', error);
-            showNotification('同步失败：' + error.message, 'error');
+    if (!window.githubSync) {
+        showNotification('GitHub同步模块未加载，请刷新页面重试', 'error');
+        return;
+    }
+    
+    try {
+        showNotification('正在从GitHub同步数据...', 'info');
+        const githubData = await window.githubSync.loadData();
+        
+        if (githubData && githubData.projectName) {
+            projectData = githubData;
+            // 保存到localStorage作为备份
+            localStorage.setItem('projectProgressData', JSON.stringify(projectData));
+            renderAll();
+            showNotification('数据同步成功！', 'success');
+        } else {
+            showNotification('同步失败：GitHub数据无效', 'error');
         }
-    } else {
-        showNotification('GitHub同步模块未加载', 'error');
+    } catch (error) {
+        console.error('从GitHub同步失败:', error);
+        let errorMessage = '同步失败：' + error.message;
+        
+        // 根据错误类型提供更详细的提示
+        if (error.message.includes('rate limit')) {
+            errorMessage = 'GitHub API调用频率超限，请稍后重试';
+        } else if (error.message.includes('401')) {
+            errorMessage = 'GitHub Token无效，请重新配置API参数';
+        } else if (error.message.includes('403')) {
+            errorMessage = 'GitHub权限不足，请检查Token权限';
+        } else if (error.message.includes('404')) {
+            errorMessage = 'GitHub仓库或文件不存在，请检查配置';
+        }
+        
+        showNotification(errorMessage, 'error');
     }
 }
 

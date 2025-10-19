@@ -81,7 +81,18 @@ class GitHubSync {
             );
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                let errorMessage = `HTTP error! status: ${response.status}`;
+                
+                if (response.status === 401) {
+                    errorMessage = 'GitHub Token无效或已过期';
+                } else if (response.status === 403) {
+                    errorMessage = 'GitHub权限不足或API调用频率超限';
+                } else if (response.status === 404) {
+                    errorMessage = 'GitHub仓库或文件不存在';
+                }
+                
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -91,8 +102,7 @@ class GitHubSync {
             return content;
         } catch (error) {
             console.error('从GitHub加载数据失败:', error);
-            // 返回默认数据
-            return this.getDefaultData();
+            throw error; // 重新抛出错误，让调用者处理
         }
     }
 
@@ -139,20 +149,30 @@ class GitHubSync {
                 this.recordApiCall();
                 return true;
             } else {
-                const error = await response.json();
+                const error = await response.json().catch(() => ({}));
                 console.error('保存数据失败:', error);
                 
-                // 如果是频率限制错误，增加等待时间
-                if (response.status === 403 && error.message.includes('rate limit')) {
-                    console.log('GitHub API频率限制，增加等待时间');
-                    this.minCallInterval = Math.min(this.minCallInterval * 2, 60000); // 最大1分钟
+                let errorMessage = `保存失败: ${response.status}`;
+                
+                if (response.status === 401) {
+                    errorMessage = 'GitHub Token无效或已过期';
+                } else if (response.status === 403) {
+                    if (error.message && error.message.includes('rate limit')) {
+                        errorMessage = 'GitHub API调用频率超限';
+                        console.log('GitHub API频率限制，增加等待时间');
+                        this.minCallInterval = Math.min(this.minCallInterval * 2, 60000); // 最大1分钟
+                    } else {
+                        errorMessage = 'GitHub权限不足';
+                    }
+                } else if (response.status === 404) {
+                    errorMessage = 'GitHub仓库或文件不存在';
                 }
                 
-                return false;
+                throw new Error(errorMessage);
             }
         } catch (error) {
             console.error('保存数据到GitHub失败:', error);
-            return false;
+            throw error; // 重新抛出错误，让调用者处理
         }
     }
 
@@ -210,11 +230,35 @@ class GitHubSync {
     hasUpdatePermission() {
         return !!this.token;
     }
+    
+    /**
+     * 验证Token是否有效
+     * @returns {Promise<boolean>} Token是否有效
+     */
+    async validateToken() {
+        if (!this.token) {
+            return false;
+        }
+        
+        try {
+            const response = await fetch(`${this.baseURL}/user`, {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${this.token}`
+                }
+            });
+            
+            return response.ok;
+        } catch (error) {
+            console.error('Token验证失败:', error);
+            return false;
+        }
+    }
 
     /**
      * 显示GitHub Token设置对话框
      */
-    showTokenDialog() {
+    async showTokenDialog() {
         const token = prompt(
             '请输入GitHub Personal Access Token:\n\n' +
             '获取Token步骤:\n' +
@@ -226,8 +270,17 @@ class GitHubSync {
         
         if (token) {
             this.setToken(token);
-            localStorage.setItem('githubToken', token);
-            return true;
+            
+            // 验证Token是否有效
+            const isValid = await this.validateToken();
+            if (isValid) {
+                localStorage.setItem('githubToken', token);
+                return true;
+            } else {
+                alert('Token无效，请检查Token是否正确或权限是否足够');
+                this.clearToken();
+                return false;
+            }
         }
         return false;
     }

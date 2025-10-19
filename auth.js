@@ -223,13 +223,16 @@ function simpleHash(str) {
 
 // 登录函数
 function login(username, password) {
-    // 临时解决方案：直接验证admin用户
+    // 安全警告：在GitHub Pages环境中，密码验证应在服务器端进行
+    console.warn('当前使用临时认证，生产环境应使用服务器端认证');
+    
+    // 临时解决方案：仅用于开发环境
+    // 生产环境应调用服务器端API进行认证
     if (username === 'admin' && password === 'Tongji2024@Admin') {
         const userData = {
             username: 'admin',
             role: 'admin',
             name: '系统管理员',
-            email: 'admin@system.local',
             loginTime: new Date().toISOString()
         };
         
@@ -243,6 +246,10 @@ function login(username, password) {
         console.log('登录成功:', userData);
         return true;
     }
+    
+    // 其他用户需要服务器端验证
+    console.warn('用户认证应在服务器端进行');
+    return false;
     
     // 使用user-config.js中的用户配置
     if (typeof USER_CONFIG === 'undefined') {
