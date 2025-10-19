@@ -127,34 +127,130 @@
     width: 85%;
 }
 
-/* 下拉菜单样式 */
+/* 下拉菜单样式 - 优化版本 */
 .head-bottom ul ul {
     position: absolute;
-    top: 100%;
-    left: 0;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    min-width: 200px;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-15px);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.12), 
+        0 2px 8px rgba(0,0,0,0.08),
+        0 0 0 1px rgba(102, 126, 234, 0.1);
+    min-width: 220px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    overflow: hidden;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .head-bottom li:hover ul {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
+    transition-delay: 0.1s;
+    animation: dropdownSlideIn 0.3s ease-out;
+}
+
+/* 下拉菜单进入动画 */
+@keyframes dropdownSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+/* 鼠标离开时延迟隐藏 */
+.head-bottom li:not(:hover) ul {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-15px);
+    transition-delay: 0.2s;
+}
+
+/* 下拉菜单箭头指示器 */
+.head-bottom ul ul::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #fff;
+    filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.1));
 }
 
 .head-bottom ul ul a {
-    padding: 10px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(240, 240, 240, 0.6);
+    color: #555;
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+/* 下拉菜单图标样式 */
+.head-bottom ul ul a i {
+    width: 16px;
+    height: 16px;
+    margin-right: 12px;
+    color: #667eea;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.head-bottom ul ul a:last-child {
+    border-bottom: none;
 }
 
 .head-bottom ul ul a:hover {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
     color: #667eea;
+    padding-left: 28px;
+    transform: translateX(4px);
+    box-shadow: inset 3px 0 0 #667eea;
+}
+
+.head-bottom ul ul a:hover i {
+    color: #667eea;
+    transform: scale(1.1);
+}
+
+/* 下拉菜单项左侧指示器 */
+.head-bottom ul ul a::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: #667eea;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.head-bottom ul ul a:hover::before {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
 }
 
 /* 响应式设计 */
@@ -179,10 +275,25 @@
         background: rgba(102, 126, 234, 0.05);
         margin-top: 5px;
         border-radius: 8px;
+        left: auto;
+        top: auto;
     }
     
     .head-bottom li:hover ul {
         transform: none;
+    }
+    
+    /* 移动端下拉菜单项样式调整 */
+    .head-bottom ul ul a {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+    
+    .head-bottom ul ul a i {
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        font-size: 12px;
     }
 }
 

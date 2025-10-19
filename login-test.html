@@ -181,10 +181,11 @@
         
         // 页面加载时自动运行测试
         window.addEventListener('load', function() {
+            console.log('登录测试页面加载完成');
             setTimeout(() => {
                 testFileLoading();
                 checkAuthStatus();
-            }, 500);
+            }, 1000);
         });
     </script>
 </body>

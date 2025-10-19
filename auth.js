@@ -7,9 +7,24 @@ let userPermissions = {
     canImport: false
 };
 
-// 页面加载时检查用户权限
+// 页面加载时检查用户权限（排除登录页面）
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthentication();
+    // 防止重复执行
+    if (window.authInitialized) {
+        return;
+    }
+    window.authInitialized = true;
+    
+    // 检查当前页面是否为登录页面
+    const currentPage = window.location.pathname.split('/').pop();
+    const isLoginPage = currentPage === 'login.html' || currentPage === 'login-test.html' || currentPage === 'index.html';
+    
+    console.log('当前页面:', currentPage, '是否为登录页面:', isLoginPage);
+    
+    // 如果不是登录页面，才检查认证状态
+    if (!isLoginPage) {
+        checkAuthentication();
+    }
 });
 
 // 检查用户认证状态
@@ -17,8 +32,11 @@ function checkAuthentication() {
     const userData = sessionStorage.getItem('currentUser');
     
     if (!userData) {
-        // 未登录，跳转到登录页面
-        window.location.href = 'login.html';
+        // 未登录，跳转到登录页面（但避免在登录页面本身执行）
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage !== 'login.html' && currentPage !== 'login-test.html') {
+            window.location.href = 'login.html';
+        }
         return;
     }
     
@@ -30,7 +48,10 @@ function checkAuthentication() {
     } catch (error) {
         console.error('用户数据解析错误:', error);
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage !== 'login.html' && currentPage !== 'login-test.html') {
+            window.location.href = 'login.html';
+        }
     }
 }
 
