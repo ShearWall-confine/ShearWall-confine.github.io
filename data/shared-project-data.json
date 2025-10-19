@@ -9,5 +9,28 @@
   "results": [],
   "roadmap": [],
   "lastUpdated": "2024-10-19T00:00:00.000Z",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "folders": [
+    {
+      "id": 1,
+      "name": "文档资料",
+      "parentId": null,
+      "children": [],
+      "createDate": "2024-01-01"
+    },
+    {
+      "id": 2,
+      "name": "实验数据",
+      "parentId": null,
+      "children": [],
+      "createDate": "2024-01-01"
+    },
+    {
+      "id": 3,
+      "name": "图片资源",
+      "parentId": null,
+      "children": [],
+      "createDate": "2024-01-01"
+    }
+  ]
 }
