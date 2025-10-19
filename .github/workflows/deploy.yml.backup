@@ -56,10 +56,8 @@ jobs:
           ENCRYPTION_KEY: '${{ secrets.ENCRYPTION_KEY }}'
         };
         
-        // 开发环境回退值（当GitHub Secrets未设置时使用）
-        if (!window.GITHUB_SECRETS.ADMIN_PASSWORD_HASH || 
-            window.GITHUB_SECRETS.ADMIN_PASSWORD_HASH.includes('secrets.')) {
-          console.warn('⚠️ 使用开发环境配置，请设置GitHub Secrets');
+        // 开发环境回退值
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
           window.GITHUB_SECRETS = {
             ADMIN_PASSWORD_HASH: 'dev_hash_admin_2024',
             EDITOR_PASSWORD_HASH: 'dev_hash_editor_2024',
@@ -68,64 +66,120 @@ jobs:
             ENCRYPTION_KEY: 'dev_encryption_key'
           };
         }
-        
-        // 导出到全局
-        if (typeof module !== 'undefined' && module.exports) {
-          module.exports = window.GITHUB_SECRETS;
-        }
         EOF
         
-        # 生成 user-config.js
+        # 生成 user-config.js（用于服务器端验证）
         cat > user-config.js << 'EOF'
         /**
-         * 用户配置文件
-         * 包含完整的用户信息和权限配置
+         * 用户配置文件 - 由GitHub Actions自动生成
+         * 包含从GitHub Secrets获取的安全配置
          * 生成时间: $(date)
          */
         
+        // 从环境变量获取的配置
         const USER_CONFIG = {
-          defaultUsers: {
-            'admin': {
-              username: 'admin',
-              role: 'admin',
-              name: '系统管理员',
-              email: 'admin@example.com',
-              passwordHash: '${{ secrets.ADMIN_PASSWORD_HASH }}'
+            // 用户数据库（从GitHub Secrets获取）
+            defaultUsers: {
+                'admin': {
+                    passwordHash: process.env.ADMIN_PASSWORD_HASH || 'dev_hash_admin_2024',
+                    role: 'admin',
+                    name: '系统管理员',
+                    email: 'admin@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                },
+                'editor': {
+                    passwordHash: process.env.EDITOR_PASSWORD_HASH || 'dev_hash_editor_2024',
+                    role: 'editor',
+                    name: '编辑用户',
+                    email: 'editor@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                },
+                'viewer': {
+                    passwordHash: process.env.VIEWER_PASSWORD_HASH || 'dev_hash_viewer_2024',
+                    role: 'viewer',
+                    name: '查看用户',
+                    email: 'viewer@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                }
             },
-            'editor': {
-              username: 'editor', 
-              role: 'editor',
-              name: '编辑者',
-              email: 'editor@example.com',
-              passwordHash: '${{ secrets.EDITOR_PASSWORD_HASH }}'
+            
+            // 安全配置
+            security: {
+                jwtSecret: process.env.JWT_SECRET || 'dev_jwt_secret',
+                encryptionKey: process.env.ENCRYPTION_KEY || 'dev_encryption_key',
+                sessionTimeout: 24 * 60 * 60 * 1000, // 24小时
+                maxLoginAttempts: 5,
+                lockoutDuration: 15 * 60 * 1000 // 15分钟
             },
-            'viewer': {
-              username: 'viewer',
-              role: 'viewer', 
-              name: '查看者',
-              email: 'viewer@example.com',
-              passwordHash: '${{ secrets.VIEWER_PASSWORD_HASH }}'
+            
+            // 角色权限配置
+            roles: {
+                'admin': {
+                    canView: true,
+                    canEdit: true,
+                    canDelete: true,
+                    canExport: true,
+                    canImport: true,
+                    canManageUsers: true
+                },
+                'editor': {
+                    canView: true,
+                    canEdit: true,
+                    canDelete: false,
+                    canExport: true,
+                    canImport: true,
+                    canManageUsers: false
+                },
+                'viewer': {
+                    canView: true,
+                    canEdit: false,
+                    canDelete: false,
+                    canExport: false,
+                    canImport: false,
+                    canManageUsers: false
+                }
             }
-          }
         };
         
-        // 密码验证函数
-        function verifyPassword(inputPassword, storedHash) {
-          // 这里应该使用与generate-secrets.py相同的哈希算法
-          // 目前仅用于开发环境，生产环境应使用服务器端验证
-          return true; // 临时返回true，实际应验证哈希
+        // 密码验证函数（使用环境变量中的哈希）
+        function verifyPassword(password, storedHash) {
+            try {
+                // 解析存储的哈希（格式：salt:hash）
+                const [salt, hash] = storedHash.split(':');
+                if (!salt || !hash) {
+                    console.error('无效的哈希格式');
+                    return false;
+                }
+                
+                // 重新计算哈希进行比较
+                const crypto = require('crypto');
+                const computedHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+                
+                return computedHash === hash;
+            } catch (error) {
+                console.error('密码验证失败:', error.message);
+                return false;
+            }
         }
         
-        // 导出函数
+        // 导出配置
         if (typeof module !== 'undefined' && module.exports) {
-          module.exports = {
-            USER_CONFIG,
-            verifyPassword
-          };
-        } else {
-          // 浏览器环境
-          window.USER_CONFIG = USER_CONFIG;
-          window.verifyPassword = verifyPassword;
+            module.exports = {
+                USER_CONFIG,
+                verifyPassword
+            };
+        }
+        
+        // 浏览器环境
+        if (typeof window !== 'undefined') {
+            window.USER_CONFIG = USER_CONFIG;
+            window.verifyPassword = verifyPassword;
         }
         EOF
         
@@ -179,5 +233,3 @@ jobs:
       run: |
         echo "🚀 部署验证完成"
         echo "GitHub Pages URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-        echo "🔧 当前使用开发环境配置"
-        echo "📝 要使用生产环境，请设置GitHub Secrets"
