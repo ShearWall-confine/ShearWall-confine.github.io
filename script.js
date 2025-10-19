@@ -937,10 +937,13 @@ function renderResults() {
 
 // 添加任务
 function addTask() {
+    console.log('addTask函数被调用');
     // 检查编辑权限
     if (typeof checkEditPermission === 'function' && !checkEditPermission()) {
+        console.log('编辑权限检查失败');
         return;
     }
+    console.log('权限检查通过，继续执行addTask');
     
     const newTask = {
         id: Date.now(),
@@ -1574,13 +1577,16 @@ function handleDrop(e) {
 
 // 导出数据
 function exportData() {
+    console.log('exportData函数被调用');
     // 检查导出权限
     if (typeof checkPermission === 'function' && !checkPermission('canExport')) {
+        console.log('导出权限检查失败');
         if (typeof showMessage === 'function') {
             showMessage('您没有导出权限', 'warning');
         }
         return;
     }
+    console.log('导出权限检查通过，继续执行exportData');
     
     // 创建增强的导出数据
     const exportData = {
@@ -6751,10 +6757,23 @@ function checkAdminAccess() {
     }
 }
 
-// 页面加载时检查管理员权限
-document.addEventListener('DOMContentLoaded', function() {
-    // 延迟检查，确保auth.js执行完成
-    setTimeout(() => {
-        checkAdminAccess();
-    }, 1000);
-});
+// 立即检查管理员权限（不等待DOMContentLoaded）
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkAdminAccess);
+} else {
+    // 如果DOM已经加载完成，立即执行
+    checkAdminAccess();
+}
+
+// 确保关键函数在全局作用域中可用
+window.addTask = addTask;
+window.exportData = exportData;
+window.importData = importData;
+window.compareData = compareData;
+window.goToHomePage = goToHomePage;
+window.toggleThemeSelector = toggleThemeSelector;
+window.configureGitHubAPI = configureGitHubAPI;
+window.syncFromGitHub = syncFromGitHub;
+window.syncToGitHub = syncToGitHub;
+
+// 页面加载时检查管理员权限（已在上面的立即检查中处理）

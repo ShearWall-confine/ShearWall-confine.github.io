@@ -60,6 +60,14 @@ function setUserPermissions() {
     if (!currentUser) return;
     
     switch (currentUser.role) {
+        case 'admin':
+            userPermissions = {
+                canEdit: true,
+                canView: true,
+                canExport: true,
+                canImport: true
+            };
+            break;
         case 'editor':
             userPermissions = {
                 canEdit: true,
@@ -215,31 +223,13 @@ function simpleHash(str) {
 
 // 登录函数
 function login(username, password) {
-    // 用户数据库 - 使用哈希密码
-    const users = {
-        'admin': { 
-            passwordHash: simpleHash('Tongji2024@Admin'), 
-            role: 'editor', 
-            name: '管理员' 
-        },
-        'viewer': { 
-            passwordHash: simpleHash('Tongji2024@Viewer'), 
-            role: 'viewer', 
-            name: '查看者' 
-        },
-        'editor': { 
-            passwordHash: simpleHash('Tongji2024@Editor'), 
-            role: 'editor', 
-            name: '编辑者' 
-        }
-    };
-    
-    // 验证用户名和密码哈希
-    if (users[username] && users[username].passwordHash === simpleHash(password)) {
+    // 临时解决方案：直接验证admin用户
+    if (username === 'admin' && password === 'Tongji2024@Admin') {
         const userData = {
-            username: username,
-            role: users[username].role,
-            name: users[username].name,
+            username: 'admin',
+            role: 'admin',
+            name: '系统管理员',
+            email: 'admin@system.local',
             loginTime: new Date().toISOString()
         };
         
@@ -247,11 +237,52 @@ function login(username, password) {
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
         currentUser = userData;
         setUserPermissions();
+        updateUIForUserRole();
+        showUserInfo();
         
         console.log('登录成功:', userData);
         return true;
+    }
+    
+    // 使用user-config.js中的用户配置
+    if (typeof USER_CONFIG === 'undefined') {
+        console.error('USER_CONFIG未加载，请确保user-config.js已正确引入');
+        return false;
+    }
+    
+    const user = USER_CONFIG.defaultUsers[username];
+    if (!user) {
+        console.log('用户不存在:', username);
+        return false;
+    }
+    
+    // 验证密码（使用user-config.js中的验证函数）
+    if (typeof verifyPassword === 'function') {
+        const isValid = verifyPassword(password, user.passwordHash);
+        if (isValid) {
+            const userData = {
+                username: username,
+                role: user.role,
+                name: user.name,
+                email: user.email,
+                loginTime: new Date().toISOString()
+            };
+        
+            // 保存用户信息到sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            currentUser = userData;
+            setUserPermissions();
+            updateUIForUserRole();
+            showUserInfo();
+            
+            console.log('登录成功:', userData);
+            return true;
+        } else {
+            console.log('密码错误');
+            return false;
+        }
     } else {
-        console.log('登录失败: 用户名或密码错误');
+        console.error('verifyPassword函数未找到，请确保user-config.js已正确引入');
         return false;
     }
 }

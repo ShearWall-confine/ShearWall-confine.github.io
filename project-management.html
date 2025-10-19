@@ -770,6 +770,13 @@
 
     <!-- SheetJS for Excel file reading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+    <!-- 工具库 -->
+    <script src="utils/logger.js"></script>
+    <script src="utils/notification.js"></script>
+    <script src="utils/loading.js"></script>
+    <!-- 用户配置 -->
+    <script src="user-config.js"></script>
+    <!-- 核心功能 -->
     <script src="auth.js"></script>
     <script src="github-sync.js" defer></script>
     <script src="script.js" defer></script>
@@ -782,6 +789,23 @@
         } else {
             window.pageLoaded = true;
         }
+        
+        // 按钮功能测试
+        function testButtonFunctions() {
+            console.log('测试按钮函数...');
+            console.log('addTask:', typeof addTask);
+            console.log('exportData:', typeof exportData);
+            console.log('importData:', typeof importData);
+            console.log('goToHomePage:', typeof goToHomePage);
+            console.log('toggleThemeSelector:', typeof toggleThemeSelector);
+            console.log('checkEditPermission:', typeof checkEditPermission);
+            console.log('checkPermission:', typeof checkPermission);
+        }
+        
+        // 页面加载完成后测试
+        window.addEventListener('load', function() {
+            setTimeout(testButtonFunctions, 1000);
+        });
         
         // 立即执行认证检查
         document.addEventListener('DOMContentLoaded', function() {

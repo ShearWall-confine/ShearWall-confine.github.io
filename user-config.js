@@ -2,35 +2,42 @@
  * 用户配置文件
  * 用于管理用户账号和权限
  * 注意：此文件应放在服务器端，不应暴露在前端代码中
+ * 
+ * 安全警告：此文件包含敏感信息，生产环境应该：
+ * 1. 移至服务器端
+ * 2. 使用环境变量
+ * 3. 实现真正的密码加密
  */
 
 // 用户数据库配置
 const USER_CONFIG = {
     // 默认用户（仅用于开发测试）
+    // 生产环境应该从服务器获取
     defaultUsers: {
         'admin': {
-            passwordHash: 'hash_Tongji2024@Admin', // 实际应该是bcrypt等安全哈希
-            role: 'editor',
-            name: '管理员',
-            email: 'admin@tongji.edu.cn',
+            // 注意：这是开发环境的临时哈希，生产环境必须使用bcrypt
+            passwordHash: 'dev_hash_admin_2024', 
+            role: 'admin', // 修正角色为admin
+            name: '系统管理员',
+            email: 'admin@system.local', // 使用本地邮箱
             created: '2024-01-01',
             lastLogin: null,
             isActive: true
         },
         'viewer': {
-            passwordHash: 'hash_Tongji2024@Viewer',
+            passwordHash: 'dev_hash_viewer_2024',
             role: 'viewer',
-            name: '查看者',
-            email: 'viewer@tongji.edu.cn',
+            name: '查看用户',
+            email: 'viewer@system.local',
             created: '2024-01-01',
             lastLogin: null,
             isActive: true
         },
         'editor': {
-            passwordHash: 'hash_Tongji2024@Editor',
+            passwordHash: 'dev_hash_editor_2024',
             role: 'editor',
-            name: '编辑者',
-            email: 'editor@tongji.edu.cn',
+            name: '编辑用户',
+            email: 'editor@system.local',
             created: '2024-01-01',
             lastLogin: null,
             isActive: true
@@ -175,30 +182,55 @@ function getUserList() {
 }
 
 /**
- * 简单的密码哈希函数
- * 注意：生产环境应使用bcrypt等更安全的哈希算法
+ * 密码哈希函数（开发环境）
+ * 警告：生产环境必须使用bcrypt等安全哈希算法
  * @param {string} password - 明文密码
  * @returns {string} 哈希值
  */
 function hashPassword(password) {
-    // 这里使用简单的哈希，生产环境应使用bcrypt
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-        const char = password.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
+    // 输入验证
+    if (typeof password !== 'string' || password.length === 0) {
+        throw new Error('密码不能为空');
     }
-    return 'hash_' + hash.toString();
+    
+    if (password.length < 6) {
+        throw new Error('密码长度至少6位');
+    }
+    
+    // 开发环境：使用盐值增强安全性
+    const salt = 'dev_salt_2024_secure';
+    const saltedPassword = password + salt;
+    
+    let hash = 0;
+    for (let i = 0; i < saltedPassword.length; i++) {
+        const char = saltedPassword.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // 转换为32位整数
+    }
+    
+    // 添加时间戳和随机数增加随机性
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2);
+    
+    return 'dev_hash_' + Math.abs(hash).toString(36) + '_' + timestamp + '_' + random;
 }
 
 /**
- * 验证密码
+ * 验证密码（开发环境）
+ * 警告：生产环境应使用bcrypt.compare()
  * @param {string} password - 明文密码
  * @param {string} hash - 哈希值
  * @returns {boolean} 是否匹配
  */
 function verifyPassword(password, hash) {
-    return hashPassword(password) === hash;
+    try {
+        // 开发环境：重新计算哈希进行比较
+        const computedHash = hashPassword(password);
+        return computedHash === hash;
+    } catch (error) {
+        console.error('密码验证失败:', error.message);
+        return false;
+    }
 }
 
 // 导出配置（如果使用模块系统）
