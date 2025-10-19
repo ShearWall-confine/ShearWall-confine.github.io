@@ -1,0 +1,35 @@
+{
+  "name": "shearwall-confine",
+  "version": "1.0.0",
+  "description": "ShearWall Confine Project - GitHub Pages Site",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "build": "echo 'No build process needed for static site'",
+    "deploy": "echo 'Deployment handled by GitHub Actions'",
+    "test": "echo 'No tests specified'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShearWall-confine/ShearWall-confine.github.io.git"
+  },
+  "keywords": [
+    "shearwall",
+    "confine",
+    "github-pages",
+    "static-site"
+  ],
+  "author": "ShearWall Confine Team",
+  "license": "MIT",
+  "homepage": "https://ShearWall-confine.github.io/ShearWall-confine.github.io",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

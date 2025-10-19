@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xxx老师课题组 - 课题进度管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="header.css">
+    <link rel="stylesheet" type="text/css" href="responsive.css">
+    <style>
+        /* 基础样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul, ol {
+            list-style: none;
+        }
+        
+        /* 头部样式现在由 header.css 统一管理 */
+        
+        /* 主要内容 */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* 响应式设计 - 多分辨率优化 */
+        
+        /* 4K分辨率 (3840x2160) 优化 */
+        @media (min-width: 2560px) and (max-width: 3840px) {
+            .main-content {
+                max-width: 1600px;
+                padding: 60px 40px;
+            }
+            
+            .welcome-section {
+                padding: 80px 60px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 4em;
+            }
+            
+            .welcome-section p {
+                font-size: 1.4em;
+            }
+            
+            .system-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 40px;
+            }
+            
+            .system-card {
+                padding: 40px;
+            }
+            
+            .system-card i {
+                font-size: 4em;
+            }
+            
+            .system-card h3 {
+                font-size: 1.8em;
+            }
+            
+            .system-card p {
+                font-size: 1.1em;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 40px;
+            }
+            
+            .feature-item i {
+                font-size: 3em;
+            }
+            
+            .feature-item h4 {
+                font-size: 1.5em;
+            }
+            
+            .feature-item p {
+                font-size: 1.1em;
+            }
+            
+            .user-accounts {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+            
+            .account-card {
+                padding: 35px;
+            }
+        }
+        
+        /* 2K分辨率 (2560x1440) 优化 */
+        @media (min-width: 1920px) and (max-width: 2559px) {
+            .main-content {
+                max-width: 1400px;
+                padding: 50px 35px;
+            }
+            
+            .welcome-section {
+                padding: 70px 50px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 3.5em;
+            }
+            
+            .welcome-section p {
+                font-size: 1.3em;
+            }
+            
+            .system-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 35px;
+            }
+            
+            .system-card {
+                padding: 35px;
+            }
+            
+            .system-card i {
+                font-size: 3.5em;
+            }
+            
+            .system-card h3 {
+                font-size: 1.7em;
+            }
+            
+            .system-card p {
+                font-size: 1.05em;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 35px;
+            }
+            
+            .feature-item i {
+                font-size: 2.8em;
+            }
+            
+            .feature-item h4 {
+                font-size: 1.4em;
+            }
+            
+            .feature-item p {
+                font-size: 1.05em;
+            }
+            
+            .user-accounts {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+            
+            .account-card {
+                padding: 30px;
+            }
+        }
+        
+        /* 1080p分辨率 (1920x1080) 优化 */
+        @media (min-width: 1366px) and (max-width: 1919px) {
+            .main-content {
+                max-width: 1200px;
+                padding: 40px 20px;
+            }
+            
+            .welcome-section {
+                padding: 60px 40px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 3em;
+            }
+            
+            .welcome-section p {
+                font-size: 1.2em;
+            }
+            
+            .system-cards {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+            }
+            
+            .system-card {
+                padding: 30px;
+            }
+            
+            .system-card i {
+                font-size: 3em;
+            }
+            
+            .system-card h3 {
+                font-size: 1.5em;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+            }
+            
+            .feature-item i {
+                font-size: 2.5em;
+            }
+            
+            .feature-item h4 {
+                font-size: 1.3em;
+            }
+            
+            .user-accounts {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+        }
+        
+        /* 平板横屏 (1024px - 1365px) */
+        @media (min-width: 1024px) and (max-width: 1365px) {
+            .main-content {
+                padding: 30px 15px;
+            }
+            
+            .welcome-section {
+                padding: 50px 30px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 2.5em;
+            }
+            
+            .welcome-section p {
+                font-size: 1.1em;
+            }
+            
+            .system-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+            
+            .system-card {
+                padding: 25px;
+            }
+            
+            .system-card i {
+                font-size: 2.5em;
+            }
+            
+            .system-card h3 {
+                font-size: 1.3em;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+            
+            .feature-item i {
+                font-size: 2em;
+            }
+            
+            .feature-item h4 {
+                font-size: 1.2em;
+            }
+            
+            .user-accounts {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        /* 移动端和平板竖屏 (768px以下) */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px 10px;
+            }
+            
+            .welcome-section {
+                padding: 40px 20px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 2em;
+            }
+            
+            .system-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .user-accounts {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-section h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .welcome-section p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .system-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .system-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .system-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .system-card i {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .system-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .system-card p {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .btn-system {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-system:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .feature-item i {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .feature-item h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .login-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #dee2e6;
+        }
+        
+        .login-info h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .user-accounts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .account-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .account-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .account-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* 页面加载动画 */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 滚动动画 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>  
+    <!-- 页面加载器 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h3>xxx老师课题组</h3>
+            <p>正在加载系统...</p>
+        </div>
+    </div>
+    
+    <!-- 头部将通过 header.js 动态加载 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="header.js"></script>
+    
+    <div class="main-content">
+        <div class="welcome-section fade-in">
+            <h1><i class="fas fa-graduation-cap"></i> xxx老师课题组</h1>
+            <p>结构防灾减灾工程系 | 同济大学</p>
+            <p>欢迎使用课题进度管理系统</p>
+        </div>
+        
+        <div class="system-cards scroll-reveal">
+            <div class="system-card">
+                <i class="fas fa-project-diagram"></i>
+                <h3>课题进度管理系统</h3>
+                <p>专业的项目进度管理工具，支持任务跟踪、时间线管理、文件管理和技术路线图等功能。</p>
+                <a href="login.html" class="btn-system">
+                    <i class="fas fa-sign-in-alt"></i> 进入系统
+                </a>
+            </div>
+            
+            <div class="system-card">
+                <i class="fas fa-database"></i>
+                <h3>剪力墙数据库</h3>
+                <p>剪力墙试验数据管理系统，提供数据查询、分析和可视化功能。</p>
+                <a href="database.html" class="btn-system">
+                    <i class="fas fa-search"></i> 查看数据库
+                </a>
+            </div>
+            
+            <div class="system-card">
+                <i class="fas fa-users"></i>
+                <h3>研究团队</h3>
+                <p>了解课题组的研究团队构成，包括教师、博士后、博士和研究生等。</p>
+                <a href="#" class="btn-system">
+                    <i class="fas fa-user-friends"></i> 查看团队
+                </a>
+            </div>
+        </div>
+        
+        <div class="features-grid scroll-reveal">
+            <div class="feature-item">
+                <i class="fas fa-tasks"></i>
+                <h4>任务管理</h4>
+                <p>创建、分配和跟踪研究任务，确保项目按时完成</p>
+            </div>
+            
+            <div class="feature-item">
+                <i class="fas fa-calendar-alt"></i>
+                <h4>时间线管理</h4>
+                <p>可视化项目时间线，合理安排研究进度</p>
+            </div>
+            
+            <div class="feature-item">
+                <i class="fas fa-folder"></i>
+                <h4>文件管理</h4>
+                <p>统一管理研究文档、数据和资料</p>
+            </div>
+            
+            <div class="feature-item">
+                <i class="fas fa-route"></i>
+                <h4>技术路线图</h4>
+                <p>规划研究技术路线，明确研究方向</p>
+            </div>
+            
+            <div class="feature-item">
+                <i class="fas fa-chart-line"></i>
+                <h4>进度跟踪</h4>
+                <p>实时跟踪项目进度，及时调整研究计划</p>
+            </div>
+            
+            <div class="feature-item">
+                <i class="fas fa-trophy"></i>
+                <h4>成果展示</h4>
+                <p>展示研究成果，记录研究历程</p>
+            </div>
+        </div>
+        
+        <div class="login-info scroll-reveal">
+            <h3><i class="fas fa-key"></i> 系统登录信息</h3>
+            <p>请使用以下账户登录课题进度管理系统：</p>
+            
+            <div class="user-accounts">
+                <div class="account-card">
+                    <h4><i class="fas fa-eye"></i> 查看者</h4>
+                    <p><strong>安全认证：</strong>请联系管理员获取账号</p>
+                    <p><em>系统采用加密存储，保护用户隐私</em></p>
+                    <p><em>只能查看项目进度</em></p>
+                </div>
+                
+                <div class="account-card">
+                    <h4><i class="fas fa-edit"></i> 编辑者</h4>
+                    <p><strong>安全认证：</strong>请联系管理员获取账号</p>
+                    <p><em>系统采用加密存储，保护用户隐私</em></p>
+                    <p><em>可以查看和编辑所有内容</em></p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <a href="login.html" class="btn-system" style="font-size: 1.2em; padding: 15px 40px;">
+                    <i class="fas fa-rocket"></i> 立即开始使用
+                </a>
+            </div>
+            
+            <!-- 管理员入口 -->
+            <div class="admin-section scroll-reveal" id="adminSection" style="display: none; margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h3><i class="fas fa-tools"></i> 管理员工具</h3>
+                <p>欢迎管理员！您可以使用以下工具管理系统：</p>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="user-management.html" class="btn-system" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-users-cog"></i> 用户管理
+                    </a>
+                    <a href="password-generator.html" class="btn-system" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-key"></i> 密码生成器
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/illi.js" onerror="console.log('illi.js加载失败，使用备用方案')"></script>
+    <!-- GitHub Secrets配置 -->
+    <script src="github-secrets-config.js"></script>
+    <!-- 用户配置 -->
+    <script src="user-config.js"></script>
+    <!-- 认证系统 -->
+    <script src="auth.js"></script>
+    <!-- 备用JavaScript，防止外部文件加载失败 -->
+    <script>
+        // 检查管理员权限并显示入口
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('检查管理员权限...');
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            console.log('当前用户:', currentUser);
+            
+            if (currentUser.role === 'admin') {
+                console.log('检测到管理员用户，显示管理员工具');
+                const adminSection = document.getElementById('adminSection');
+                if (adminSection) {
+                    adminSection.style.display = 'block';
+                    console.log('管理员工具已显示');
+                } else {
+                    console.error('未找到adminSection元素');
+                }
+            } else {
+                console.log('非管理员用户，角色:', currentUser.role);
+            }
+        });
+        
+        // 备用工具函数
+        window.illi = window.illi || {};
+        
+        // 如果外部文件加载失败，提供基础功能
+        if (!window.illi.showNotification) {
+            window.illi.showNotification = function(message, type = 'info') {
+                console.log(`[${type.toUpperCase()}] ${message}`);
+                // 简单的通知实现
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 10px 15px;
+                    background: #333;
+                    color: white;
+                    border-radius: 4px;
+                    z-index: 10000;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            };
+        }
+    </script>
+    <script>
+        // 页面加载完成后隐藏加载器
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loader = document.getElementById('pageLoader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000); // 显示加载器1秒
+        });
+
+        // 滚动动画效果
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.scroll-reveal');
+            
+            reveals.forEach(function(reveal) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveal.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('revealed');
+                }
+            });
+        }
+
+        // 监听滚动事件
+        window.addEventListener('scroll', revealOnScroll);
+        
+        // 页面加载时立即检查一次
+        document.addEventListener('DOMContentLoaded', function() {
+            revealOnScroll();
+        });
+
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 添加页面可见性检测
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面隐藏时暂停动画
+                document.body.style.animationPlayState = 'paused';
+            } else {
+                // 页面显示时恢复动画
+                document.body.style.animationPlayState = 'running';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+{
+  "projectName": "管道地震动应力分析",
+  "startDate": "2023-09-01",
+  "endDate": "2029-03-31",
+  "description": "针对发电厂在地震作用下的汽水管道,其在地震中的响应影响着电厂的正常发电工作，因此对于地震中管道使用状态的评判极为重要",
+  "tasks": [
+    {
+      "id": 1760787461942,
+      "title": "管道吊架模态测试",
+      "description": "请输入任务描述",
+      "status": "in-progress",
+      "priority": "high",
+      "startDate": "2025-09-01",
+      "endDate": "2025-11-17",
+      "progress": 50,
+      "subtasks": [
+        {
+          "title": "模态测试：CA_13_R",
+          "completed": true,
+          "issues": [],
+          "notes": "",
+          "startTime": "2025-10-19T22:48",
+          "endTime": "2025-10-30T22:48",
+          "timeDescription": "",
+          "completionTime": "2025-10-19T23:07"
+        },
+        {
+          "title": "模态测试：CA_07_R",
+          "completed": false,
+          "completionTime": "2025-10-19T23:39",
+          "timeDescription": ""
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1760787494825,
+      "title": "开题答辩",
+      "description": "请输入任务描述",
+      "status": "in-progress",
+      "priority": "medium",
+      "startDate": "2025-10-18",
+      "endDate": "2025-11-17",
+      "progress": 0,
+      "subtasks": [
+        {
+          "title": "开题报告",
+          "completed": false
+        },
+        {
+          "title": "开题报告PPT",
+          "completed": false
+        }
+      ],
+      "attachments": []
+    }
+  ],
+  "timeline": [
+    {
+      "id": 1760788694451,
+      "date": "2025-10-01",
+      "title": "开题",
+      "description": "",
+      "status": "in-progress"
+    },
+    {
+      "id": 1760794148003.2786,
+      "date": "2025-10-18",
+      "title": "管道吊架模态测试",
+      "description": "请输入任务描述",
+      "status": "in-progress",
+      "linkedTaskId": 1760787461942,
+      "endDate": "2025-11-17"
+    },
+    {
+      "id": 1760794148003.7666,
+      "date": "2025-10-18",
+      "title": "开题答辩",
+      "description": "请输入任务描述",
+      "status": "in-progress",
+      "linkedTaskId": 1760787494825,
+      "endDate": "2025-11-17"
+    },
+    {
+      "id": "task-start-1760787461942",
+      "date": "2025-09-01",
+      "title": "开始：管道吊架模态测试",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760787461942,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760787461942",
+      "date": "2025-11-17",
+      "title": "完成：管道吊架模态测试",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760787461942,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760787461942-1",
+      "date": "2025-10-19",
+      "time": "23:39",
+      "title": "完成：模态测试：CA_07_R",
+      "description": "完成子任务：模态测试：CA_07_R",
+      "status": "pending",
+      "linkedTaskId": 1760787461942,
+      "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "管道吊架模态测试"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "管道吊架模态测试",
+      "isSubtask": true
+    },
+    {
+      "id": "task-start-1760787494825",
+      "date": "2025-10-18",
+      "title": "开始：开题答辩",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760787494825,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760787494825",
+      "date": "2025-11-17",
+      "title": "完成：开题答辩",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760787494825,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760787461942-0",
+      "date": "2025-10-19",
+      "time": "23:07",
+      "title": "完成：模态测试：CA_13_R",
+      "description": "完成子任务：模态测试：CA_13_R",
+      "status": "completed",
+      "linkedTaskId": 1760787461942,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "管道吊架模态测试"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "管道吊架模态测试",
+      "isSubtask": true
+    }
+  ],
+  "files": [
+    {
+      "id": 1760789327690.4856,
+      "name": "柏林广场A1练习册答案 L1-6.pdf",
+      "type": "pdf",
+      "size": "269.71 KB",
+      "uploadDate": "2025-10-18",
+      "category": "documents",
+      "folderId": 1760789062421,
+      "file": null,
+      "savedToLocal": true
+    },
+    {
+      "id": 1760789389379.0986,
+      "name": "教学笔记.docx",
+      "type": "document",
+      "size": "517.04 KB",
+      "uploadDate": "2025-10-18",
+      "category": "documents",
+      "folderId": null,
+      "file": null,
+      "savedToLocal": true
+    },
+    {
+      "id": 1760789693175.6328,
+      "name": "单科作业成绩表_03040309_wzy.xlsx",
+      "type": "spreadsheet",
+      "size": "14.39 KB",
+      "uploadDate": "2025-10-18",
+      "category": "data",
+      "folderId": 1760789303128,
+      "file": null,
+      "savedToLocal": true
+    },
+    {
+      "id": 1760790148782.9727,
+      "name": "证券市场基本法律法规.md",
+      "type": "document",
+      "size": "2.76 KB",
+      "uploadDate": "2025-10-18",
+      "category": "others",
+      "folderId": null,
+      "savedToLocal": true,
+      "file": null
+    }
+  ],
+  "results": [
+    {
+      "id": 1,
+      "title": "文献综述初稿",
+      "description": "完成了相关领域的文献综述初稿",
+      "date": "2024-02-15",
+      "image": null,
+      "attachments": []
+    }
+  ],
+  "roadmap": [
+    {
+      "id": 1760788986221,
+      "title": "管道吊架模态测试、有限元模拟及理论推导",
+      "description": "测试管道吊架模态",
+      "status": "in-progress",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "children": [
+        1760793979798,
+        1760799476110
+      ],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    },
+    {
+      "id": 1760789502136,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": []
+    },
+    {
+      "id": 1760793979798,
+      "title": "12",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760788986221,
+      "children": [
+        1760799233374
+      ],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    },
+    {
+      "id": 1760799233374,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760793979798,
+      "children": [
+        1760799790522
+      ]
+    },
+    {
+      "id": 1760799476110,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760788986221,
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    },
+    {
+      "id": 1760799790522,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760799233374,
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    }
+  ],
+  "folders": [
+    {
+      "id": 1760789062421,
+      "name": "实验鼠韩剧",
+      "parentId": null,
+      "description": "",
+      "children": [],
+      "createDate": "2025-10-18"
+    },
+    {
+      "id": 1760789303128,
+      "name": "1231231",
+      "parentId": null,
+      "description": "",
+      "children": [],
+      "createDate": "2025-10-18"
+    },
+    {
+      "id": 1760790174629,
+      "name": "111",
+      "parentId": null,
+      "description": "",
+      "children": [],
+      "createDate": "2025-10-18"
+    },
+    {
+      "id": 1760790183208,
+      "name": "1222",
+      "parentId": 1760789303128,
+      "description": "",
+      "children": [],
+      "createDate": "2025-10-18"
+    }
+  ],
+  "mindmaps": [],
+  "exportInfo": {
+    "exportTime": "2025-10-18T15:43:57.846Z",
+    "version": "1.0.0",
+    "taskCount": 2,
+    "completedTasks": 0,
+    "totalSubtasks": 4,
+    "completedSubtasks": 1,
+    "timelineItems": 9
+  }
+}

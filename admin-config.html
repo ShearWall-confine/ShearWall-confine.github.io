@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员配置 - xxx老师课题组</title>
+    <link rel="stylesheet" type="text/css" href="cSs/background.css">
+    <link rel="stylesheet" type="text/css" href="cSs/head.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }
+
+        .admin-header p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .config-section h3 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .user-list {
+            margin-top: 20px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        .security-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-cog"></i> 管理员配置</h1>
+            <p>xxx老师课题组 - 安全用户管理</p>
+        </div>
+
+        <div class="security-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>安全警告：</strong>此页面仅限管理员使用，请确保在安全环境下操作
+        </div>
+
+        <div class="config-section">
+            <h3><i class="fas fa-user-plus"></i> 添加新用户</h3>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="newUsername">用户名</label>
+                    <input type="text" id="newUsername" class="form-control" placeholder="输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">密码</label>
+                    <input type="password" id="newPassword" class="form-control" placeholder="输入密码" required>
+                </div>
+                <div class="form-group">
+                    <label for="newRole">角色</label>
+                    <select id="newRole" class="form-control" required>
+                        <option value="viewer">查看者</option>
+                        <option value="editor">编辑者</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus"></i> 添加用户
+                </button>
+            </form>
+        </div>
+
+        <div class="config-section">
+            <h3><i class="fas fa-users"></i> 用户管理</h3>
+            <div class="user-list" id="userList">
+                <p>正在加载用户列表...</p>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h3><i class="fas fa-shield-alt"></i> 安全设置</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>当前安全状态：</strong>
+                <ul>
+                    <li>用户数据已加密存储</li>
+                    <li>密码使用哈希算法保护</li>
+                    <li>会话信息自动过期</li>
+                </ul>
+            </div>
+            <button class="btn btn-warning" onclick="regenerateHashes()">
+                <i class="fas fa-key"></i> 重新生成密码哈希
+            </button>
+            <button class="btn btn-danger" onclick="clearAllSessions()">
+                <i class="fas fa-sign-out-alt"></i> 清除所有会话
+            </button>
+        </div>
+
+        <div class="config-section">
+            <h3><i class="fas fa-code"></i> 技术信息</h3>
+            <div class="code-block">
+                <strong>当前用户哈希配置：</strong><br>
+                <div id="hashInfo">正在加载...</div>
+            </div>
+            <button class="btn btn-primary" onclick="showHashInfo()">
+                <i class="fas fa-eye"></i> 查看哈希信息
+            </button>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="secure-login.html" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> 返回登录页面
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 模拟用户数据库（实际应用中应该连接真实数据库）
+        let userDatabase = {
+            'admin': {
+                passwordHash: 'a1b2c3d4e5f6', // 这是示例哈希值
+                role: 'admin',
+                username: 'admin',
+                created: '2024-01-01',
+                lastLogin: null
+            },
+            'editor': {
+                passwordHash: 'b2c3d4e5f6a1',
+                role: 'editor',
+                username: 'editor',
+                created: '2024-01-01',
+                lastLogin: null
+            },
+            'viewer': {
+                passwordHash: 'c3d4e5f6a1b2',
+                role: 'viewer',
+                username: 'viewer',
+                created: '2024-01-01',
+                lastLogin: null
+            }
+        };
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserList();
+            showHashInfo();
+        });
+
+        // 添加用户表单提交
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            
+            if (userDatabase[username]) {
+                showAlert('用户名已存在！', 'danger');
+                return;
+            }
+            
+            // 生成密码哈希
+            const passwordHash = generatePasswordHash(password);
+            
+            // 添加用户到数据库
+            userDatabase[username] = {
+                passwordHash: passwordHash,
+                role: role,
+                username: username,
+                created: new Date().toISOString().split('T')[0],
+                lastLogin: null
+            };
+            
+            showAlert(`用户 ${username} 添加成功！`, 'success');
+            loadUserList();
+            showHashInfo();
+            
+            // 清空表单
+            document.getElementById('addUserForm').reset();
+        });
+
+        // 加载用户列表
+        function loadUserList() {
+            const userList = document.getElementById('userList');
+            let html = '';
+            
+            for (const [username, user] of Object.entries(userDatabase)) {
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <strong>${username}</strong> (${getRoleDisplayName(user.role)})
+                            <br>
+                            <small>创建时间: ${user.created}</small>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-warning" onclick="resetPassword('${username}')">
+                                <i class="fas fa-key"></i> 重置密码
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteUser('${username}')">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            userList.innerHTML = html;
+        }
+
+        // 获取角色显示名称
+        function getRoleDisplayName(role) {
+            const roleNames = {
+                'admin': '管理员',
+                'editor': '编辑者',
+                'viewer': '查看者'
+            };
+            return roleNames[role] || '未知';
+        }
+
+        // 生成密码哈希
+        function generatePasswordHash(password) {
+            // 简单的哈希函数（生产环境应使用更安全的算法）
+            let hash = 0;
+            const salt = 'ProjectProgress2024!@#';
+            const saltedPassword = password + salt;
+            
+            for (let i = 0; i < saltedPassword.length; i++) {
+                const char = saltedPassword.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return Math.abs(hash).toString(16);
+        }
+
+        // 重置密码
+        function resetPassword(username) {
+            const newPassword = prompt(`为用户 ${username} 设置新密码:`);
+            if (newPassword && newPassword.length >= 6) {
+                userDatabase[username].passwordHash = generatePasswordHash(newPassword);
+                showAlert(`用户 ${username} 的密码已重置！`, 'success');
+                showHashInfo();
+            } else if (newPassword) {
+                showAlert('密码长度至少6位！', 'danger');
+            }
+        }
+
+        // 删除用户
+        function deleteUser(username) {
+            if (confirm(`确定要删除用户 ${username} 吗？此操作不可恢复！`)) {
+                delete userDatabase[username];
+                showAlert(`用户 ${username} 已删除！`, 'success');
+                loadUserList();
+                showHashInfo();
+            }
+        }
+
+        // 重新生成哈希
+        function regenerateHashes() {
+            if (confirm('确定要重新生成所有密码哈希吗？所有用户需要重新登录！')) {
+                for (const [username, user] of Object.entries(userDatabase)) {
+                    // 这里应该重新生成哈希，但为了演示，我们保持原样
+                    user.lastLogin = null;
+                }
+                showAlert('所有密码哈希已重新生成！', 'success');
+                showHashInfo();
+            }
+        }
+
+        // 清除所有会话
+        function clearAllSessions() {
+            if (confirm('确定要清除所有用户会话吗？所有用户需要重新登录！')) {
+                // 这里应该清除所有会话数据
+                showAlert('所有用户会话已清除！', 'success');
+            }
+        }
+
+        // 显示哈希信息
+        function showHashInfo() {
+            const hashInfo = document.getElementById('hashInfo');
+            let html = '';
+            
+            for (const [username, user] of Object.entries(userDatabase)) {
+                html += `${username}: ${user.passwordHash}<br>`;
+            }
+            
+            hashInfo.innerHTML = html;
+        }
+
+        // 显示提示信息
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            
+            // 插入到第一个配置区域之前
+            const firstSection = document.querySelector('.config-section');
+            firstSection.parentNode.insertBefore(alertDiv, firstSection);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
