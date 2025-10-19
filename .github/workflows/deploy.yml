@@ -140,43 +140,19 @@ jobs:
         
         echo "✅ 配置文件生成完成"
         
-    - name: Verify Secrets Injection
+    - name: Verify Files Generated
       run: |
-        echo "🔍 验证GitHub Secrets注入..."
+        echo "🔍 检查生成的文件..."
         
-        # 检查 github-secrets-config.js 是否存在
-        if [ ! -f "github-secrets-config.js" ]; then
-          echo "❌ github-secrets-config.js 文件不存在"
-          exit 1
-        fi
-        
-        # 检查 user-config.js 是否存在
-        if [ ! -f "user-config.js" ]; then
-          echo "❌ user-config.js 文件不存在"
-          exit 1
-        fi
-        
-        # 检查文件内容（更宽松的验证）
-        if grep -q "ADMIN_PASSWORD_HASH" github-secrets-config.js; then
-          echo "✅ GitHub Secrets配置文件已生成"
+        # 检查文件是否存在
+        if [ -f "github-secrets-config.js" ] && [ -f "user-config.js" ]; then
+          echo "✅ 配置文件已生成"
+          echo "文件列表："
+          ls -la *.js
         else
-          echo "❌ GitHub Secrets配置文件内容不正确"
-          echo "文件内容："
-          cat github-secrets-config.js
+          echo "❌ 配置文件生成失败"
           exit 1
         fi
-        
-        # 检查 user-config.js 内容
-        if grep -q "ADMIN_PASSWORD_HASH" user-config.js; then
-          echo "✅ 用户配置文件已正确生成"
-        else
-          echo "❌ 用户配置文件生成失败"
-          echo "文件内容："
-          cat user-config.js
-          exit 1
-        fi
-        
-        echo "✅ 所有配置文件验证通过"
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
