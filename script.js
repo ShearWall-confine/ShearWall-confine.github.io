@@ -1561,6 +1561,7 @@ function exportData() {
         }
         return;
     }
+    
     // 创建增强的导出数据
     const exportData = {
         ...projectData,
@@ -1576,8 +1577,9 @@ function exportData() {
         }
     };
     
+    // 使用UTF-8编码确保中文字符正确导出
     const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const dataBlob = new Blob([dataStr], {type: 'application/json;charset=utf-8'});
     const url = URL.createObjectURL(dataBlob);
     const a = document.createElement('a');
     a.href = url;
@@ -1588,8 +1590,16 @@ function exportData() {
     const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
     a.download = `project_progress_${dateStr}_${timeStr}.json`;
     
+    // 添加BOM头确保UTF-8编码被正确识别
+    const bom = '\uFEFF';
+    const dataWithBom = bom + dataStr;
+    const dataBlobWithBom = new Blob([dataWithBom], {type: 'application/json;charset=utf-8'});
+    const urlWithBom = URL.createObjectURL(dataBlobWithBom);
+    a.href = urlWithBom;
+    
     a.click();
     URL.revokeObjectURL(url);
+    URL.revokeObjectURL(urlWithBom);
     
     showNotification('数据导出成功！', 'success');
 }

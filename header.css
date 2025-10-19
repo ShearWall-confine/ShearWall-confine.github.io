@@ -253,7 +253,157 @@
     transform: translateY(-50%) scale(1.2);
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 多分辨率优化 */
+
+/* 4K分辨率 (3840x2160) 优化 */
+@media (min-width: 2560px) and (max-width: 3840px) {
+    .head-top {
+        padding: 20px 0;
+    }
+    
+    .head-top img {
+        height: 60px;
+        margin-right: 16px;
+    }
+    
+    .head-top p {
+        font-size: 18px;
+    }
+    
+    .head-bottom > ul > li > a {
+        padding: 24px 32px;
+        font-size: 16px;
+    }
+    
+    .head-bottom ul ul {
+        min-width: 280px;
+    }
+    
+    .head-bottom ul ul a {
+        padding: 18px 24px;
+        font-size: 16px;
+    }
+    
+    .head-bottom ul ul a i {
+        width: 18px;
+        height: 18px;
+        margin-right: 14px;
+        font-size: 16px;
+    }
+}
+
+/* 2K分辨率 (2560x1440) 优化 */
+@media (min-width: 1920px) and (max-width: 2559px) {
+    .head-top {
+        padding: 18px 0;
+    }
+    
+    .head-top img {
+        height: 52px;
+        margin-right: 14px;
+    }
+    
+    .head-top p {
+        font-size: 16px;
+    }
+    
+    .head-bottom > ul > li > a {
+        padding: 20px 28px;
+        font-size: 15px;
+    }
+    
+    .head-bottom ul ul {
+        min-width: 240px;
+    }
+    
+    .head-bottom ul ul a {
+        padding: 16px 22px;
+        font-size: 15px;
+    }
+    
+    .head-bottom ul ul a i {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+}
+
+/* 1080p分辨率 (1920x1080) 优化 */
+@media (min-width: 1366px) and (max-width: 1919px) {
+    .head-top {
+        padding: 15px 0;
+    }
+    
+    .head-top img {
+        height: 45px;
+        margin-right: 12px;
+    }
+    
+    .head-top p {
+        font-size: 15px;
+    }
+    
+    .head-bottom > ul > li > a {
+        padding: 18px 25px;
+        font-size: 14px;
+    }
+    
+    .head-bottom ul ul {
+        min-width: 220px;
+    }
+    
+    .head-bottom ul ul a {
+        padding: 14px 20px;
+        font-size: 14px;
+    }
+    
+    .head-bottom ul ul a i {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+        font-size: 14px;
+    }
+}
+
+/* 平板横屏 (1024px - 1365px) */
+@media (min-width: 1024px) and (max-width: 1365px) {
+    .head-top {
+        padding: 12px 0;
+    }
+    
+    .head-top img {
+        height: 40px;
+        margin-right: 10px;
+    }
+    
+    .head-top p {
+        font-size: 14px;
+    }
+    
+    .head-bottom > ul > li > a {
+        padding: 16px 22px;
+        font-size: 13px;
+    }
+    
+    .head-bottom ul ul {
+        min-width: 200px;
+    }
+    
+    .head-bottom ul ul a {
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+    
+    .head-bottom ul ul a i {
+        width: 14px;
+        height: 14px;
+        margin-right: 10px;
+        font-size: 12px;
+    }
+}
+
+/* 移动端和平板竖屏 (768px以下) */
 @media (max-width: 768px) {
     .head-bottom ul {
         flex-direction: column;

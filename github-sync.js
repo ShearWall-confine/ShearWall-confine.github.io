@@ -41,7 +41,7 @@ class GitHubSync {
             }
 
             const data = await response.json();
-            const content = JSON.parse(atob(data.content));
+            const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
             
             console.log('从GitHub加载数据成功:', content);
             return content;
@@ -78,7 +78,7 @@ class GitHubSync {
                     },
                     body: JSON.stringify({
                         message: `更新项目数据 - ${new Date().toLocaleString()}`,
-                        content: btoa(JSON.stringify(data, null, 2)),
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
                         sha: currentFile.sha
                     })
                 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>剪力墙数据库 - xxx老师课题组</title>
     <link rel="stylesheet" type="text/css" href="header.css">
+    <link rel="stylesheet" type="text/css" href="responsive.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* 基础样式 */
@@ -193,7 +194,292 @@
             font-size: 0.9em;
         }
         
-        /* 响应式设计 */
+        /* 响应式设计 - 多分辨率优化 */
+        
+        /* 4K分辨率 (3840x2160) 优化 */
+        @media (min-width: 2560px) and (max-width: 3840px) {
+            .database-container {
+                max-width: 1800px;
+                padding: 60px 40px;
+            }
+            
+            .database-header {
+                padding: 60px;
+            }
+            
+            .database-header h1 {
+                font-size: 3.5em;
+            }
+            
+            .database-header p {
+                font-size: 1.3em;
+            }
+            
+            .database-controls {
+                padding: 40px;
+            }
+            
+            .control-buttons {
+                gap: 20px;
+            }
+            
+            .btn-control {
+                padding: 15px 30px;
+                font-size: 1.1em;
+            }
+            
+            .search-input {
+                padding: 16px 20px;
+                font-size: 1.1em;
+            }
+            
+            .btn-search {
+                padding: 16px 30px;
+                font-size: 1.1em;
+            }
+            
+            .database-table th {
+                padding: 20px;
+                font-size: 1.1em;
+            }
+            
+            .database-table td {
+                padding: 16px 20px;
+                font-size: 1.05em;
+            }
+            
+            .stats-section {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+            }
+            
+            .stat-card {
+                padding: 30px;
+            }
+            
+            .stat-card i {
+                font-size: 2.5em;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.8em;
+            }
+            
+            .stat-card p {
+                font-size: 1em;
+            }
+        }
+        
+        /* 2K分辨率 (2560x1440) 优化 */
+        @media (min-width: 1920px) and (max-width: 2559px) {
+            .database-container {
+                max-width: 1600px;
+                padding: 50px 35px;
+            }
+            
+            .database-header {
+                padding: 50px;
+            }
+            
+            .database-header h1 {
+                font-size: 3em;
+            }
+            
+            .database-header p {
+                font-size: 1.2em;
+            }
+            
+            .database-controls {
+                padding: 35px;
+            }
+            
+            .control-buttons {
+                gap: 18px;
+            }
+            
+            .btn-control {
+                padding: 14px 28px;
+                font-size: 1.05em;
+            }
+            
+            .search-input {
+                padding: 15px 18px;
+                font-size: 1.05em;
+            }
+            
+            .btn-search {
+                padding: 15px 28px;
+                font-size: 1.05em;
+            }
+            
+            .database-table th {
+                padding: 18px;
+                font-size: 1.05em;
+            }
+            
+            .database-table td {
+                padding: 15px 18px;
+                font-size: 1em;
+            }
+            
+            .stats-section {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 25px;
+            }
+            
+            .stat-card {
+                padding: 25px;
+            }
+            
+            .stat-card i {
+                font-size: 2.2em;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.6em;
+            }
+        }
+        
+        /* 1080p分辨率 (1920x1080) 优化 */
+        @media (min-width: 1366px) and (max-width: 1919px) {
+            .database-container {
+                max-width: 1200px;
+                padding: 40px 20px;
+            }
+            
+            .database-header {
+                padding: 40px;
+            }
+            
+            .database-header h1 {
+                font-size: 2.5em;
+            }
+            
+            .database-header p {
+                font-size: 1.1em;
+            }
+            
+            .database-controls {
+                padding: 30px;
+            }
+            
+            .control-buttons {
+                gap: 15px;
+            }
+            
+            .btn-control {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+            
+            .search-input {
+                padding: 12px 15px;
+                font-size: 1em;
+            }
+            
+            .btn-search {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+            
+            .database-table th {
+                padding: 15px;
+                font-size: 1em;
+            }
+            
+            .database-table td {
+                padding: 12px 15px;
+                font-size: 0.95em;
+            }
+            
+            .stats-section {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-card i {
+                font-size: 2em;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.5em;
+            }
+        }
+        
+        /* 平板横屏 (1024px - 1365px) */
+        @media (min-width: 1024px) and (max-width: 1365px) {
+            .database-container {
+                padding: 30px 15px;
+            }
+            
+            .database-header {
+                padding: 35px;
+            }
+            
+            .database-header h1 {
+                font-size: 2.2em;
+            }
+            
+            .database-header p {
+                font-size: 1em;
+            }
+            
+            .database-controls {
+                padding: 25px;
+            }
+            
+            .control-buttons {
+                gap: 12px;
+            }
+            
+            .btn-control {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            
+            .search-input {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+            
+            .btn-search {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            
+            .database-table th {
+                padding: 12px;
+                font-size: 0.95em;
+            }
+            
+            .database-table td {
+                padding: 10px 12px;
+                font-size: 0.9em;
+            }
+            
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 18px;
+            }
+            
+            .stat-card {
+                padding: 18px;
+            }
+            
+            .stat-card i {
+                font-size: 1.8em;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.3em;
+            }
+        }
+        
+        /* 移动端和平板竖屏 (768px以下) */
         @media (max-width: 768px) {
             .database-container {
                 padding: 20px 10px;
