@@ -379,37 +379,6 @@
             console.log('输入框初始化完成');
         });
         
-        // 测试输入框功能
-        function testInputs() {
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
-            
-            // 测试输入框状态
-            const usernameStatus = {
-                disabled: usernameInput.disabled,
-                readOnly: usernameInput.readOnly,
-                value: usernameInput.value,
-                type: usernameInput.type,
-                placeholder: usernameInput.placeholder
-            };
-            
-            const passwordStatus = {
-                disabled: passwordInput.disabled,
-                readOnly: passwordInput.readOnly,
-                value: passwordInput.value,
-                type: passwordInput.type,
-                placeholder: passwordInput.placeholder
-            };
-            
-            console.log('用户名输入框状态:', usernameStatus);
-            console.log('密码输入框状态:', passwordStatus);
-            
-            // 尝试设置测试值
-            usernameInput.value = 'test_user';
-            passwordInput.value = 'test_password';
-            
-            alert(`输入框测试结果：\n用户名: ${usernameInput.value}\n密码: ${passwordInput.value.length}个字符\n\n如果看到测试值，说明输入框工作正常！`);
-        }
         
         // 登录表单提交处理
         document.getElementById('loginForm').addEventListener('submit', function(e) {

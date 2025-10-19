@@ -164,6 +164,12 @@ function disableEditFeatures() {
 function showUserInfo() {
     if (!currentUser) return;
     
+    // 检查是否已经存在用户信息，避免重复添加
+    const existingUserInfo = document.querySelector('.user-info');
+    if (existingUserInfo) {
+        existingUserInfo.remove();
+    }
+    
     // 在头部添加用户信息
     const header = document.querySelector('.header');
     if (header) {
@@ -175,7 +181,7 @@ function showUserInfo() {
             </div>
             <div class="user-details">
                 <span class="user-name">${currentUser.name}</span>
-                <span class="user-role">${currentUser.role === 'editor' ? '编辑者' : '查看者'}</span>
+                <span class="user-role">${getRoleDisplayName(currentUser.role)}</span>
             </div>
             <button class="btn btn-logout" onclick="logout()" title="退出登录">
                 <i class="fas fa-sign-out-alt"></i>
@@ -184,6 +190,16 @@ function showUserInfo() {
         
         header.appendChild(userInfo);
     }
+}
+
+// 获取角色显示名称
+function getRoleDisplayName(role) {
+    const roleNames = {
+        'admin': '管理员',
+        'editor': '编辑者',
+        'viewer': '查看者'
+    };
+    return roleNames[role] || role;
 }
 
 // 简单的密码哈希函数（生产环境应使用更安全的哈希算法）

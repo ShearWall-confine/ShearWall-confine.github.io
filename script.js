@@ -4166,37 +4166,6 @@ function toggleTextInput() {
     }
 }
 
-// 测试Markdown解析
-function testMarkdownParsing() {
-    const testText = `# 证券市场基本法律法规
-
-## 1.证券市场基本法律法规
-
-### 1.证券市场法律法规
-
-- 法律关系的概念、特征和种类
-
-	- 法律关系发生的方式
-
-		- 确认性法律关系与创设性法律
-
-		- 双边法律关系与多边法律关系
-
-- 法律关系
-
-	- 法律关系由主体、客体与内容构成
-
-		- 法律关系由主体、客体与内容构成`;
-
-    try {
-        const result = parseMarkdownToMindmap(testText);
-        console.log('Markdown解析测试结果:', result);
-        return result;
-    } catch (error) {
-        console.error('Markdown解析测试失败:', error);
-        return null;
-    }
-}
 
 // 从Markdown生成思维导图
 function generateMindmapFromMD() {
@@ -5480,38 +5449,6 @@ function initializeViewStates() {
     console.log('视图状态初始化完成');
 }
 
-// 测试时间线标签功能
-function testTimelineTags() {
-    console.log('测试时间线标签功能');
-    
-    // 检查是否有任务数据
-    if (!projectData.tasks || projectData.tasks.length === 0) {
-        console.log('没有任务数据，创建测试任务');
-        const testTask = {
-            id: Date.now(),
-            title: "测试任务",
-            description: "这是一个测试任务",
-            status: "in-progress",
-            priority: "high",
-            startDate: "2024-01-01",
-            endDate: "2024-01-15",
-            progress: 50,
-            subtasks: [],
-            attachments: []
-        };
-        projectData.tasks.push(testTask);
-        saveData();
-    }
-    
-    // 同步任务到时间线
-    syncTasksToTimeline();
-    
-    // 渲染时间线
-    renderTimelineVertical();
-    
-    console.log('时间线数据:', projectData.timeline);
-    showNotification('时间线标签测试完成，请查看时间线区域', 'success');
-}
 
 // 编辑时间线项目
 function editTimelineItem(itemId) {
@@ -5829,46 +5766,6 @@ function renderSubtaskIssues(subtaskIndex) {
     `).join('');
 }
 
-// 测试任务日期保存功能
-function testTaskDateSave() {
-    console.log('=== 测试任务日期保存功能 ===');
-    
-    // 检查当前编辑的任务
-    if (!currentEditingTask) {
-        console.log('没有正在编辑的任务');
-        return;
-    }
-    
-    console.log('当前编辑的任务:', currentEditingTask);
-    
-    // 检查日期输入框的值
-    const startDateInput = document.getElementById('task-start-date');
-    const endDateInput = document.getElementById('task-end-date');
-    
-    if (startDateInput) {
-        console.log('开始日期输入框值:', startDateInput.value);
-    } else {
-        console.log('开始日期输入框未找到');
-    }
-    
-    if (endDateInput) {
-        console.log('结束日期输入框值:', endDateInput.value);
-    } else {
-        console.log('结束日期输入框未找到');
-    }
-    
-    // 检查任务数据中的日期
-    console.log('任务数据中的日期:', {
-        startDate: currentEditingTask.startDate,
-        endDate: currentEditingTask.endDate
-    });
-    
-    // 检查时间线数据
-    const timelineItems = projectData.timeline.filter(item => item.linkedTaskId === currentEditingTask.id);
-    console.log('相关时间线项目:', timelineItems);
-    
-    showNotification('测试完成，请查看控制台输出', 'success');
-}
 
 // ==================== 时间线过滤和管理功能 ====================
 
@@ -6305,55 +6202,6 @@ function saveTimelineTags(itemId) {
     showNotification('标签已保存', 'success');
 }
 
-// ==================== 任务日期保存问题调试 ====================
-
-// 调试任务日期保存问题
-function debugTaskDateSave() {
-    console.log('=== 调试任务日期保存问题 ===');
-    
-    // 检查当前编辑的任务
-    if (!currentEditingTask) {
-        console.log('没有正在编辑的任务');
-        return;
-    }
-    
-    console.log('当前编辑的任务:', currentEditingTask);
-    
-    // 检查日期输入框的值
-    const startDateInput = document.getElementById('task-start-date');
-    const endDateInput = document.getElementById('task-end-date');
-    
-    if (startDateInput) {
-        console.log('开始日期输入框值:', startDateInput.value);
-        console.log('开始日期输入框属性:', {
-            value: startDateInput.value,
-            defaultValue: startDateInput.defaultValue,
-            min: startDateInput.min,
-            max: startDateInput.max
-        });
-    } else {
-        console.log('开始日期输入框未找到');
-    }
-    
-    if (endDateInput) {
-        console.log('结束日期输入框值:', endDateInput.value);
-    } else {
-        console.log('结束日期输入框未找到');
-    }
-    
-    // 检查任务数据中的日期
-    console.log('任务数据中的日期:', {
-        startDate: currentEditingTask.startDate,
-        endDate: currentEditingTask.endDate
-    });
-    
-    // 检查时间线数据
-    const timelineItems = projectData.timeline.filter(item => item.linkedTaskId === currentEditingTask.id);
-    console.log('相关时间线项目:', timelineItems);
-    
-    showNotification('调试完成，请查看控制台输出', 'success');
-}
-
 // 强制设置任务开始日期
 function forceSetTaskStartDate(dateString) {
     if (!currentEditingTask) {
@@ -6371,49 +6219,6 @@ function forceSetTaskStartDate(dateString) {
     }
 }
 
-// 测试任务日期保存
-function testTaskDateSave() {
-    console.log('=== 测试任务日期保存 ===');
-    
-    if (!currentEditingTask) {
-        console.log('没有正在编辑的任务');
-        return;
-    }
-    
-    // 获取当前输入框的值
-    const startDateInput = document.getElementById('task-start-date');
-    const endDateInput = document.getElementById('task-end-date');
-    
-    if (startDateInput && endDateInput) {
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
-        
-        console.log('输入框中的日期:', { startDate, endDate });
-        
-        // 手动更新任务数据
-        currentEditingTask.startDate = startDate;
-        currentEditingTask.endDate = endDate;
-        
-        console.log('更新后的任务数据:', {
-            startDate: currentEditingTask.startDate,
-            endDate: currentEditingTask.endDate
-        });
-        
-        // 同步到时间线
-        syncTasksToTimeline();
-        
-        // 保存数据
-        saveData();
-        
-        // 重新渲染
-        renderTasks();
-        renderTimelineVertical();
-        
-        showNotification('任务日期已手动更新', 'success');
-    } else {
-        showNotification('日期输入框未找到', 'error');
-    }
-}
 
 // 验证任务日期
 function validateTaskDates() {

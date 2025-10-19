@@ -639,12 +639,36 @@
                     <i class="fas fa-rocket"></i> 立即开始使用
                 </a>
             </div>
+            
+            <!-- 管理员入口 -->
+            <div class="admin-section scroll-reveal" id="adminSection" style="display: none; margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h3><i class="fas fa-tools"></i> 管理员工具</h3>
+                <p>欢迎管理员！您可以使用以下工具管理系统：</p>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="user-management.html" class="btn-system" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-users-cog"></i> 用户管理
+                    </a>
+                    <a href="password-generator.html" class="btn-system" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.3);">
+                        <i class="fas fa-key"></i> 密码生成器
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     
     <script src="js/illi.js" onerror="console.log('illi.js加载失败，使用备用方案')"></script>
+    <script src="auth.js"></script>
     <!-- 备用JavaScript，防止外部文件加载失败 -->
     <script>
+        // 检查管理员权限并显示入口
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminSection').style.display = 'block';
+            }
+        });
+        
         // 备用工具函数
         window.illi = window.illi || {};
         
