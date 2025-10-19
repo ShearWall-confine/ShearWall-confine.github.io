@@ -391,6 +391,10 @@
                 <i class="fas fa-bug"></i> 测试输入框
             </button>
             <br>
+            <button type="button" onclick="enterGuestMode()" style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px;">
+                <i class="fas fa-user-friends"></i> 游客模式浏览
+            </button>
+            <br>
             <a href="index.html" class="back-btn">
                 <i class="fas fa-arrow-left"></i> 返回课题组首页
             </a>
@@ -442,6 +446,35 @@
             console.log('输入框初始化完成');
         });
         
+        // 进入游客模式函数
+        function enterGuestMode() {
+            console.log('用户选择进入游客模式');
+            
+            // 创建游客用户数据
+            const guestUser = {
+                username: 'guest',
+                role: 'guest',
+                name: '游客',
+                email: 'guest@example.com',
+                loginTime: new Date().toISOString(),
+                isGuest: true
+            };
+            
+            // 保存游客信息
+            sessionStorage.setItem('currentUser', JSON.stringify(guestUser));
+            
+            // 显示成功消息
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.textContent = '已切换到游客模式，正在跳转到首页...';
+                successMessage.style.display = 'block';
+            }
+            
+            // 延迟跳转到首页
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
         
         // 登录表单提交处理
         document.getElementById('loginForm').addEventListener('submit', function(e) {

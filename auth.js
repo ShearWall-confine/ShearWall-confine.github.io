@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 如果不是登录页面，才检查认证状态
     if (!isLoginPage) {
         checkAuthentication();
+    } else {
+        // 在登录页面，设置游客模式以便返回首页
+        console.log('在登录页面，设置游客模式以便返回首页');
+        setGuestMode();
     }
 });
 
