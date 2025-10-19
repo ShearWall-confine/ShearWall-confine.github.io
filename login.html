@@ -571,13 +571,27 @@
         
         // 智能登录验证（支持GitHub Secrets和开发环境）
         function smartLogin(username, password) {
+            console.log('智能登录验证开始，用户名:', username);
+            
+            // 检查是否在GitHub Pages环境
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            console.log('当前环境:', isGitHubPages ? 'GitHub Pages' : '本地开发');
             
             // 1. 首先尝试使用auth.js的login函数（如果可用）
             if (typeof window.login === 'function') {
                 try {
+                    console.log('尝试使用auth.js进行认证...');
                     const result = window.login(username, password);
                     if (result) {
+                        console.log('auth.js认证成功');
                         return result;
+                    } else {
+                        console.log('auth.js认证失败');
+                        // 在GitHub Pages环境中，不允许回退到开发环境
+                        if (isGitHubPages) {
+                            console.log('GitHub Pages环境，不允许开发环境回退');
+                            return false;
+                        }
                     }
                 } catch (error) {
                     console.warn('auth.js登录异常:', error);
@@ -607,25 +621,32 @@
                 }
             }
             
-            // 3. 回退到开发环境验证
-            const devPasswords = {
-                'admin': 'Tongji2024@Admin',
-                'editor': 'Tongji2024@Editor',
-                'viewer': 'Tongji2024@Viewer'
-            };
-            
-            for (const [role, pwd] of Object.entries(devPasswords)) {
-                if (username === role && password === pwd) {
-                    return {
-                        username: role,
-                        role: role,
-                        name: role === 'admin' ? '管理员' : role === 'editor' ? '编辑者' : '查看者',
-                        email: role + '@example.com',
-                        loginTime: new Date().toISOString()
-                    };
+            // 3. 回退到开发环境验证（仅在本地开发环境）
+            if (!isGitHubPages) {
+                console.log('尝试开发环境验证...');
+                const devPasswords = {
+                    'admin': 'Tongji2024@Admin',
+                    'editor': 'Tongji2024@Editor',
+                    'viewer': 'Tongji2024@Viewer'
+                };
+                
+                for (const [role, pwd] of Object.entries(devPasswords)) {
+                    if (username === role && password === pwd) {
+                        console.log('开发环境认证成功，角色:', role);
+                        return {
+                            username: role,
+                            role: role,
+                            name: role === 'admin' ? '管理员' : role === 'editor' ? '编辑者' : '查看者',
+                            email: role + '@example.com',
+                            loginTime: new Date().toISOString()
+                        };
+                    }
                 }
+            } else {
+                console.log('GitHub Pages环境，跳过开发环境验证');
             }
             
+            console.log('所有认证方法都失败');
             return false;
         }
         
@@ -719,6 +740,7 @@
                     if (loading) loading.style.display = 'block';
                     
                     setTimeout(() => {
+                        // 使用smartLogin函数，它包含回退机制
                         const result = smartLogin(username, password);
                         
                         if (result) {

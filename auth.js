@@ -277,10 +277,12 @@ function login(username, password) {
     const isGitHubPages = window.location.hostname.includes('github.io');
     
     if (isGitHubPages) {
-        // GitHub Pages环境：使用GitHub Secrets
+        // GitHub Pages环境：只使用GitHub Secrets，不允许开发环境回退
+        console.log('GitHub Pages环境，仅使用GitHub Secrets认证');
         return authenticateWithGitHubSecrets(username, password);
     } else {
         // 本地开发环境：使用临时认证
+        console.log('本地开发环境，使用开发环境认证');
         return authenticateForDevelopment(username, password);
     }
 }
@@ -334,6 +336,13 @@ function authenticateWithGitHubSecrets(username, password) {
 
 // 本地开发环境认证（临时方案）
 function authenticateForDevelopment(username, password) {
+    // 检查是否在GitHub Pages环境，如果是则拒绝开发环境认证
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    if (isGitHubPages) {
+        console.error('GitHub Pages环境不允许使用开发环境认证');
+        return false;
+    }
+    
     console.warn('使用开发环境临时认证');
     
     // 临时开发环境密码（生产环境应移除）
