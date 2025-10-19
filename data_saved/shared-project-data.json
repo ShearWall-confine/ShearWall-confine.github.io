@@ -12,7 +12,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-17",
-      "progress": 50,
+      "progress": 33,
       "subtasks": [
         {
           "title": "模态测试：CA_13_R",
@@ -29,6 +29,13 @@
           "completed": false,
           "completionTime": "2025-10-19T23:39",
           "timeDescription": ""
+        },
+        {
+          "id": 1760865325293,
+          "title": "123",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
