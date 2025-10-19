@@ -8,10 +8,174 @@
     <link rel="stylesheet" type="text/css" href="cSs/head.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* 现代化样式 */
+        /* 基础样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul, ol {
+            list-style: none;
+        }
+        
+        /* 头部样式 - 与主界面统一 */
+        .head-top {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 0;
+            border-bottom: 3px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .head-top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .head-top a {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 0 8px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .head-top a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .head-top img {
+            height: 45px;
+            margin-right: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+        
+        .head-top a:hover img {
+            transform: scale(1.05);
+        }
+        
+        .head-top p {
+            margin: 0;
+            font-size: 15px;
+            color: white;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .head-top a:hover p {
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .head-bottom {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .head-bottom ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .head-bottom li {
+            position: relative;
+        }
+        
+        .head-bottom > ul > li > a {
+            display: block;
+            padding: 18px 25px;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 8px;
+            margin: 5px;
+        }
+        
+        .head-bottom > ul > li > a:hover {
+            color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .head-bottom > ul > li > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .head-bottom > ul > li > a:hover::after {
+            width: 80%;
+        }
+        
+        .head-bottom ul ul {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .head-bottom li:hover ul {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .head-bottom ul ul a {
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .head-bottom ul ul a:hover {
+            background: #f8f9fa;
+            color: #667eea;
         }
         
         .database-container {

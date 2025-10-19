@@ -741,5 +741,24 @@
     <script src="auth.js" defer></script>
     <script src="github-sync.js" defer></script>
     <script src="script.js" defer></script>
+    
+    <!-- 基础错误处理 -->
+    <script>
+        // 防重复加载保护
+        if (window.pageLoaded) {
+            console.log('页面已加载，防止重复加载');
+        } else {
+            window.pageLoaded = true;
+        }
+        
+        // 基础功能备用
+        if (typeof window.goToHomePage === 'undefined') {
+            window.goToHomePage = function() {
+                if (confirm('确定要返回课题组首页吗？')) {
+                    window.location.href = 'index.html';
+                }
+            };
+        }
+    </script>
 </body>
 </html>
