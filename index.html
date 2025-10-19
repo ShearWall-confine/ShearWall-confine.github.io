@@ -615,15 +615,22 @@
         </div>
         
         <div class="login-info scroll-reveal">
-            <h3><i class="fas fa-key"></i> 系统登录信息</h3>
-            <p>请使用以下账户登录课题进度管理系统：</p>
+            <h3><i class="fas fa-key"></i> 系统访问信息</h3>
+            <p>欢迎访问课题进度管理系统！您可以以游客身份浏览，或登录获得完整功能：</p>
             
             <div class="user-accounts">
+                <div class="account-card" style="border: 2px solid #28a745;">
+                    <h4><i class="fas fa-user-friends"></i> 游客模式</h4>
+                    <p><strong>无需登录：</strong>可以直接浏览系统内容</p>
+                    <p><em>可以查看公开信息和项目概览</em></p>
+                    <p><em>功能有限，建议登录获得完整体验</em></p>
+                </div>
+                
                 <div class="account-card">
                     <h4><i class="fas fa-eye"></i> 查看者</h4>
                     <p><strong>安全认证：</strong>请联系管理员获取账号</p>
                     <p><em>系统采用加密存储，保护用户隐私</em></p>
-                    <p><em>只能查看项目进度</em></p>
+                    <p><em>可以查看详细项目进度</em></p>
                 </div>
                 
                 <div class="account-card">
@@ -634,9 +641,15 @@
                 </div>
             </div>
             
-            <div style="margin-top: 30px;">
-                <a href="login.html" class="btn-system" style="font-size: 1.2em; padding: 15px 40px;">
-                    <i class="fas fa-rocket"></i> 立即开始使用
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="login.html" class="btn-system" style="font-size: 1.1em; padding: 12px 30px;">
+                    <i class="fas fa-sign-in-alt"></i> 登录系统
+                </a>
+                <a href="#" onclick="setGuestMode()" class="btn-system" style="font-size: 1.1em; padding: 12px 30px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                    <i class="fas fa-user-friends"></i> 游客浏览
+                </a>
+                <a href="#" onclick="exitGuestMode()" class="btn-system" style="font-size: 1.1em; padding: 12px 30px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); display: none;" id="exitGuestBtn">
+                    <i class="fas fa-sign-out-alt"></i> 退出游客模式
                 </a>
             </div>
             
@@ -671,7 +684,7 @@
             console.log('检查管理员权限...');
             const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
             console.log('当前用户:', currentUser);
-            
+
             if (currentUser.role === 'admin') {
                 console.log('检测到管理员用户，显示管理员工具');
                 const adminSection = document.getElementById('adminSection');
@@ -684,7 +697,65 @@
             } else {
                 console.log('非管理员用户，角色:', currentUser.role);
             }
+            
+            // 检查游客模式状态，显示/隐藏相应按钮
+            const exitGuestBtn = document.getElementById('exitGuestBtn');
+            if (currentUser.isGuest && exitGuestBtn) {
+                exitGuestBtn.style.display = 'inline-block';
+                console.log('检测到游客模式，显示退出按钮');
+            } else if (exitGuestBtn) {
+                exitGuestBtn.style.display = 'none';
+            }
         });
+        
+        // 设置游客模式函数
+        function setGuestMode() {
+            console.log('用户选择游客模式');
+            
+            // 创建游客用户数据
+            const guestUser = {
+                username: 'guest',
+                role: 'guest',
+                name: '游客',
+                email: 'guest@example.com',
+                loginTime: new Date().toISOString(),
+                isGuest: true
+            };
+            
+            // 保存游客信息
+            sessionStorage.setItem('currentUser', JSON.stringify(guestUser));
+            
+            // 显示成功消息
+            if (window.illi && window.illi.showNotification) {
+                window.illi.showNotification('已切换到游客模式，可以浏览系统内容', 'success');
+            } else {
+                alert('已切换到游客模式，可以浏览系统内容');
+            }
+            
+            // 刷新页面以应用游客模式
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        function exitGuestMode() {
+            console.log('用户选择退出游客模式');
+            
+            // 清除游客信息
+            sessionStorage.removeItem('currentUser');
+            
+            // 显示成功消息
+            if (window.illi && window.illi.showNotification) {
+                window.illi.showNotification('已退出游客模式，可以正常登录', 'success');
+            } else {
+                alert('已退出游客模式，可以正常登录');
+            }
+            
+            // 刷新页面以应用退出游客模式
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
         
         // 备用工具函数
         window.illi = window.illi || {};

@@ -66,8 +66,11 @@
             box-sizing: border-box;
             background: #fff;
             color: #333;
-            pointer-events: auto;
+            pointer-events: auto !important;
             user-select: text;
+            cursor: text;
+            z-index: 1;
+            position: relative;
         }
 
         .form-group input:focus {
@@ -144,6 +147,71 @@
             color: #5a6fd8;
         }
 
+        /* 按钮悬停效果 */
+        .test-btn:hover {
+            background: #218838 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            cursor: pointer !important;
+        }
+
+        .guest-btn:hover {
+            background: #138496 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+            cursor: pointer !important;
+        }
+
+        .exit-guest-btn:hover {
+            background: #c82333 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            cursor: pointer !important;
+        }
+
+        .back-btn:hover {
+            color: #5a6fd8 !important;
+            transform: translateY(-1px);
+            cursor: pointer !important;
+        }
+
+        /* 确保所有按钮都有正确的鼠标样式 */
+        button {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+
+        a {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+
+        /* 确保输入框可以正常点击和输入 */
+        input[type="text"], input[type="password"] {
+            pointer-events: auto !important;
+            cursor: text !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+        }
+
+        /* 确保表单组不会阻挡输入框 */
+        .form-group {
+            pointer-events: auto !important;
+        }
+
+        /* 确保按钮可以点击 */
+        .test-btn, .guest-btn {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            user-select: none;
+        }
+
+        .test-btn:active, .guest-btn:active {
+            transform: translateY(0px) !important;
+        }
+
         .error-message {
             background: #fee;
             color: #c33;
@@ -167,10 +235,15 @@
         /* 密码容器样式 */
         .password-container {
             position: relative;
+            pointer-events: auto !important;
         }
 
         .password-container input {
             padding-right: 45px;
+            pointer-events: auto !important;
+            cursor: text;
+            z-index: 1;
+            position: relative;
         }
 
         /* 密码显示/隐藏按钮样式 */
@@ -187,6 +260,8 @@
             padding: 5px;
             border-radius: 3px;
             transition: all 0.3s ease;
+            z-index: 2;
+            pointer-events: auto;
         }
 
         #togglePassword:hover {
@@ -387,49 +462,227 @@
         </div>
 
         <div style="text-align: center;">
-            <button type="button" onclick="testInputs()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer;">
+            <button type="button" onclick="testInputs()" class="test-btn" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; transition: all 0.3s ease;">
                 <i class="fas fa-bug"></i> 测试输入框
             </button>
             <br>
-            <button type="button" onclick="enterGuestMode()" style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px;">
+            <button type="button" onclick="enterGuestMode()" class="guest-btn" style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
                 <i class="fas fa-user-friends"></i> 游客模式浏览
             </button>
             <br>
-            <a href="index.html" class="back-btn">
+            <button type="button" onclick="exitGuestMode()" class="exit-guest-btn" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease; display: none;">
+                <i class="fas fa-sign-out-alt"></i> 退出游客模式
+            </button>
+            <br>
+            <a href="index.html" class="back-btn" style="display: inline-block; margin-top: 10px; transition: all 0.3s ease;">
                 <i class="fas fa-arrow-left"></i> 返回课题组首页
             </a>
         </div>
     </div>
 
     <!-- GitHub Secrets配置 -->
-    <script src="github-secrets-config.js"></script>
+    <script src="github-secrets-config.js" onerror="console.log('github-secrets-config.js加载失败，使用备用配置')"></script>
     <!-- 用户配置 -->
-    <script src="user-config.js"></script>
+    <script src="user-config.js" onerror="console.error('user-config.js加载失败，使用备用配置')"></script>
     <!-- 认证系统 -->
     <script src="auth.js" onerror="console.log('auth.js加载失败，使用备用认证')"></script>
     <script>
-        // 页面加载完成后的初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('登录页面加载完成');
+        // 登录系统（支持GitHub Secrets和开发环境）
+        
+        // 测试输入框函数
+        function testInputs() {
+            console.log('测试输入框功能被调用');
             
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
-            const togglePasswordBtn = document.getElementById('togglePassword');
-            const toggleIcon = document.getElementById('toggleIcon');
             
-            // 确保输入框属性正确
+            if (usernameInput && passwordInput) {
+                usernameInput.value = 'test_user';
+                passwordInput.value = 'test_password';
+                
+                const successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.textContent = '✅ 输入框测试成功！';
+                    successMessage.style.display = 'block';
+                }
+                
+                setTimeout(() => {
+                    usernameInput.value = '';
+                    passwordInput.value = '';
+                    if (successMessage) {
+                        successMessage.style.display = 'none';
+                    }
+                }, 2000);
+            }
+        }
+        
+        // 游客模式函数
+        function enterGuestMode() {
+            console.log('游客模式被调用');
+            
+            const guestUser = {
+                username: 'guest',
+                role: 'guest',
+                name: '游客',
+                email: 'guest@example.com',
+                loginTime: new Date().toISOString(),
+                isGuest: true
+            };
+            
+            sessionStorage.setItem('currentUser', JSON.stringify(guestUser));
+            
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.textContent = '已切换到游客模式，正在跳转...';
+                successMessage.style.display = 'block';
+            }
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+        
+        // 退出游客模式函数
+        function exitGuestMode() {
+            console.log('退出游客模式被调用');
+            
+            // 清除游客模式数据
+            sessionStorage.removeItem('currentUser');
+            
+            const successMessage = document.getElementById('successMessage');
+            if (successMessage) {
+                successMessage.textContent = '已退出游客模式，可以正常登录';
+                successMessage.style.display = 'block';
+            }
+            
+            // 隐藏退出游客模式按钮，显示游客模式按钮
+            const exitGuestBtn = document.querySelector('.exit-guest-btn');
+            const guestBtn = document.querySelector('.guest-btn');
+            
+            if (exitGuestBtn) exitGuestBtn.style.display = 'none';
+            if (guestBtn) guestBtn.style.display = 'inline-block';
+            
+            // 清空输入框
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            if (usernameInput) usernameInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+        }
+        
+        // 智能登录验证（支持GitHub Secrets和开发环境）
+        function smartLogin(username, password) {
+            
+            // 1. 首先尝试使用auth.js的login函数（如果可用）
+            if (typeof window.login === 'function') {
+                try {
+                    const result = window.login(username, password);
+                    if (result) {
+                        return result;
+                    }
+                } catch (error) {
+                    console.warn('auth.js登录异常:', error);
+                }
+            }
+            
+            // 2. 尝试使用user-config.js的验证函数
+            if (typeof window.verifyPassword === 'function' && typeof window.USER_CONFIG !== 'undefined') {
+                try {
+                    const users = window.USER_CONFIG.defaultUsers;
+                    for (const [role, userInfo] of Object.entries(users)) {
+                        if (userInfo.username === username) {
+                            const isValid = window.verifyPassword(password, userInfo.passwordHash);
+                            if (isValid) {
+                                return {
+                                    username: userInfo.username,
+                                    role: userInfo.role,
+                                    name: userInfo.name,
+                                    email: userInfo.email,
+                                    loginTime: new Date().toISOString()
+                                };
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.warn('user-config.js验证异常:', error);
+                }
+            }
+            
+            // 3. 回退到开发环境验证
+            const devPasswords = {
+                'admin': 'Tongji2024@Admin',
+                'editor': 'Tongji2024@Editor',
+                'viewer': 'Tongji2024@Viewer'
+            };
+            
+            for (const [role, pwd] of Object.entries(devPasswords)) {
+                if (username === role && password === pwd) {
+                    return {
+                        username: role,
+                        role: role,
+                        name: role === 'admin' ? '管理员' : role === 'editor' ? '编辑者' : '查看者',
+                        email: role + '@example.com',
+                        loginTime: new Date().toISOString()
+                    };
+                }
+            }
+            
+            return false;
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 检查当前是否处于游客模式
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                try {
+                    const currentUser = JSON.parse(userData);
+                    if (currentUser.isGuest) {
+                        // 如果当前是游客模式，显示退出游客模式按钮
+                        const exitGuestBtn = document.querySelector('.exit-guest-btn');
+                        const guestBtn = document.querySelector('.guest-btn');
+                        
+                        if (exitGuestBtn) exitGuestBtn.style.display = 'inline-block';
+                        if (guestBtn) guestBtn.style.display = 'none';
+                        
+                        console.log('检测到游客模式，显示退出按钮');
+                    }
+                } catch (error) {
+                    console.error('用户数据解析错误:', error);
+                }
+            }
+            
+            // 确保输入框可以正常点击
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
             if (usernameInput) {
-                usernameInput.removeAttribute('readonly');
-                usernameInput.removeAttribute('disabled');
+                usernameInput.addEventListener('click', function() {
+                    console.log('用户名输入框被点击');
+                    this.focus();
+                });
+                
+                usernameInput.addEventListener('focus', function() {
+                    console.log('用户名输入框获得焦点');
+                });
             }
             
             if (passwordInput) {
-                passwordInput.removeAttribute('readonly');
-                passwordInput.removeAttribute('disabled');
+                passwordInput.addEventListener('click', function() {
+                    console.log('密码输入框被点击');
+                    this.focus();
+                });
+                
+                passwordInput.addEventListener('focus', function() {
+                    console.log('密码输入框获得焦点');
+                });
             }
             
             // 密码显示/隐藏功能
-            if (togglePasswordBtn && toggleIcon) {
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (togglePasswordBtn && passwordInput && toggleIcon) {
                 togglePasswordBtn.addEventListener('click', function() {
                     if (passwordInput.type === 'password') {
                         passwordInput.type = 'text';
@@ -443,99 +696,80 @@
                 });
             }
             
-            console.log('输入框初始化完成');
-        });
-        
-        // 进入游客模式函数
-        function enterGuestMode() {
-            console.log('用户选择进入游客模式');
-            
-            // 创建游客用户数据
-            const guestUser = {
-                username: 'guest',
-                role: 'guest',
-                name: '游客',
-                email: 'guest@example.com',
-                loginTime: new Date().toISOString(),
-                isGuest: true
-            };
-            
-            // 保存游客信息
-            sessionStorage.setItem('currentUser', JSON.stringify(guestUser));
-            
-            // 显示成功消息
-            const successMessage = document.getElementById('successMessage');
-            if (successMessage) {
-                successMessage.textContent = '已切换到游客模式，正在跳转到首页...';
-                successMessage.style.display = 'block';
+            // 登录表单处理
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('登录表单被提交');
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const loginBtn = document.getElementById('loginBtn');
+                    const loading = document.getElementById('loading');
+                    const errorMessage = document.getElementById('errorMessage');
+                    const successMessage = document.getElementById('successMessage');
+                    
+                    // 隐藏之前的消息
+                    if (errorMessage) errorMessage.style.display = 'none';
+                    if (successMessage) successMessage.style.display = 'none';
+                    
+                    // 显示加载状态
+                    if (loginBtn) loginBtn.disabled = true;
+                    if (loading) loading.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        const result = smartLogin(username, password);
+                        
+                        if (result) {
+                            sessionStorage.setItem('currentUser', JSON.stringify(result));
+                            
+                            if (successMessage) {
+                                successMessage.textContent = '登录成功！正在跳转...';
+                                successMessage.style.display = 'block';
+                            }
+                            
+                            setTimeout(() => {
+                                window.location.href = 'project-management.html';
+                            }, 1500);
+                        } else {
+                            if (errorMessage) {
+                                errorMessage.textContent = '用户名或密码错误，请重试';
+                                errorMessage.style.display = 'block';
+                            }
+                        }
+                        
+                        // 恢复按钮状态
+                        if (loginBtn) loginBtn.disabled = false;
+                        if (loading) loading.style.display = 'none';
+                    }, 800);
+                });
             }
             
-            // 延迟跳转到首页
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-        }
-        
-        // 登录表单提交处理
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // 按钮点击事件绑定
+            const testBtn = document.querySelector('.test-btn');
+            const guestBtn = document.querySelector('.guest-btn');
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const loading = document.getElementById('loading');
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
+            if (testBtn) {
+                testBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    testInputs();
+                });
+            }
             
-            // 隐藏之前的消息
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-            
-            // 显示加载状态
-            loginBtn.disabled = true;
-            loading.style.display = 'block';
-            
-            // 简单的登录验证（避免复杂的异步操作）
-            setTimeout(() => {
-                console.log('开始登录验证...');
-                
-                // 检查auth.js是否加载
-                if (typeof login !== 'function') {
-                    console.error('auth.js未加载');
-                    errorMessage.textContent = '认证系统未加载，请刷新页面重试';
-                    errorMessage.style.display = 'block';
-                    loginBtn.disabled = false;
-                    loading.style.display = 'none';
-                    return;
-                }
-                
-                try {
-                    const result = login(username, password);
-                    console.log('登录结果:', result);
-                    
-                    if (result) {
-                        successMessage.textContent = '登录成功！正在跳转...';
-                        successMessage.style.display = 'block';
-                        
-                        // 延迟跳转
-                        setTimeout(() => {
-                            window.location.href = 'project-management.html';
-                        }, 1500);
-                    } else {
-                        errorMessage.textContent = '用户名或密码错误，请重试';
-                        errorMessage.style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error('登录过程中出错:', error);
-                    errorMessage.textContent = '登录过程中出错，请重试';
-                    errorMessage.style.display = 'block';
-                }
-                
-                // 隐藏加载状态
-                loginBtn.disabled = false;
-                loading.style.display = 'none';
-            }, 800);
+            if (guestBtn) {
+                guestBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    enterGuestMode();
+                });
+            }
         });
+        
+        // 确保函数在全局作用域
+        window.testInputs = testInputs;
+        window.enterGuestMode = enterGuestMode;
+        window.exitGuestMode = exitGuestMode;
+        
     </script>
 </body>
 </html>

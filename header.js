@@ -22,8 +22,13 @@ async function loadHeader() {
         document.head.appendChild(cssLink);
         
         // 加载头部HTML
+        console.log('正在加载 header.html...');
         const response = await fetch('header.html');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         const headerHTML = await response.text();
+        console.log('header.html 加载成功');
         
         // 创建头部容器
         const headerContainer = document.createElement('div');
@@ -35,9 +40,9 @@ async function loadHeader() {
         
         console.log('头部组件加载成功');
     } catch (error) {
-        console.error('头部组件加载失败:', error);
-        // 如果加载失败，显示默认头部
-        loadFallbackHeader();
+        console.log('外部头部文件加载失败，使用内联头部:', error.message);
+        // 如果加载失败，使用内联头部
+        loadInlineHeader();
     }
 }
 
@@ -49,46 +54,54 @@ function loadInlineHeader() {
     cssLink.href = 'header.css';
     document.head.appendChild(cssLink);
     
-    // 创建内联头部HTML
+    // 创建内联头部HTML（使用正确的四个链接结构）
     const headerHTML = `
-        <div class="head">
-            <div class="head-top">
-                <div class="head-left">
-                    <img src="https://via.placeholder.com/60x60/667eea/ffffff?text=LOGO" alt="课题组Logo" style="height: 60px; border-radius: 50%;">
-                    <div class="head-info">
-                        <h1>xxx老师课题组</h1>
-                        <p>结构防灾减灾工程系 | 同济大学</p>
-                    </div>
-                </div>
-                <div class="head-right">
-                    <div class="user-info" id="userInfo" style="display: none;">
-                        <span class="user-name" id="userName"></span>
-                        <button class="btn-logout" onclick="logout()">退出</button>
-                    </div>
-                </div>
-            </div>
-            <div class="head-bottom">
-                <nav class="head-nav">
+        <div class="head-top">     
+            <a href="https://www.tongji.edu.cn/">
+                <img src="figurE/tju.png" />
+            </a>
+            <a href="https://ddms.tongji.edu.cn/main.htm">
+                <img src="figurE/tju-ce.png" />
+            </a>
+            <a href="https://ddms.tongji.edu.cn/main.htm">
+                <p>&nbsp;结构防灾减灾工程系&nbsp;</p>
+            </a>
+            <a href="https://shearwall-confine.github.io/">
+                <p>&nbsp;xxx老师课题组&nbsp;</p>
+                <p>&nbsp;Research Group&nbsp;</p>
+            </a> 
+        </div>
+        <div class="head-bottom">     
+            <ul>
+                <li><a href="index.html">首页</a></li>
+                <li><a href="#">概况</a>
                     <ul>
-                        <li><a href="index.html"><i class="fas fa-home"></i> 首页</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle"><i class="fas fa-project-diagram"></i> 系统 <i class="fas fa-chevron-down"></i></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> 课题进度管理</a></li>
-                                <li><a href="database.html"><i class="fas fa-database"></i> 剪力墙数据库</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle"><i class="fas fa-info-circle"></i> 关于 <i class="fas fa-chevron-down"></i></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#"><i class="fas fa-users"></i> 研究团队</a></li>
-                                <li><a href="#"><i class="fas fa-graduation-cap"></i> 研究方向</a></li>
-                                <li><a href="#"><i class="fas fa-envelope"></i> 联系我们</a></li>
-                            </ul>
-                        </li>
+                        <li><a href="#"><i class="fas fa-search"></i> 研究方向</a></li>
+                        <li><a href="#"><i class="fas fa-project-diagram"></i> 研究项目</a></li>
                     </ul>
-                </nav>
-            </div>
+                </li>
+                <li><a href="#">组内动态</a></li>
+                <li><a href="#">研究团队</a>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-chalkboard-teacher"></i> 教师</a></li>
+                        <li><a href="#"><i class="fas fa-user-graduate"></i> 博士后</a></li>
+                        <li><a href="#"><i class="fas fa-user-check"></i> 出站博士后</a></li>
+                        <li><a href="#"><i class="fas fa-graduation-cap"></i> 博士</a></li>
+                        <li><a href="#"><i class="fas fa-user-graduate"></i> 往届博士</a></li>
+                        <li><a href="#"><i class="fas fa-user"></i> 研究生</a></li>
+                        <li><a href="#"><i class="fas fa-user-friends"></i> 往届研究生</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">科研成果</a>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-flask"></i> ILEE联合试验</a></li>
+                        <li><a href="database.html"><i class="fas fa-database"></i> 剪力墙数据库</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">交流合作</a></li>
+                <li><a href="login.html">课题进度管理</a></li>
+                <li><a href="#">联系我们</a></li>
+            </ul>
         </div>
     `;
     

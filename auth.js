@@ -25,9 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!isLoginPage) {
         checkAuthentication();
     } else {
-        // 在登录页面，设置游客模式以便返回首页
-        console.log('在登录页面，设置游客模式以便返回首页');
-        setGuestMode();
+        // 在登录页面，不自动设置游客模式，让用户可以选择登录或游客模式
+        console.log('在登录页面，等待用户选择登录或游客模式');
     }
 });
 

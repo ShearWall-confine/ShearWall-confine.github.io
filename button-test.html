@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按钮测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-btn {
+            background: #28a745;
+            color: white;
+        }
+        .guest-btn {
+            background: #17a2b8;
+            color: white;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 按钮功能测试</h1>
+        <p>这个页面用于测试登录页面的按钮功能是否正常工作。</p>
+        
+        <div>
+            <button class="test-btn" onclick="testInputs()">
+                <i class="fas fa-bug"></i> 测试输入框
+            </button>
+            <button class="guest-btn" onclick="enterGuestMode()">
+                <i class="fas fa-user-friends"></i> 游客模式浏览
+            </button>
+            <a href="index.html" class="back-btn" style="text-decoration: none; display: inline-block;">
+                <i class="fas fa-arrow-left"></i> 返回课题组首页
+            </a>
+        </div>
+        
+        <div id="result" class="result"></div>
+        
+        <div style="margin-top: 30px;">
+            <h3>测试说明：</h3>
+            <ul>
+                <li><strong>测试输入框</strong>：应该显示成功消息并自动清空</li>
+                <li><strong>游客模式浏览</strong>：应该跳转到首页</li>
+                <li><strong>返回课题组首页</strong>：应该跳转到index.html</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 全局错误处理
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript错误:', e.error);
+            showResult('❌ JavaScript错误: ' + e.message, 'error');
+        });
+        
+        // 测试输入框函数
+        window.testInputs = function() {
+            console.log('测试输入框功能...');
+            showResult('✅ 测试输入框功能正常！按钮点击事件已触发。', 'success');
+        };
+        
+        // 进入游客模式函数
+        window.enterGuestMode = function() {
+            console.log('用户选择进入游客模式');
+            showResult('✅ 游客模式功能正常！正在跳转到首页...', 'success');
+            
+            // 延迟跳转
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        };
+        
+        // 显示结果
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.textContent = message;
+            result.className = 'result ' + type;
+            result.style.display = 'block';
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                result.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('测试页面加载完成');
+            showResult('✅ 页面加载完成，所有按钮已准备就绪！', 'success');
+        });
+    </script>
+</body>
+</html>

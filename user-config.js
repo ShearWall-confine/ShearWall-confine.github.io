@@ -8,9 +8,16 @@
  * - 自动检测环境并选择相应配置
  */
 
-// 检测环境
-const isProduction = typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
-const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+// 防止重复加载
+if (window.USER_CONFIG_LOADED) {
+    console.warn('user-config.js 已经加载过，跳过重复加载');
+} else {
+    window.USER_CONFIG_LOADED = true;
+    console.log('user-config.js 开始加载...');
+
+    // 检测环境
+    const isProduction = typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
+    const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
 
 // 获取GitHub Secrets配置
 function getGitHubSecrets() {
@@ -275,16 +282,29 @@ function verifyPassword(password, storedHash) {
     }
 }
 
-// 导出配置（如果使用模块系统）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        USER_CONFIG,
-        addUser,
-        updateUser,
-        deleteUser,
-        resetPassword,
-        getUserList,
-        hashPassword,
-        verifyPassword
-    };
+    // 导出配置（如果使用模块系统）
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {
+            USER_CONFIG,
+            addUser,
+            updateUser,
+            deleteUser,
+            resetPassword,
+            getUserList,
+            hashPassword,
+            verifyPassword
+        };
+    } else {
+        // 浏览器环境
+        window.USER_CONFIG = USER_CONFIG;
+        window.addUser = addUser;
+        window.updateUser = updateUser;
+        window.deleteUser = deleteUser;
+        window.resetPassword = resetPassword;
+        window.getUserList = getUserList;
+        window.hashPassword = hashPassword;
+        window.verifyPassword = verifyPassword;
+    }
+    
+    console.log('user-config.js 加载完成');
 }
