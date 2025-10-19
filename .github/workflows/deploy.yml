@@ -15,6 +15,11 @@ jobs:
       contents: read
       pages: write
       id-token: write
+      actions: read
+      checks: write
+      pull-requests: write
+      statuses: write
+      security-events: write
     
     steps:
     - name: Checkout
