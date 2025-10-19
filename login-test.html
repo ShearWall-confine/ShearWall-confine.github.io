@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>课题进度系统登录诊断</h1>
+    
+    <div class="test-section">
+        <h2>1. 文件加载测试</h2>
+        <div id="file-load-results"></div>
+        <button onclick="testFileLoading()">测试文件加载</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 登录功能测试</h2>
+        <div>
+            <input type="text" id="test-username" placeholder="用户名" value="admin">
+            <input type="password" id="test-password" placeholder="密码" value="admin123">
+            <button onclick="testLogin()">测试登录</button>
+        </div>
+        <div id="login-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 认证状态检查</h2>
+        <div id="auth-status"></div>
+        <button onclick="checkAuthStatus()">检查认证状态</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 页面跳转测试</h2>
+        <div id="redirect-results"></div>
+        <button onclick="testRedirect()">测试跳转到项目管理页面</button>
+    </div>
+
+    <script src="auth.js" onerror="console.log('auth.js加载失败')"></script>
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        function testFileLoading() {
+            clearResults('file-load-results');
+            
+            // 测试auth.js是否加载
+            if (typeof login === 'function') {
+                addResult('file-load-results', '✅ auth.js 加载成功，login函数可用', 'success');
+            } else {
+                addResult('file-load-results', '❌ auth.js 加载失败或login函数不可用', 'error');
+            }
+            
+            // 测试其他函数
+            if (typeof checkAuthentication === 'function') {
+                addResult('file-load-results', '✅ checkAuthentication 函数可用', 'success');
+            } else {
+                addResult('file-load-results', '❌ checkAuthentication 函数不可用', 'error');
+            }
+            
+            if (typeof logout === 'function') {
+                addResult('file-load-results', '✅ logout 函数可用', 'success');
+            } else {
+                addResult('file-load-results', '❌ logout 函数不可用', 'error');
+            }
+        }
+        
+        function testLogin() {
+            clearResults('login-results');
+            
+            const username = document.getElementById('test-username').value;
+            const password = document.getElementById('test-password').value;
+            
+            if (!username || !password) {
+                addResult('login-results', '❌ 请输入用户名和密码', 'error');
+                return;
+            }
+            
+            if (typeof login !== 'function') {
+                addResult('login-results', '❌ login函数不可用', 'error');
+                return;
+            }
+            
+            try {
+                const result = login(username, password);
+                if (result) {
+                    addResult('login-results', '✅ 登录成功！', 'success');
+                    addResult('login-results', `用户信息: ${JSON.stringify(JSON.parse(sessionStorage.getItem('currentUser')))}`, 'info');
+                } else {
+                    addResult('login-results', '❌ 登录失败：用户名或密码错误', 'error');
+                }
+            } catch (error) {
+                addResult('login-results', `❌ 登录过程中出错: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkAuthStatus() {
+            clearResults('auth-status');
+            
+            const userData = sessionStorage.getItem('currentUser');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    addResult('auth-status', '✅ 用户已登录', 'success');
+                    addResult('auth-status', `用户名: ${user.username}`, 'info');
+                    addResult('auth-status', `角色: ${user.role}`, 'info');
+                    addResult('auth-status', `姓名: ${user.name}`, 'info');
+                    addResult('auth-status', `登录时间: ${user.loginTime}`, 'info');
+                } catch (error) {
+                    addResult('auth-status', `❌ 用户数据解析错误: ${error.message}`, 'error');
+                }
+            } else {
+                addResult('auth-status', '❌ 用户未登录', 'error');
+            }
+        }
+        
+        function testRedirect() {
+            clearResults('redirect-results');
+            
+            const userData = sessionStorage.getItem('currentUser');
+            if (!userData) {
+                addResult('redirect-results', '❌ 请先登录', 'error');
+                return;
+            }
+            
+            addResult('redirect-results', '正在跳转到项目管理页面...', 'info');
+            
+            setTimeout(() => {
+                window.location.href = 'project-management.html';
+            }, 1000);
+        }
+        
+        // 页面加载时自动运行测试
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testFileLoading();
+                checkAuthStatus();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

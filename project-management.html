@@ -738,11 +738,11 @@
 
     <!-- SheetJS for Excel file reading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-    <script src="auth.js" defer></script>
+    <script src="auth.js"></script>
     <script src="github-sync.js" defer></script>
     <script src="script.js" defer></script>
     
-    <!-- 基础错误处理 -->
+    <!-- 认证检查和基础错误处理 -->
     <script>
         // 防重复加载保护
         if (window.pageLoaded) {
@@ -750,6 +750,29 @@
         } else {
             window.pageLoaded = true;
         }
+        
+        // 立即执行认证检查
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('开始认证检查...');
+            
+            // 等待auth.js加载完成
+            const checkAuth = () => {
+                if (typeof checkAuthentication === 'function') {
+                    console.log('执行认证检查');
+                    checkAuthentication();
+                } else {
+                    console.log('auth.js未加载，1秒后重试...');
+                    setTimeout(checkAuth, 1000);
+                }
+            };
+            
+            // 立即检查一次，如果失败则延迟重试
+            if (typeof checkAuthentication === 'function') {
+                checkAuthentication();
+            } else {
+                setTimeout(checkAuth, 100);
+            }
+        });
         
         // 基础功能备用
         if (typeof window.goToHomePage === 'undefined') {
