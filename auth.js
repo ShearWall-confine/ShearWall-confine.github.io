@@ -186,17 +186,40 @@ function showUserInfo() {
     }
 }
 
+// 简单的密码哈希函数（生产环境应使用更安全的哈希算法）
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // 转换为32位整数
+    }
+    return hash.toString();
+}
+
 // 登录函数
 function login(username, password) {
-    // 模拟用户数据库
+    // 用户数据库 - 使用哈希密码
     const users = {
-        'admin': { password: 'admin123', role: 'editor', name: '管理员' },
-        'viewer': { password: 'viewer123', role: 'viewer', name: '查看者' },
-        'editor': { password: 'editor123', role: 'editor', name: '编辑者' }
+        'admin': { 
+            passwordHash: simpleHash('Tongji2024@Admin'), 
+            role: 'editor', 
+            name: '管理员' 
+        },
+        'viewer': { 
+            passwordHash: simpleHash('Tongji2024@Viewer'), 
+            role: 'viewer', 
+            name: '查看者' 
+        },
+        'editor': { 
+            passwordHash: simpleHash('Tongji2024@Editor'), 
+            role: 'editor', 
+            name: '编辑者' 
+        }
     };
     
-    // 验证用户名和密码
-    if (users[username] && users[username].password === password) {
+    // 验证用户名和密码哈希
+    if (users[username] && users[username].passwordHash === simpleHash(password)) {
         const userData = {
             username: username,
             role: users[username].role,
