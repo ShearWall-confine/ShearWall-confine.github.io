@@ -163,6 +163,42 @@
             font-size: 14px;
             display: none;
         }
+
+        /* 密码容器样式 */
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 45px;
+        }
+
+        /* 密码显示/隐藏按钮样式 */
+        #togglePassword {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        #togglePassword:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        #togglePassword:focus {
+            outline: none;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
         
         /* 响应式设计 - 多分辨率优化 */
         
@@ -332,7 +368,12 @@
 
             <div class="form-group">
                 <label for="password"><i class="fas fa-key"></i> 密码</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="请输入密码">
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="请输入密码">
+                    <button type="button" id="togglePassword" title="显示/隐藏密码">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="login-btn" id="loginBtn">
@@ -369,6 +410,8 @@
             
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('toggleIcon');
             
             // 确保输入框属性正确
             if (usernameInput) {
@@ -379,6 +422,21 @@
             if (passwordInput) {
                 passwordInput.removeAttribute('readonly');
                 passwordInput.removeAttribute('disabled');
+            }
+            
+            // 密码显示/隐藏功能
+            if (togglePasswordBtn && toggleIcon) {
+                togglePasswordBtn.addEventListener('click', function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.className = 'fas fa-eye-slash';
+                        togglePasswordBtn.title = '隐藏密码';
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.className = 'fas fa-eye';
+                        togglePasswordBtn.title = '显示密码';
+                    }
+                });
             }
             
             console.log('输入框初始化完成');
