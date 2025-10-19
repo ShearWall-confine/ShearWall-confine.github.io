@@ -172,6 +172,7 @@
     },
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       "id": "task-start-1760864122952",
       "date": "2025-10-19",
       "title": "开始：新任务test",
@@ -199,6 +200,8 @@
       "isSynced": true,
       "type": "task-end"
 =======
+=======
+>>>>>>> Stashed changes
       "id": "subtask-completion-1760787461942-0",
       "date": "2025-10-19",
       "time": "23:07",
@@ -216,6 +219,9 @@
       "type": "subtask-completion",
       "parentTask": "管道吊架模态测试",
       "isSubtask": true
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
   ],
