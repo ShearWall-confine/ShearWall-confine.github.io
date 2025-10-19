@@ -54,6 +54,19 @@
         }
       ],
       "attachments": []
+    },
+    {
+      "id": 1760864122952,
+      "title": "新任务test",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-19",
+      "endDate": "2025-11-18",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -169,6 +182,34 @@
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760787494825,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "task-start-1760864122952",
+      "date": "2025-10-19",
+      "title": "开始：新任务test",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760864122952,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760864122952",
+      "date": "2025-11-18",
+      "title": "完成：新任务test",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760864122952,
       "tags": [
         "工作清单",
         "结束"
