@@ -63,11 +63,25 @@
             font-size: 16px;
             transition: border-color 0.3s ease;
             box-sizing: border-box;
+            background: #fff;
+            color: #333;
+            pointer-events: auto;
+            user-select: text;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .form-group input:read-only {
+            background: #f9f9f9;
         }
 
         .login-btn {
@@ -163,12 +177,12 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="username"><i class="fas fa-user"></i> 用户名</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required autocomplete="username" placeholder="请输入用户名">
             </div>
 
             <div class="form-group">
                 <label for="password"><i class="fas fa-key"></i> 密码</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="请输入密码">
             </div>
 
             <button type="submit" class="login-btn" id="loginBtn">
@@ -182,14 +196,95 @@
         </div>
 
         <div style="text-align: center;">
+            <button type="button" onclick="testInputs()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer;">
+                <i class="fas fa-bug"></i> 测试输入框
+            </button>
+            <br>
             <a href="index.html" class="back-btn">
                 <i class="fas fa-arrow-left"></i> 返回课题组首页
             </a>
         </div>
     </div>
 
-    <script src="auth.js"></script>
+    <script src="auth.js" onerror="console.log('auth.js加载失败，使用备用认证')"></script>
     <script>
+        // 确保输入框可以正常输入
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            // 确保输入框属性正确
+            usernameInput.removeAttribute('readonly');
+            usernameInput.removeAttribute('disabled');
+            passwordInput.removeAttribute('readonly');
+            passwordInput.removeAttribute('disabled');
+            
+            // 确保输入框可以聚焦和输入
+            usernameInput.addEventListener('focus', function() {
+                console.log('用户名输入框获得焦点');
+                this.style.borderColor = '#667eea';
+            });
+            
+            passwordInput.addEventListener('focus', function() {
+                console.log('密码输入框获得焦点');
+                this.style.borderColor = '#667eea';
+            });
+            
+            // 确保输入框可以输入
+            usernameInput.addEventListener('input', function() {
+                console.log('用户名输入:', this.value);
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                console.log('密码输入:', this.value.length + ' 个字符');
+            });
+            
+            // 添加点击事件确保可以聚焦
+            usernameInput.addEventListener('click', function() {
+                this.focus();
+            });
+            
+            passwordInput.addEventListener('click', function() {
+                this.focus();
+            });
+            
+            // 测试输入框是否可编辑
+            console.log('用户名输入框可编辑:', !usernameInput.readOnly && !usernameInput.disabled);
+            console.log('密码输入框可编辑:', !passwordInput.readOnly && !passwordInput.disabled);
+        });
+        
+        // 测试输入框功能
+        function testInputs() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            // 测试输入框状态
+            const usernameStatus = {
+                disabled: usernameInput.disabled,
+                readOnly: usernameInput.readOnly,
+                value: usernameInput.value,
+                type: usernameInput.type,
+                placeholder: usernameInput.placeholder
+            };
+            
+            const passwordStatus = {
+                disabled: passwordInput.disabled,
+                readOnly: passwordInput.readOnly,
+                value: passwordInput.value,
+                type: passwordInput.type,
+                placeholder: passwordInput.placeholder
+            };
+            
+            console.log('用户名输入框状态:', usernameStatus);
+            console.log('密码输入框状态:', passwordStatus);
+            
+            // 尝试设置测试值
+            usernameInput.value = 'test_user';
+            passwordInput.value = 'test_password';
+            
+            alert(`输入框测试结果：\n用户名: ${usernameInput.value}\n密码: ${passwordInput.value.length}个字符\n\n如果看到测试值，说明输入框工作正常！`);
+        }
+        
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
