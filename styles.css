@@ -711,7 +711,17 @@ body {
 
 .header-actions {
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 /* 按钮样式 */
@@ -2394,6 +2404,19 @@ textarea.form-control {
     
     .header-actions {
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .button-group {
+        gap: 6px;
+    }
+    
+    .header-actions .btn {
+        flex: 0 1 auto;
+        min-width: 120px;
+        font-size: 13px;
+        padding: 8px 14px;
     }
     
     .main-content {
@@ -3949,14 +3972,39 @@ textarea.form-control {
     
     /* 移动端按钮布局 */
     .header-actions {
-        flex-wrap: wrap;
-        gap: 8px;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .button-group {
+        justify-content: center;
+        gap: 6px;
     }
     
     .header-actions .btn {
         flex: 1;
-        min-width: 120px;
+        min-width: 100px;
         font-size: 12px;
+        padding: 8px 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* 超小屏幕按钮布局 */
+    @media (max-width: 480px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .header-actions .btn {
+            width: 100%;
+            min-width: auto;
+            font-size: 11px;
+            padding: 6px 10px;
+        }
     }
     
     /* 移动端任务对比 */

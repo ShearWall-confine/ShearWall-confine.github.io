@@ -10,6 +10,13 @@ class GitHubSync {
         this.dataPath = 'data/shared-project-data.json';
         this.token = null; // 需要用户提供GitHub Token
         this.baseURL = 'https://api.github.com';
+        
+        // API调用频率限制
+        this.lastApiCall = 0;
+        this.apiCallCount = 0;
+        this.apiCallWindow = 0;
+        this.maxCallsPerHour = 4000; // 保守估计，留出缓冲
+        this.minCallInterval = 1000; // 最小调用间隔1秒
     }
 
     /**
@@ -18,6 +25,43 @@ class GitHubSync {
      */
     setToken(token) {
         this.token = token;
+    }
+    
+    /**
+     * 检查API调用频率限制
+     * @returns {boolean} 是否可以调用API
+     */
+    canMakeApiCall() {
+        const now = Date.now();
+        const timeSinceLastCall = now - this.lastApiCall;
+        
+        // 检查最小调用间隔
+        if (timeSinceLastCall < this.minCallInterval) {
+            console.log(`API调用被限制，距离上次调用仅${timeSinceLastCall}ms，需要等待${this.minCallInterval - timeSinceLastCall}ms`);
+            return false;
+        }
+        
+        // 重置小时窗口
+        if (now - this.apiCallWindow > 3600000) { // 1小时
+            this.apiCallCount = 0;
+            this.apiCallWindow = now;
+        }
+        
+        // 检查每小时调用次数
+        if (this.apiCallCount >= this.maxCallsPerHour) {
+            console.log(`API调用被限制，已达到每小时${this.maxCallsPerHour}次限制`);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * 记录API调用
+     */
+    recordApiCall() {
+        this.lastApiCall = Date.now();
+        this.apiCallCount++;
     }
 
     /**
@@ -63,6 +107,12 @@ class GitHubSync {
             return false;
         }
 
+        // 检查API调用频率限制
+        if (!this.canMakeApiCall()) {
+            console.log('API调用被频率限制阻止，跳过GitHub同步');
+            return false;
+        }
+
         try {
             // 先获取当前文件的SHA
             const currentFile = await this.getCurrentFileInfo();
@@ -86,10 +136,18 @@ class GitHubSync {
 
             if (response.ok) {
                 console.log('数据保存到GitHub成功');
+                this.recordApiCall();
                 return true;
             } else {
                 const error = await response.json();
                 console.error('保存数据失败:', error);
+                
+                // 如果是频率限制错误，增加等待时间
+                if (response.status === 403 && error.message.includes('rate limit')) {
+                    console.log('GitHub API频率限制，增加等待时间');
+                    this.minCallInterval = Math.min(this.minCallInterval * 2, 60000); // 最大1分钟
+                }
+                
                 return false;
             }
         } catch (error) {

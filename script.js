@@ -160,10 +160,40 @@ async function loadData() {
     loadFileSystemState();
 }
 
-// 保存数据
+// 防抖和频率限制配置
+let saveDataTimeout = null;
+let lastGitHubSync = 0;
+const GITHUB_SYNC_INTERVAL = 30000; // 30秒内最多同步一次到GitHub
+const DEBOUNCE_DELAY = 2000; // 2秒防抖延迟
+
+// 保存数据（带防抖和频率限制）
 async function saveData() {
-    // 保存到localStorage
+    // 立即保存到localStorage
     localStorage.setItem('projectProgressData', JSON.stringify(projectData));
+    
+    // 清除之前的防抖定时器
+    if (saveDataTimeout) {
+        clearTimeout(saveDataTimeout);
+    }
+    
+    // 设置防抖定时器
+    saveDataTimeout = setTimeout(async () => {
+        await performGitHubSync();
+    }, DEBOUNCE_DELAY);
+    
+    updateOverallProgress();
+}
+
+// 执行GitHub同步（带频率限制）
+async function performGitHubSync() {
+    const now = Date.now();
+    const timeSinceLastSync = now - lastGitHubSync;
+    
+    // 检查是否在频率限制期内
+    if (timeSinceLastSync < GITHUB_SYNC_INTERVAL) {
+        console.log(`GitHub同步被限制，距离上次同步仅${Math.round(timeSinceLastSync/1000)}秒，需要等待${Math.round((GITHUB_SYNC_INTERVAL - timeSinceLastSync)/1000)}秒`);
+        return;
+    }
     
     // 如果GitHub同步可用，同时保存到GitHub
     if (window.githubSync && window.githubSync.hasUpdatePermission()) {
@@ -172,6 +202,7 @@ async function saveData() {
             const success = await window.githubSync.saveData(projectData);
             if (success) {
                 console.log('数据已同步到GitHub');
+                lastGitHubSync = now;
                 showNotification('数据已同步到云端', 'success');
             } else {
                 console.log('GitHub同步失败，数据已保存到本地');
@@ -182,8 +213,6 @@ async function saveData() {
             showNotification('数据已保存到本地', 'info');
         }
     }
-    
-    updateOverallProgress();
 }
 
 // 初始化示例数据
@@ -1071,21 +1100,12 @@ function editTask(taskId) {
     const statusInput = document.getElementById('task-status');
     const priorityInput = document.getElementById('task-priority');
     
-    // 为基本输入框添加自动保存
+    // 为基本输入框添加防抖自动保存
     [titleInput, descriptionInput, statusInput, priorityInput].forEach(input => {
         if (input) {
+            // 只使用input事件，移除change和blur事件避免重复触发
             input.addEventListener('input', function() {
                 console.log(`${this.id} 输入变化:`, this.value);
-                autoSaveTaskData();
-            });
-            
-            input.addEventListener('change', function() {
-                console.log(`${this.id} 值变化:`, this.value);
-                autoSaveTaskData();
-            });
-            
-            input.addEventListener('blur', function() {
-                console.log(`${this.id} 失焦:`, this.value);
                 autoSaveTaskData();
             });
         }
