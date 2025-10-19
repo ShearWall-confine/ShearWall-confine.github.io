@@ -2,35 +2,72 @@
  * 用户配置文件
  * 用于管理用户账号和权限
  * 
- * 安全警告：此文件已移除所有敏感信息
- * 在GitHub Pages环境中，所有用户数据应通过以下方式管理：
- * 1. 使用GitHub Secrets存储敏感信息
- * 2. 通过GitHub Actions动态生成配置文件
- * 3. 使用外部认证服务
+ * 安全配置：
+ * - 生产环境：从GitHub Secrets获取密码哈希
+ * - 开发环境：使用默认配置
+ * - 自动检测环境并选择相应配置
  */
 
-// 用户数据库配置（已移除敏感信息）
+// 检测环境
+const isProduction = typeof process !== 'undefined' && process.env.NODE_ENV === 'production';
+const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+
+// 获取GitHub Secrets配置
+function getGitHubSecrets() {
+    // 在GitHub Pages环境中，这些值应该通过GitHub Actions注入
+    // 或者通过服务器端API获取
+    const secrets = {
+        ADMIN_PASSWORD_HASH: window.GITHUB_SECRETS?.ADMIN_PASSWORD_HASH || 'dev_hash_admin_2024',
+        EDITOR_PASSWORD_HASH: window.GITHUB_SECRETS?.EDITOR_PASSWORD_HASH || 'dev_hash_editor_2024',
+        VIEWER_PASSWORD_HASH: window.GITHUB_SECRETS?.VIEWER_PASSWORD_HASH || 'dev_hash_viewer_2024',
+        JWT_SECRET: window.GITHUB_SECRETS?.JWT_SECRET || 'dev_jwt_secret',
+        ENCRYPTION_KEY: window.GITHUB_SECRETS?.ENCRYPTION_KEY || 'dev_encryption_key'
+    };
+    
+    return secrets;
+}
+
+// 用户数据库配置
 const USER_CONFIG = {
-    // 默认用户（仅用于开发测试，无敏感信息）
+    // 默认用户配置
     defaultUsers: {
         'admin': {
+            // 从GitHub Secrets获取密码哈希
+            passwordHash: getGitHubSecrets().ADMIN_PASSWORD_HASH,
             role: 'admin',
             name: '系统管理员',
+            email: 'admin@system.local',
             created: '2024-01-01',
-            isActive: true
-        },
-        'viewer': {
-            role: 'viewer',
-            name: '查看用户',
-            created: '2024-01-01',
+            lastLogin: null,
             isActive: true
         },
         'editor': {
+            passwordHash: getGitHubSecrets().EDITOR_PASSWORD_HASH,
             role: 'editor',
             name: '编辑用户',
+            email: 'editor@system.local',
             created: '2024-01-01',
+            lastLogin: null,
+            isActive: true
+        },
+        'viewer': {
+            passwordHash: getGitHubSecrets().VIEWER_PASSWORD_HASH,
+            role: 'viewer',
+            name: '查看用户',
+            email: 'viewer@system.local',
+            created: '2024-01-01',
+            lastLogin: null,
             isActive: true
         }
+    },
+    
+    // 安全配置
+    security: {
+        jwtSecret: (typeof process !== 'undefined' && process.env.JWT_SECRET) || 'dev_jwt_secret',
+        encryptionKey: (typeof process !== 'undefined' && process.env.ENCRYPTION_KEY) || 'dev_encryption_key',
+        sessionTimeout: 24 * 60 * 60 * 1000, // 24小时
+        maxLoginAttempts: 5,
+        lockoutDuration: 15 * 60 * 1000 // 15分钟
     },
     
     // 角色权限配置
@@ -159,21 +196,83 @@ function getUserList() {
 }
 
 /**
- * 密码哈希函数（已移除）
- * 警告：密码管理应在服务器端进行
+ * 密码哈希函数
+ * 支持环境变量和开发环境
  */
 function hashPassword(password) {
-    console.warn('密码哈希功能已移除，请在服务器端管理密码');
-    throw new Error('密码管理应在服务器端进行');
+    // 输入验证
+    if (typeof password !== 'string' || password.length === 0) {
+        throw new Error('密码不能为空');
+    }
+    
+    if (password.length < 6) {
+        throw new Error('密码长度至少6位');
+    }
+    
+    // 检查是否在Node.js环境中（可以使用crypto模块）
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
+        try {
+            const crypto = require('crypto');
+            const salt = crypto.randomBytes(16).toString('hex');
+            const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+            return `${salt}:${hash}`;
+        } catch (error) {
+            console.error('密码哈希失败:', error);
+            throw new Error('密码哈希失败');
+        }
+    }
+    
+    // 开发环境：使用简单的哈希
+    const salt = 'dev_salt_2024_secure';
+    const saltedPassword = password + salt;
+    
+    let hash = 0;
+    for (let i = 0; i < saltedPassword.length; i++) {
+        const char = saltedPassword.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // 转换为32位整数
+    }
+    
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2);
+    
+    return 'dev_hash_' + Math.abs(hash).toString(36) + '_' + timestamp + '_' + random;
 }
 
 /**
- * 验证密码（已移除）
- * 警告：密码验证应在服务器端进行
+ * 验证密码
+ * 支持环境变量和开发环境
  */
-function verifyPassword(password, hash) {
-    console.warn('密码验证功能已移除，请在服务器端进行密码验证');
-    return false;
+function verifyPassword(password, storedHash) {
+    try {
+        // 检查是否是生产环境的哈希格式（salt:hash）
+        if (storedHash.includes(':')) {
+            const [salt, hash] = storedHash.split(':');
+            if (!salt || !hash) {
+                console.error('无效的哈希格式');
+                return false;
+            }
+            
+            // 检查是否在Node.js环境中
+            if (typeof process !== 'undefined') {
+                try {
+                    const crypto = require('crypto');
+                    const computedHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+                    return computedHash === hash;
+                } catch (error) {
+                    console.error('密码验证失败:', error);
+                    return false;
+                }
+            }
+        }
+        
+        // 开发环境：重新计算哈希进行比较
+        const computedHash = hashPassword(password);
+        return computedHash === storedHash;
+    } catch (error) {
+        console.error('密码验证失败:', error.message);
+        return false;
+    }
 }
 
 // 导出配置（如果使用模块系统）

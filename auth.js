@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 检查当前页面是否为登录页面
     const currentPage = window.location.pathname.split('/').pop();
-    const isLoginPage = currentPage === 'login.html' || currentPage === 'login-test.html' || currentPage === 'index.html';
+    const isLoginPage = currentPage === 'login.html' || currentPage === 'login-test.html';
     
     console.log('当前页面:', currentPage, '是否为登录页面:', isLoginPage);
     
@@ -59,39 +59,18 @@ function checkAuthentication() {
 function setUserPermissions() {
     if (!currentUser) return;
     
-    switch (currentUser.role) {
-        case 'admin':
-            userPermissions = {
-                canEdit: true,
-                canView: true,
-                canExport: true,
-                canImport: true
-            };
-            break;
-        case 'editor':
-            userPermissions = {
-                canEdit: true,
-                canView: true,
-                canExport: true,
-                canImport: true
-            };
-            break;
-        case 'viewer':
-            userPermissions = {
-                canEdit: false,
-                canView: true,
-                canExport: false,
-                canImport: false
-            };
-            break;
-        default:
-            userPermissions = {
-                canEdit: false,
-                canView: false,
-                canExport: false,
-                canImport: false
-            };
-    }
+    const permissionMap = {
+        'admin': { canEdit: true, canView: true, canExport: true, canImport: true },
+        'editor': { canEdit: true, canView: true, canExport: true, canImport: true },
+        'viewer': { canEdit: false, canView: true, canExport: false, canImport: false }
+    };
+    
+    userPermissions = permissionMap[currentUser.role] || {
+        canEdit: false,
+        canView: false,
+        canExport: false,
+        canImport: false
+    };
 }
 
 // 根据用户角色更新UI
@@ -122,12 +101,22 @@ function updateUIForUserRole() {
 
 // 隐藏编辑按钮
 function hideEditButtons() {
-    const editButtons = document.querySelectorAll('button[onclick*="edit"], button[onclick*="add"], button[onclick*="upload"], button[onclick*="new"]');
+    // 使用更通用的选择器
+    const editButtons = document.querySelectorAll(`
+        button[onclick*="edit"], 
+        button[onclick*="add"], 
+        button[onclick*="upload"], 
+        button[onclick*="new"],
+        .edit-btn,
+        .add-btn,
+        .upload-btn
+    `);
+    
     editButtons.forEach(btn => {
-        if (btn.textContent.includes('编辑') || 
-            btn.textContent.includes('添加') || 
-            btn.textContent.includes('上传') || 
-            btn.textContent.includes('新建')) {
+        const text = btn.textContent.toLowerCase();
+        if (text.includes('编辑') || text.includes('添加') || 
+            text.includes('上传') || text.includes('新建') ||
+            text.includes('edit') || text.includes('add')) {
             btn.style.display = 'none';
         }
     });
@@ -159,12 +148,15 @@ function disableEditFeatures() {
         element.style.opacity = '0.7';
     });
     
-    // 禁用表单输入
-    const formInputs = document.querySelectorAll('input, textarea, select');
-    formInputs.forEach(input => {
-        if (!input.id.includes('search') && !input.id.includes('filter')) {
-            input.disabled = true;
-        }
+    // 更精确的表单元素选择
+    const editableInputs = document.querySelectorAll(`
+        input:not([type="search"]):not([id*="search"]):not([id*="filter"]),
+        textarea:not([id*="search"]):not([id*="filter"]),
+        select:not([id*="search"]):not([id*="filter"])
+    `);
+    
+    editableInputs.forEach(input => {
+        input.disabled = true;
     });
 }
 
@@ -223,16 +215,85 @@ function simpleHash(str) {
 
 // 登录函数
 function login(username, password) {
-    // 安全警告：在GitHub Pages环境中，密码验证应在服务器端进行
-    console.warn('当前使用临时认证，生产环境应使用服务器端认证');
+    console.log('开始用户认证...');
     
-    // 临时解决方案：仅用于开发环境
-    // 生产环境应调用服务器端API进行认证
-    if (username === 'admin' && password === 'Tongji2024@Admin') {
+    // 检查是否在GitHub Pages环境
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    if (isGitHubPages) {
+        // GitHub Pages环境：使用GitHub Secrets
+        return authenticateWithGitHubSecrets(username, password);
+    } else {
+        // 本地开发环境：使用临时认证
+        return authenticateForDevelopment(username, password);
+    }
+}
+
+// GitHub Pages环境认证（使用GitHub Secrets）
+function authenticateWithGitHubSecrets(username, password) {
+    console.log('使用GitHub Secrets进行认证...');
+    
+    // 从user-config.js获取用户配置
+    if (typeof USER_CONFIG === 'undefined') {
+        console.error('USER_CONFIG未定义，请确保user-config.js已加载');
+        return false;
+    }
+    
+    const user = USER_CONFIG.defaultUsers[username];
+    if (!user) {
+        console.log('用户不存在:', username);
+        return false;
+    }
+    
+    // 使用user-config.js中的密码验证
+    if (typeof verifyPassword === 'function') {
+        const isValid = verifyPassword(password, user.passwordHash);
+        if (isValid) {
+            const userData = {
+                username: user.username || username,
+                role: user.role,
+                name: user.name,
+                email: user.email,
+                loginTime: new Date().toISOString()
+            };
+            
+            // 保存用户信息到sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            currentUser = userData;
+            setUserPermissions();
+            updateUIForUserRole();
+            showUserInfo();
+            
+            console.log('GitHub Secrets认证成功:', userData);
+            return true;
+        } else {
+            console.log('密码错误');
+            return false;
+        }
+    } else {
+        console.error('verifyPassword函数未找到，请确保user-config.js已正确引入');
+        return false;
+    }
+}
+
+// 本地开发环境认证（临时方案）
+function authenticateForDevelopment(username, password) {
+    console.warn('使用开发环境临时认证');
+    
+    // 临时开发环境密码（生产环境应移除）
+    // 注意：这些密码仅用于本地开发，生产环境使用GitHub Secrets
+    const devPasswords = {
+        'admin': 'Tongji2024@Admin',     // 开发环境临时密码
+        'editor': 'Tongji2024@Editor',  // 开发环境临时密码
+        'viewer': 'Tongji2024@Viewer'   // 开发环境临时密码
+    };
+    
+    if (devPasswords[username] && password === devPasswords[username]) {
         const userData = {
-            username: 'admin',
-            role: 'admin',
-            name: '系统管理员',
+            username: username,
+            role: username,
+            name: username === 'admin' ? '系统管理员' : 
+                  username === 'editor' ? '编辑者' : '查看者',
             loginTime: new Date().toISOString()
         };
         
@@ -243,55 +304,12 @@ function login(username, password) {
         updateUIForUserRole();
         showUserInfo();
         
-        console.log('登录成功:', userData);
+        console.log('开发环境认证成功:', userData);
         return true;
     }
     
-    // 其他用户需要服务器端验证
-    console.warn('用户认证应在服务器端进行');
+    console.log('开发环境认证失败');
     return false;
-    
-    // 使用user-config.js中的用户配置
-    if (typeof USER_CONFIG === 'undefined') {
-        console.error('USER_CONFIG未加载，请确保user-config.js已正确引入');
-        return false;
-    }
-    
-    const user = USER_CONFIG.defaultUsers[username];
-    if (!user) {
-        console.log('用户不存在:', username);
-        return false;
-    }
-    
-    // 验证密码（使用user-config.js中的验证函数）
-    if (typeof verifyPassword === 'function') {
-        const isValid = verifyPassword(password, user.passwordHash);
-        if (isValid) {
-            const userData = {
-                username: username,
-                role: user.role,
-                name: user.name,
-                email: user.email,
-                loginTime: new Date().toISOString()
-            };
-        
-            // 保存用户信息到sessionStorage
-            sessionStorage.setItem('currentUser', JSON.stringify(userData));
-            currentUser = userData;
-            setUserPermissions();
-            updateUIForUserRole();
-            showUserInfo();
-            
-            console.log('登录成功:', userData);
-            return true;
-        } else {
-            console.log('密码错误');
-            return false;
-        }
-    } else {
-        console.error('verifyPassword函数未找到，请确保user-config.js已正确引入');
-        return false;
-    }
 }
 
 // 退出登录

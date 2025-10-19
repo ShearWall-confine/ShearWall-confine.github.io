@@ -6,6 +6,15 @@
 // 加载头部HTML和CSS
 async function loadHeader() {
     try {
+        // 检查是否在本地文件系统中运行
+        const isLocalFile = window.location.protocol === 'file:';
+        
+        if (isLocalFile) {
+            console.log('检测到本地文件系统，使用内联头部');
+            loadInlineHeader();
+            return;
+        }
+        
         // 加载头部CSS
         const cssLink = document.createElement('link');
         cssLink.rel = 'stylesheet';
@@ -30,6 +39,68 @@ async function loadHeader() {
         // 如果加载失败，显示默认头部
         loadFallbackHeader();
     }
+}
+
+// 内联头部（用于本地文件系统）
+function loadInlineHeader() {
+    // 加载头部CSS
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'header.css';
+    document.head.appendChild(cssLink);
+    
+    // 创建内联头部HTML
+    const headerHTML = `
+        <div class="head">
+            <div class="head-top">
+                <div class="head-left">
+                    <img src="https://via.placeholder.com/60x60/667eea/ffffff?text=LOGO" alt="课题组Logo" style="height: 60px; border-radius: 50%;">
+                    <div class="head-info">
+                        <h1>xxx老师课题组</h1>
+                        <p>结构防灾减灾工程系 | 同济大学</p>
+                    </div>
+                </div>
+                <div class="head-right">
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <span class="user-name" id="userName"></span>
+                        <button class="btn-logout" onclick="logout()">退出</button>
+                    </div>
+                </div>
+            </div>
+            <div class="head-bottom">
+                <nav class="head-nav">
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-home"></i> 首页</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle"><i class="fas fa-project-diagram"></i> 系统 <i class="fas fa-chevron-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> 课题进度管理</a></li>
+                                <li><a href="database.html"><i class="fas fa-database"></i> 剪力墙数据库</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle"><i class="fas fa-info-circle"></i> 关于 <i class="fas fa-chevron-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#"><i class="fas fa-users"></i> 研究团队</a></li>
+                                <li><a href="#"><i class="fas fa-graduation-cap"></i> 研究方向</a></li>
+                                <li><a href="#"><i class="fas fa-envelope"></i> 联系我们</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    `;
+    
+    // 创建头部容器
+    const headerContainer = document.createElement('div');
+    headerContainer.id = 'header-container';
+    headerContainer.innerHTML = headerHTML;
+    
+    // 将头部插入到页面顶部
+    document.body.insertBefore(headerContainer, document.body.firstChild);
+    
+    console.log('内联头部组件加载成功');
 }
 
 // 备用头部（如果外部文件加载失败）

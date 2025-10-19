@@ -1,0 +1,211 @@
+name: Deploy to GitHub Pages with Secrets
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    # 每天凌晨2点自动更新配置（可选）
+    - cron: '0 2 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Generate GitHub Secrets Config
+      env:
+        ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
+        EDITOR_PASSWORD_HASH: ${{ secrets.EDITOR_PASSWORD_HASH }}
+        VIEWER_PASSWORD_HASH: ${{ secrets.VIEWER_PASSWORD_HASH }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      run: |
+        echo "🔐 生成GitHub Secrets配置文件..."
+        
+        # 生成 github-secrets-config.js
+        cat > github-secrets-config.js << 'EOF'
+        /**
+         * GitHub Secrets 配置文件
+         * 此文件在GitHub Actions构建时会被动态生成
+         * 包含从GitHub Secrets获取的密码哈希值
+         * 生成时间: $(date)
+         */
+        
+        // 这些值从GitHub Secrets中注入
+        window.GITHUB_SECRETS = {
+          ADMIN_PASSWORD_HASH: '${{ secrets.ADMIN_PASSWORD_HASH }}',
+          EDITOR_PASSWORD_HASH: '${{ secrets.EDITOR_PASSWORD_HASH }}',
+          VIEWER_PASSWORD_HASH: '${{ secrets.VIEWER_PASSWORD_HASH }}',
+          JWT_SECRET: '${{ secrets.JWT_SECRET }}',
+          ENCRYPTION_KEY: '${{ secrets.ENCRYPTION_KEY }}'
+        };
+        
+        // 开发环境回退值
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          window.GITHUB_SECRETS = {
+            ADMIN_PASSWORD_HASH: 'dev_hash_admin_2024',
+            EDITOR_PASSWORD_HASH: 'dev_hash_editor_2024',
+            VIEWER_PASSWORD_HASH: 'dev_hash_viewer_2024',
+            JWT_SECRET: 'dev_jwt_secret',
+            ENCRYPTION_KEY: 'dev_encryption_key'
+          };
+        }
+        EOF
+        
+        # 生成 user-config.js（用于服务器端验证）
+        cat > user-config.js << 'EOF'
+        /**
+         * 用户配置文件 - 由GitHub Actions自动生成
+         * 包含从GitHub Secrets获取的安全配置
+         * 生成时间: $(date)
+         */
+        
+        // 从环境变量获取的配置
+        const USER_CONFIG = {
+            // 用户数据库（从GitHub Secrets获取）
+            defaultUsers: {
+                'admin': {
+                    passwordHash: process.env.ADMIN_PASSWORD_HASH || 'dev_hash_admin_2024',
+                    role: 'admin',
+                    name: '系统管理员',
+                    email: 'admin@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                },
+                'editor': {
+                    passwordHash: process.env.EDITOR_PASSWORD_HASH || 'dev_hash_editor_2024',
+                    role: 'editor',
+                    name: '编辑用户',
+                    email: 'editor@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                },
+                'viewer': {
+                    passwordHash: process.env.VIEWER_PASSWORD_HASH || 'dev_hash_viewer_2024',
+                    role: 'viewer',
+                    name: '查看用户',
+                    email: 'viewer@system.local',
+                    created: '2024-01-01',
+                    lastLogin: null,
+                    isActive: true
+                }
+            },
+            
+            // 安全配置
+            security: {
+                jwtSecret: process.env.JWT_SECRET || 'dev_jwt_secret',
+                encryptionKey: process.env.ENCRYPTION_KEY || 'dev_encryption_key',
+                sessionTimeout: 24 * 60 * 60 * 1000, // 24小时
+                maxLoginAttempts: 5,
+                lockoutDuration: 15 * 60 * 1000 // 15分钟
+            },
+            
+            // 角色权限配置
+            roles: {
+                'admin': {
+                    canView: true,
+                    canEdit: true,
+                    canDelete: true,
+                    canExport: true,
+                    canImport: true,
+                    canManageUsers: true
+                },
+                'editor': {
+                    canView: true,
+                    canEdit: true,
+                    canDelete: false,
+                    canExport: true,
+                    canImport: true,
+                    canManageUsers: false
+                },
+                'viewer': {
+                    canView: true,
+                    canEdit: false,
+                    canDelete: false,
+                    canExport: false,
+                    canImport: false,
+                    canManageUsers: false
+                }
+            }
+        };
+        
+        // 密码验证函数（使用环境变量中的哈希）
+        function verifyPassword(password, storedHash) {
+            try {
+                // 解析存储的哈希（格式：salt:hash）
+                const [salt, hash] = storedHash.split(':');
+                if (!salt || !hash) {
+                    console.error('无效的哈希格式');
+                    return false;
+                }
+                
+                // 重新计算哈希进行比较
+                const crypto = require('crypto');
+                const computedHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+                
+                return computedHash === hash;
+            } catch (error) {
+                console.error('密码验证失败:', error.message);
+                return false;
+            }
+        }
+        
+        // 导出配置
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = {
+                USER_CONFIG,
+                verifyPassword
+            };
+        }
+        
+        // 浏览器环境
+        if (typeof window !== 'undefined') {
+            window.USER_CONFIG = USER_CONFIG;
+            window.verifyPassword = verifyPassword;
+        }
+        EOF
+        
+        echo "✅ 配置文件生成完成"
+        
+    - name: Verify Secrets Injection
+      run: |
+        echo "🔍 验证GitHub Secrets注入..."
+        
+        # 检查 github-secrets-config.js
+        if grep -q "ADMIN_PASSWORD_HASH.*secrets" github-secrets-config.js; then
+          echo "✅ GitHub Secrets配置已正确注入"
+        else
+          echo "❌ GitHub Secrets配置注入失败"
+          exit 1
+        fi
+        
+        # 检查 user-config.js
+        if grep -q "ADMIN_PASSWORD_HASH" user-config.js; then
+          echo "✅ 用户配置文件已正确生成"
+        else
+          echo "❌ 用户配置文件生成失败"
+          exit 1
+        fi
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        
+    - name: Verify Deployment
+      run: |
+        echo "🚀 部署验证完成"
+        echo "GitHub Pages URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"

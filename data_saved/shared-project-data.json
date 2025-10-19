@@ -12,7 +12,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-17",
-      "progress": 33,
+      "progress": 50,
       "subtasks": [
         {
           "title": "模态测试：CA_13_R",
@@ -29,13 +29,6 @@
           "completed": false,
           "completionTime": "2025-10-19T23:39",
           "timeDescription": ""
-        },
-        {
-          "id": 1760865325293,
-          "title": "123",
-          "completed": false,
-          "notes": "",
-          "issues": []
         }
       ],
       "attachments": [],
@@ -61,48 +54,6 @@
         }
       ],
       "attachments": []
-    },
-    {
-      "id": 1760865535041,
-      "title": "新任务",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-19",
-      "endDate": "2025-11-18",
-      "progress": 0,
-      "subtasks": [
-        {
-          "id": 1760865536006,
-          "title": "新子任务",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        }
-      ],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1760865541058,
-      "title": "新任务qwqwdqwd",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-19",
-      "endDate": "2025-11-18",
-      "progress": 0,
-      "subtasks": [
-        {
-          "id": 1760865543988,
-          "title": "新子任务",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        }
-      ],
-      "attachments": [],
-      "autoProgress": true
     }
   ],
   "timeline": [
@@ -160,25 +111,6 @@
       "type": "task-end"
     },
     {
-      "id": "subtask-completion-1760787461942-0",
-      "date": "2025-10-19",
-      "time": "23:07",
-      "title": "完成：模态测试：CA_13_R",
-      "description": "完成子任务：模态测试：CA_13_R",
-      "status": "completed",
-      "linkedTaskId": 1760787461942,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "管道吊架模态测试"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "管道吊架模态测试",
-      "isSubtask": true
-    },
-    {
       "id": "subtask-completion-1760787461942-1",
       "date": "2025-10-19",
       "time": "23:39",
@@ -226,60 +158,23 @@
       "type": "task-end"
     },
     {
-      "id": "task-start-1760865535041",
+      "id": "subtask-completion-1760787461942-0",
       "date": "2025-10-19",
-      "title": "开始：新任务",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760865535041,
+      "time": "23:07",
+      "title": "完成：模态测试：CA_13_R",
+      "description": "完成子任务：模态测试：CA_13_R",
+      "status": "completed",
+      "linkedTaskId": 1760787461942,
+      "linkedSubtaskIndex": 0,
       "tags": [
-        "工作清单",
-        "开始"
+        "子任务",
+        "完成",
+        "管道吊架模态测试"
       ],
       "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1760865535041",
-      "date": "2025-11-18",
-      "title": "完成：新任务",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760865535041,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "task-start-1760865541058",
-      "date": "2025-10-19",
-      "title": "开始：新任务qwqwdqwd",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760865541058,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1760865541058",
-      "date": "2025-11-18",
-      "title": "完成：新任务qwqwdqwd",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760865541058,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
+      "type": "subtask-completion",
+      "parentTask": "管道吊架模态测试",
+      "isSubtask": true
     }
   ],
   "files": [
