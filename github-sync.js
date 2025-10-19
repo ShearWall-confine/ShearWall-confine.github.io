@@ -7,7 +7,7 @@ class GitHubSync {
     constructor() {
         this.repoOwner = 'ShearWall-confine';
         this.repoName = 'ShearWall-confine.github.io';
-        this.dataPath = 'data/shared-project-data.json';
+        this.dataPath = 'data_saved/shared-project-data.json';
         this.token = null; // 需要用户提供GitHub Token
         this.baseURL = 'https://api.github.com';
         

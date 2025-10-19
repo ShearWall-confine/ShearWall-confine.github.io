@@ -663,9 +663,21 @@
     <script>
         // 检查管理员权限并显示入口
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('检查管理员权限...');
             const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            console.log('当前用户:', currentUser);
+            
             if (currentUser.role === 'admin') {
-                document.getElementById('adminSection').style.display = 'block';
+                console.log('检测到管理员用户，显示管理员工具');
+                const adminSection = document.getElementById('adminSection');
+                if (adminSection) {
+                    adminSection.style.display = 'block';
+                    console.log('管理员工具已显示');
+                } else {
+                    console.error('未找到adminSection元素');
+                }
+            } else {
+                console.log('非管理员用户，角色:', currentUser.role);
             }
         });
         
