@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课题进度管理系统 - 登录</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .auth-header {
+            margin-bottom: 30px;
+        }
+        
+        .auth-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .auth-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-auth:hover {
+            transform: translateY(-2px);
+        }
+        
+        .auth-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .auth-footer p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .role-option {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-option.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .role-option i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-project-diagram"></i> 课题进度管理系统</h1>
+                <p>请选择您的身份进行登录</p>
+            </div>
+            
+            <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
+            
+            <form id="auth-form">
+                <div class="role-selector">
+                    <div class="role-option active" data-role="viewer">
+                        <i class="fas fa-eye"></i>
+                        <div>查看者</div>
+                    </div>
+                    <div class="role-option" data-role="editor">
+                        <i class="fas fa-edit"></i>
+                        <div>编辑者</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" class="form-control" placeholder="请输入用户名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" class="form-control" placeholder="请输入密码" required>
+                </div>
+                
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-sign-in-alt"></i> 登录
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>系统默认用户：</p>
+                <p><strong>查看者：</strong> viewer / 123456</p>
+                <p><strong>编辑者：</strong> admin / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据库（实际应用中应该使用服务器端数据库）
+        const users = {
+            'viewer': {
+                password: '123456',
+                role: 'viewer',
+                name: '查看者'
+            },
+            'admin': {
+                password: 'admin123',
+                role: 'editor',
+                name: '管理员'
+            }
+        };
+        
+        let selectedRole = 'viewer';
+        
+        // 角色选择
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                selectedRole = this.dataset.role;
+            });
+        });
+        
+        // 表单提交
+        document.getElementById('auth-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 验证用户
+            if (users[username] && users[username].password === password) {
+                const user = users[username];
+                
+                // 检查角色匹配
+                if (user.role !== selectedRole) {
+                    showError('角色选择与用户身份不匹配，请重新选择');
+                    return;
+                }
+                
+                // 保存用户信息到sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    username: username,
+                    role: user.role,
+                    name: user.name,
+                    loginTime: new Date().toISOString()
+                }));
+                
+                showSuccess('登录成功，正在跳转...');
+                
+                // 跳转到主页面
+                setTimeout(() => {
+                    window.location.href = 'project-management.html';
+                }, 1000);
+                
+            } else {
+                showError('用户名或密码错误');
+            }
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+        // 检查是否已经登录
+        window.addEventListener('load', function() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (currentUser) {
+                // 如果已经登录，直接跳转
+                window.location.href = 'main.html';
+            }
+        });
+    </script>
+</body>
+</html>

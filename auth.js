@@ -18,7 +18,7 @@ function checkAuthentication() {
     
     if (!userData) {
         // 未登录，跳转到登录页面
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
         return;
     }
     
@@ -30,7 +30,7 @@ function checkAuthentication() {
     } catch (error) {
         console.error('用户数据解析错误:', error);
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
     }
 }
 
@@ -169,7 +169,7 @@ function showUserInfo() {
 function logout() {
     if (confirm('确定要退出登录吗？')) {
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
     }
 }
 

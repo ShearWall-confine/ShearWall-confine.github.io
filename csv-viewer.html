@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV文件查看器 - xxx老师课题组</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .upload-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #5a67d8;
+            background: #f7fafc;
+        }
+        
+        .upload-area.dragover {
+            border-color: #5a67d8;
+            background: #e6fffa;
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        caption {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        td {
+            border: 1px solid #e1e5e9;
+            text-align: center;
+            padding: 12px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card i {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            table {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+ 
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-csv"></i> CSV文件查看器</h1>
+            <p>xxx老师课题组 | 同济大学结构防灾减灾工程系</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('input').click()">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">点击选择CSV文件或拖拽文件到此处</div>
+                <div class="upload-hint">支持.csv格式文件，最大10MB</div>
+            </div>
+            <input type="file" id="input" class="file-input" accept=".csv">
+        </div>
+        
+        <div class="table-container" id="tableContainer" style="display: none;">
+            <div class="controls">
+                <button class="btn" onclick="exportData()">
+                    <i class="fas fa-download"></i> 导出数据
+                </button>
+                <button class="btn btn-secondary" onclick="clearData()">
+                    <i class="fas fa-trash"></i> 清空数据
+                </button>
+                <button class="btn btn-success" onclick="showStats()">
+                    <i class="fas fa-chart-bar"></i> 统计信息
+                </button>
+                <button class="btn btn-warning" onclick="sortTable()">
+                    <i class="fas fa-sort"></i> 排序数据
+                </button>
+            </div>
+            
+            <table id="output">
+                <caption>CSV 文件内容</caption>
+            </table>
+        </div>
+        
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <div class="stat-card">
+                <i class="fas fa-table"></i>
+                <h3 id="totalRows">0</h3>
+                <p>总行数</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-columns"></i>
+                <h3 id="totalCols">0</h3>
+                <p>总列数</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-file"></i>
+                <h3 id="fileSize">0 KB</h3>
+                <p>文件大小</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <h3 id="loadTime">0 ms</h3>
+                <p>加载时间</p>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        // 全局变量
+        let currentData = [];
+        let currentHeaders = [];
+        let loadStartTime = 0;
+        
+        // 获取元素
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const tableContainer = document.getElementById('tableContainer');
+        const statsSection = document.getElementById('statsSection');
+        
+        // 拖拽上传功能
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                input.files = files;
+                handleFileUpload(files[0]);
+            }
+        });
+        
+        // 文件选择事件
+        input.addEventListener('change', function() {
+            const file = input.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+        
+        // 处理文件上传
+        function handleFileUpload(file) {
+            loadStartTime = Date.now();
+            
+            // 检查文件类型
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showError('请选择CSV格式文件！');
+                return;
+            }
+            
+            // 检查文件大小（10MB限制）
+            if (file.size > 10 * 1024 * 1024) {
+                showError('文件大小不能超过10MB！');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            
+            reader.onload = function() {
+                try {
+                    parseCSV(reader.result);
+                    showSuccess('文件加载成功！');
+                } catch (error) {
+                    showError('文件解析失败：' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('文件读取失败！');
+            };
+        }
+        
+        // 解析CSV文件
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) {
+                throw new Error('文件为空');
+            }
+            
+            currentHeaders = lines[0].split(',').map(header => header.trim());
+            currentData = lines.slice(1).map(line => 
+                line.split(',').map(cell => cell.trim())
+            );
+            
+            renderTable();
+            updateStats();
+            showTable();
+        }
+        
+        // 渲染表格
+        function renderTable() {
+            output.innerHTML = `
+                <caption>CSV 文件内容</caption>
+                <thead>
+                    <tr>
+                        ${currentHeaders.map(header => `<th>${header}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${currentData.map(row => `
+                        <tr>
+                            ${row.map(cell => `<td>${cell}</td>`).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+        }
+        
+        // 显示表格
+        function showTable() {
+            tableContainer.style.display = 'block';
+            statsSection.style.display = 'grid';
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            const loadTime = Date.now() - loadStartTime;
+            const fileSize = (input.files[0] ? input.files[0].size : 0) / 1024;
+            
+            document.getElementById('totalRows').textContent = currentData.length;
+            document.getElementById('totalCols').textContent = currentHeaders.length;
+            document.getElementById('fileSize').textContent = fileSize.toFixed(1) + ' KB';
+            document.getElementById('loadTime').textContent = loadTime + ' ms';
+        }
+        
+        // 导出数据
+        function exportData() {
+            if (currentData.length === 0) {
+                showError('没有数据可导出！');
+                return;
+            }
+            
+            const csvContent = currentHeaders.join(',') + '\n' + 
+                currentData.map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'exported_data.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 清空数据
+        function clearData() {
+            if (confirm('确定要清空所有数据吗？')) {
+                currentData = [];
+                currentHeaders = [];
+                output.innerHTML = '<caption>CSV 文件内容</caption>';
+                tableContainer.style.display = 'none';
+                statsSection.style.display = 'none';
+                input.value = '';
+                showSuccess('数据已清空！');
+            }
+        }
+        
+        // 显示统计信息
+        function showStats() {
+            if (currentData.length === 0) {
+                showError('没有数据可统计！');
+                return;
+            }
+            
+            const stats = {
+                totalRows: currentData.length,
+                totalCols: currentHeaders.length,
+                fileSize: (input.files[0] ? input.files[0].size : 0) / 1024,
+                loadTime: Date.now() - loadStartTime
+            };
+            
+            alert(`数据统计信息：\n总行数：${stats.totalRows}\n总列数：${stats.totalCols}\n文件大小：${stats.fileSize.toFixed(1)} KB\n加载时间：${stats.loadTime} ms`);
+        }
+        
+        // 排序表格
+        function sortTable() {
+            if (currentData.length === 0) {
+                showError('没有数据可排序！');
+                return;
+            }
+            
+            const column = prompt('请输入要排序的列名（从0开始）：');
+            const colIndex = parseInt(column);
+            
+            if (isNaN(colIndex) || colIndex < 0 || colIndex >= currentHeaders.length) {
+                showError('无效的列索引！');
+                return;
+            }
+            
+            currentData.sort((a, b) => {
+                const aVal = a[colIndex];
+                const bVal = b[colIndex];
+                
+                // 尝试数字比较
+                if (!isNaN(aVal) && !isNaN(bVal)) {
+                    return parseFloat(aVal) - parseFloat(bVal);
+                }
+                
+                // 字符串比较
+                return aVal.localeCompare(bVal);
+            });
+            
+            renderTable();
+            showSuccess('数据排序完成！');
+        }
+        
+        // 显示错误消息
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.container').appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+        
+        // 显示成功消息
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.querySelector('.container').appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+    </script>
+  </body>
+</html>
