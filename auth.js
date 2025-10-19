@@ -165,6 +165,37 @@ function showUserInfo() {
     }
 }
 
+// 登录函数
+function login(username, password) {
+    // 模拟用户数据库
+    const users = {
+        'admin': { password: 'admin123', role: 'editor', name: '管理员' },
+        'viewer': { password: 'viewer123', role: 'viewer', name: '查看者' },
+        'editor': { password: 'editor123', role: 'editor', name: '编辑者' }
+    };
+    
+    // 验证用户名和密码
+    if (users[username] && users[username].password === password) {
+        const userData = {
+            username: username,
+            role: users[username].role,
+            name: users[username].name,
+            loginTime: new Date().toISOString()
+        };
+        
+        // 保存用户信息到sessionStorage
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        currentUser = userData;
+        setUserPermissions();
+        
+        console.log('登录成功:', userData);
+        return true;
+    } else {
+        console.log('登录失败: 用户名或密码错误');
+        return false;
+    }
+}
+
 // 退出登录
 function logout() {
     if (confirm('确定要退出登录吗？')) {
