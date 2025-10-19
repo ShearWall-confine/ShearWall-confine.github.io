@@ -54,6 +54,19 @@
         }
       ],
       "attachments": []
+    },
+    {
+      "id": 1760885571197,
+      "title": "新任务",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-19",
+      "endDate": "2025-11-18",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -111,6 +124,25 @@
       "type": "task-end"
     },
     {
+      "id": "subtask-completion-1760787461942-0",
+      "date": "2025-10-19",
+      "time": "23:07",
+      "title": "完成：模态测试：CA_13_R",
+      "description": "完成子任务：模态测试：CA_13_R",
+      "status": "completed",
+      "linkedTaskId": 1760787461942,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "管道吊架模态测试"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "管道吊架模态测试",
+      "isSubtask": true
+    },
+    {
       "id": "subtask-completion-1760787461942-1",
       "date": "2025-10-19",
       "time": "23:39",
@@ -156,25 +188,6 @@
       ],
       "isSynced": true,
       "type": "task-end"
-    },
-    {
-      "id": "subtask-completion-1760787461942-0",
-      "date": "2025-10-19",
-      "time": "23:07",
-      "title": "完成：模态测试：CA_13_R",
-      "description": "完成子任务：模态测试：CA_13_R",
-      "status": "completed",
-      "linkedTaskId": 1760787461942,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "管道吊架模态测试"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "管道吊架模态测试",
-      "isSubtask": true
     }
   ],
   "files": [
