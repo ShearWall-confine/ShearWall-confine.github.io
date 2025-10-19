@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思维导图查看器</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .mindmap-viewer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .mindmap-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .mindmap-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        
+        .mindmap-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .mindmap-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .mindmap-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto;
+            cursor: grab;
+        }
+        
+        .mindmap-canvas:active {
+            cursor: grabbing;
+        }
+        
+        .mindmap-zoom-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 100;
+        }
+        
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .zoom-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .mindmap-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .mindmap-node {
+            position: absolute;
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            min-width: 120px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            user-select: none;
+        }
+        
+        .mindmap-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        
+        .mindmap-node.root {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 16px;
+            padding: 16px 20px;
+        }
+        
+        .mindmap-node.level-1 {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-dark);
+            font-weight: 500;
+        }
+        
+        .mindmap-node.level-2 {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-dark);
+        }
+        
+        .mindmap-node.level-3 {
+            background: white;
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+        
+        .mindmap-connection {
+            position: absolute;
+            border: 2px solid var(--primary-color);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="mindmap-viewer">
+        <div class="mindmap-header">
+            <h1 class="mindmap-title" id="mindmap-title">思维导图查看器</h1>
+            <div class="mindmap-controls">
+                <button class="btn btn-secondary" onclick="resetZoom()">
+                    <i class="fas fa-expand-arrows-alt"></i> 重置视图
+                </button>
+                <button class="btn btn-secondary" onclick="exportMindmap()">
+                    <i class="fas fa-download"></i> 导出图片
+                </button>
+                <button class="btn btn-secondary" onclick="closeViewer()">
+                    <i class="fas fa-times"></i> 关闭
+                </button>
+            </div>
+        </div>
+        
+        <div class="mindmap-content">
+            <div class="mindmap-zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()" title="放大">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()" title="缩小">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetZoom()" title="重置">
+                    <i class="fas fa-home"></i>
+                </button>
+            </div>
+            
+            <div class="mindmap-canvas" id="mindmap-canvas">
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>正在加载思维导图...</p>
+                </div>
+            </div>
+            
+            <div class="mindmap-info" id="mindmap-info">
+                节点数量: 0 | 缩放: 100%
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+        let mindmapData = null;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let canvasOffset = { x: 0, y: 0 };
+        
+        // 页面加载时从localStorage获取思维导图数据
+        window.addEventListener('load', function() {
+            loadMindmapData();
+        });
+        
+        // 加载思维导图数据
+        function loadMindmapData() {
+            const savedMindmap = localStorage.getItem('currentMindmap');
+            if (savedMindmap) {
+                try {
+                    mindmapData = JSON.parse(savedMindmap);
+                    console.log('加载的思维导图数据:', mindmapData);
+                    
+                    // 验证数据格式
+                    if (!mindmapData.nodes || !Array.isArray(mindmapData.nodes)) {
+                        throw new Error('思维导图数据格式不正确');
+                    }
+                    
+                    renderMindmap();
+                } catch (error) {
+                    console.error('加载思维导图数据失败:', error);
+                    showError('加载思维导图数据失败: ' + error.message);
+                }
+            } else {
+                showError('没有找到思维导图数据');
+            }
+        }
+        
+        // 渲染思维导图
+        function renderMindmap() {
+            const canvas = document.getElementById('mindmap-canvas');
+            const loading = document.getElementById('loading');
+            const info = document.getElementById('mindmap-info');
+            
+            // 隐藏加载提示
+            loading.style.display = 'none';
+            
+            // 清空画布
+            canvas.innerHTML = '';
+            
+            if (!mindmapData || !mindmapData.nodes || mindmapData.nodes.length === 0) {
+                showError('思维导图数据为空');
+                return;
+            }
+            
+            // 计算布局
+            const layout = calculateMindmapLayout(mindmapData.nodes);
+            
+            // 渲染节点
+            mindmapData.nodes.forEach(node => {
+                const nodeElement = createMindmapNode(node, layout[node.id]);
+                canvas.appendChild(nodeElement);
+            });
+            
+            // 渲染连接线
+            mindmapData.connections.forEach(connection => {
+                const connectionElement = createMindmapConnection(connection, layout);
+                canvas.appendChild(connectionElement);
+            });
+            
+            // 更新信息
+            info.textContent = `节点数量: ${mindmapData.nodes.length} | 缩放: ${Math.round(currentZoom * 100)}%`;
+            
+            // 设置标题
+            const title = document.getElementById('mindmap-title');
+            title.textContent = mindmapData.title || '思维导图查看器';
+            
+            // 居中显示
+            centerMindmap(layout);
+        }
+        
+        // 创建思维导图节点
+        function createMindmapNode(node, position) {
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `mindmap-node level-${node.level || 0}`;
+            nodeElement.style.left = position.x + 'px';
+            nodeElement.style.top = position.y + 'px';
+            nodeElement.textContent = node.text;
+            nodeElement.title = node.text;
+            
+            // 添加点击事件
+            nodeElement.addEventListener('click', function(e) {
+                e.stopPropagation();
+                highlightNode(nodeElement);
+            });
+            
+            return nodeElement;
+        }
+        
+        // 创建连接线
+        function createMindmapConnection(connection, layout) {
+            const fromPos = layout[connection.from];
+            const toPos = layout[connection.to];
+            
+            if (!fromPos || !toPos) return null;
+            
+            const connectionElement = document.createElement('div');
+            connectionElement.className = 'mindmap-connection';
+            
+            // 计算连接线位置和角度
+            const dx = toPos.x - fromPos.x;
+            const dy = toPos.y - fromPos.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            connectionElement.style.left = (fromPos.x + 60) + 'px';
+            connectionElement.style.top = (fromPos.y + 20) + 'px';
+            connectionElement.style.width = (length - 120) + 'px';
+            connectionElement.style.transform = `rotate(${angle}deg)`;
+            connectionElement.style.transformOrigin = '0 50%';
+            
+            return connectionElement;
+        }
+        
+        // 计算思维导图布局
+        function calculateMindmapLayout(nodes) {
+            const layout = {};
+            
+            // 找到根节点
+            const rootNode = nodes.find(node => node.id === 'root') || nodes[0];
+            if (!rootNode) return layout;
+            
+            // 根节点位置（居中）
+            layout[rootNode.id] = { x: 400, y: 300 };
+            
+            // 按层级组织节点
+            const nodesByLevel = {};
+            nodes.forEach(node => {
+                if (!nodesByLevel[node.level]) {
+                    nodesByLevel[node.level] = [];
+                }
+                nodesByLevel[node.level].push(node);
+            });
+            
+            // 为每个层级计算位置
+            Object.keys(nodesByLevel).forEach(level => {
+                const levelNodes = nodesByLevel[level];
+                const levelNum = parseInt(level);
+                
+                if (levelNum === 0) return; // 跳过根节点
+                
+                // 计算该层级的Y位置
+                const levelY = 300 + levelNum * 120; // 每层间隔120px
+                
+                levelNodes.forEach((node, index) => {
+                    let x, y;
+                    
+                    if (levelNum === 1) {
+                        // 第一级节点水平分布
+                        const totalNodes = levelNodes.length;
+                        const startX = 400 - (totalNodes - 1) * 100; // 居中分布
+                        x = startX + index * 200; // 每个节点间隔200px
+                        y = levelY;
+                    } else {
+                        // 其他层级节点
+                        const parentNode = nodes.find(n => n.id === node.parentId);
+                        if (parentNode && layout[parentNode.id]) {
+                            const parentPos = layout[parentNode.id];
+                            const siblings = nodes.filter(n => n.parentId === node.parentId);
+                            const siblingIndex = siblings.findIndex(n => n.id === node.id);
+                            
+                            if (siblings.length === 1) {
+                                // 只有一个子节点，放在父节点正下方
+                                x = parentPos.x;
+                                y = levelY;
+                            } else {
+                                // 多个子节点，在父节点下方水平分布
+                                const totalSiblings = siblings.length;
+                                const startX = parentPos.x - (totalSiblings - 1) * 80; // 居中分布
+                                x = startX + siblingIndex * 160; // 每个节点间隔160px
+                                y = levelY;
+                            }
+                        } else {
+                            // 如果没有父节点，按层级分布
+                            x = 200 + index * 150;
+                            y = levelY;
+                        }
+                    }
+                    
+                    layout[node.id] = { x, y };
+                });
+            });
+            
+            return layout;
+        }
+        
+        // 居中显示思维导图
+        function centerMindmap(layout) {
+            const canvas = document.getElementById('mindmap-canvas');
+            const positions = Object.values(layout);
+            
+            if (positions.length === 0) return;
+            
+            // 计算边界
+            const minX = Math.min(...positions.map(p => p.x));
+            const maxX = Math.max(...positions.map(p => p.x));
+            const minY = Math.min(...positions.map(p => p.y));
+            const maxY = Math.max(...positions.map(p => p.y));
+            
+            // 计算中心点
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            
+            // 计算偏移量
+            const offsetX = canvas.clientWidth / 2 - centerX;
+            const offsetY = canvas.clientHeight / 2 - centerY;
+            
+            // 应用偏移
+            canvasOffset.x = offsetX;
+            canvasOffset.y = offsetY;
+            updateCanvasTransform();
+        }
+        
+        // 更新画布变换
+        function updateCanvasTransform() {
+            const canvas = document.getElementById('mindmap-canvas');
+            canvas.style.transform = `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${currentZoom})`;
+        }
+        
+        // 缩放功能
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom * 1.2, 3);
+            updateCanvasTransform();
+            updateInfo();
+        }
+        
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom / 1.2, 0.3);
+            updateCanvasTransform();
+            updateInfo();
+        }
+        
+        function resetZoom() {
+            currentZoom = 1;
+            canvasOffset = { x: 0, y: 0 };
+            updateCanvasTransform();
+            updateInfo();
+            if (mindmapData) {
+                const layout = calculateMindmapLayout(mindmapData.nodes);
+                centerMindmap(layout);
+            }
+        }
+        
+        // 更新信息显示
+        function updateInfo() {
+            const info = document.getElementById('mindmap-info');
+            const nodeCount = mindmapData ? mindmapData.nodes.length : 0;
+            info.textContent = `节点数量: ${nodeCount} | 缩放: ${Math.round(currentZoom * 100)}%`;
+        }
+        
+        // 高亮节点
+        function highlightNode(nodeElement) {
+            // 移除之前的高亮
+            document.querySelectorAll('.mindmap-node').forEach(node => {
+                node.style.boxShadow = '';
+            });
+            
+            // 添加高亮
+            nodeElement.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.8)';
+        }
+        
+        // 显示错误
+        function showError(message) {
+            const canvas = document.getElementById('mindmap-canvas');
+            canvas.innerHTML = `
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-secondary);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+        
+        // 导出思维导图
+        function exportMindmap() {
+            // 这里可以实现导出为图片的功能
+            alert('导出功能正在开发中...');
+        }
+        
+        // 关闭查看器
+        function closeViewer() {
+            window.close();
+        }
+        
+        // 拖拽功能
+        document.getElementById('mindmap-canvas').addEventListener('mousedown', function(e) {
+            if (e.target.classList.contains('mindmap-node')) return;
+            
+            isDragging = true;
+            dragStart.x = e.clientX - canvasOffset.x;
+            dragStart.y = e.clientY - canvasOffset.y;
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            canvasOffset.x = e.clientX - dragStart.x;
+            canvasOffset.y = e.clientY - dragStart.y;
+            updateCanvasTransform();
+        });
+        
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '=':
+                    case '+':
+                        e.preventDefault();
+                        zoomIn();
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        zoomOut();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        resetZoom();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
