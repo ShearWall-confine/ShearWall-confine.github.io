@@ -1642,14 +1642,23 @@ function compareData() {
 }
 
 // GitHub同步相关函数
-function setupGitHubSync() {
+function configureGitHubAPI() {
     if (window.githubSync) {
         const success = window.githubSync.showTokenDialog();
         if (success) {
-            showNotification('GitHub Token设置成功！现在可以同步数据到云端', 'success');
+            showNotification('GitHub API参数配置成功！现在可以同步数据到云端', 'success');
         }
     } else {
         showNotification('GitHub同步模块未加载', 'error');
+    }
+}
+
+function syncToGitHub() {
+    if (window.githubSync && window.githubSync.hasUpdatePermission()) {
+        showNotification('正在同步数据到GitHub...', 'info');
+        saveData(); // 这会触发GitHub同步
+    } else {
+        showNotification('请先配置GitHub API参数', 'warning');
     }
 }
 
@@ -6722,3 +6731,30 @@ function updateProgressInfo() {
         progressInfo.innerHTML = '暂无子任务';
     }
 }
+
+// 检查管理员权限并显示管理员工具
+function checkAdminAccess() {
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    console.log('检查管理员权限，当前用户:', currentUser);
+    
+    if (currentUser.role === 'admin') {
+        console.log('检测到管理员用户，显示管理员工具');
+        const adminSection = document.getElementById('adminSection');
+        if (adminSection) {
+            adminSection.style.display = 'block';
+            console.log('管理员工具已显示');
+        } else {
+            console.error('未找到adminSection元素');
+        }
+    } else {
+        console.log('非管理员用户，角色:', currentUser.role);
+    }
+}
+
+// 页面加载时检查管理员权限
+document.addEventListener('DOMContentLoaded', function() {
+    // 延迟检查，确保auth.js执行完成
+    setTimeout(() => {
+        checkAdminAccess();
+    }, 1000);
+});
