@@ -30,10 +30,28 @@ document.addEventListener('DOMContentLoaded', function() {
 // 检查用户认证状态
 function checkAuthentication() {
     const userData = sessionStorage.getItem('currentUser');
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    // 允许游客访问的页面列表
+    const guestAllowedPages = [
+        'index.html',
+        'login.html', 
+        'login-test.html',
+        'database.html'
+    ];
+    
+    // 如果是允许游客访问的页面，不强制登录
+    if (guestAllowedPages.includes(currentPage)) {
+        console.log('当前页面允许游客访问:', currentPage);
+        if (!userData) {
+            // 设置游客模式
+            setGuestMode();
+        }
+        return;
+    }
     
     if (!userData) {
         // 未登录，跳转到登录页面（但避免在登录页面本身执行）
-        const currentPage = window.location.pathname.split('/').pop();
         if (currentPage !== 'login.html' && currentPage !== 'login-test.html') {
             window.location.href = 'login.html';
         }
@@ -55,6 +73,39 @@ function checkAuthentication() {
     }
 }
 
+// 设置游客模式
+function setGuestMode() {
+    console.log('设置游客模式');
+    
+    // 创建游客用户数据
+    const guestUser = {
+        username: 'guest',
+        role: 'guest',
+        name: '游客',
+        email: 'guest@example.com',
+        loginTime: new Date().toISOString(),
+        isGuest: true
+    };
+    
+    // 设置游客权限（只读权限）
+    userPermissions = {
+        canEdit: false,
+        canView: true,
+        canExport: false,
+        canImport: false
+    };
+    
+    // 保存游客信息
+    sessionStorage.setItem('currentUser', JSON.stringify(guestUser));
+    currentUser = guestUser;
+    
+    // 更新UI
+    updateUIForUserRole();
+    showUserInfo();
+    
+    console.log('游客模式已设置');
+}
+
 // 设置用户权限
 function setUserPermissions() {
     if (!currentUser) return;
@@ -62,7 +113,8 @@ function setUserPermissions() {
     const permissionMap = {
         'admin': { canEdit: true, canView: true, canExport: true, canImport: true },
         'editor': { canEdit: true, canView: true, canExport: true, canImport: true },
-        'viewer': { canEdit: false, canView: true, canExport: false, canImport: false }
+        'viewer': { canEdit: false, canView: true, canExport: false, canImport: false },
+        'guest': { canEdit: false, canView: true, canExport: false, canImport: false }
     };
     
     userPermissions = permissionMap[currentUser.role] || {
@@ -197,7 +249,8 @@ function getRoleDisplayName(role) {
     const roleNames = {
         'admin': '管理员',
         'editor': '编辑者',
-        'viewer': '查看者'
+        'viewer': '查看者',
+        'guest': '游客'
     };
     return roleNames[role] || role;
 }
@@ -316,7 +369,12 @@ function authenticateForDevelopment(username, password) {
 function logout() {
     if (confirm('确定要退出登录吗？')) {
         sessionStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
+        // 如果是游客模式，返回首页；否则跳转到登录页
+        if (currentUser && currentUser.isGuest) {
+            window.location.href = 'index.html';
+        } else {
+            window.location.href = 'login.html';
+        }
     }
 }
 
