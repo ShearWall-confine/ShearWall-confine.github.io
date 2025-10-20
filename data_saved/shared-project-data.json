@@ -550,7 +550,7 @@
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
-      "startDate": "2025-10-20",
+      "startDate": "2023-09-20",
       "endDate": "2029-03-19",
       "progress": 0,
       "subtasks": [
@@ -559,7 +559,9 @@
           "title": "与西北院开会/例会",
           "completed": false,
           "notes": "",
-          "issues": []
+          "issues": [],
+          "completionTime": "2025-10-23T21:05",
+          "timeDescription": ""
         }
       ],
       "attachments": [],
@@ -596,15 +598,6 @@
       "id": 1760950197915,
       "title": "实验室参观",
       "description": "10月23日下午16:15-16:30振动台实验室，德国伊尔梅瑙工业大学的校长代表团来访，",
-      "date": "2025-10-23",
-      "status": "pending",
-      "tags": [],
-      "isSynced": false
-    },
-    {
-      "id": 1760965186420,
-      "title": "例行开会",
-      "description": "与西北院开会/例会",
       "date": "2025-10-23",
       "status": "pending",
       "tags": [],
@@ -743,7 +736,7 @@
     },
     {
       "id": "task-start-1760965498124",
-      "date": "2025-10-20",
+      "date": "2023-09-20",
       "title": "开始：每周例会",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
@@ -768,6 +761,25 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760965498124-0",
+      "date": "2025-10-23",
+      "time": "21:05",
+      "title": "完成：与西北院开会/例会",
+      "description": "完成子任务：与西北院开会/例会",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
     }
   ],
   "files": [
