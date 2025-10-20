@@ -114,10 +114,12 @@
             cursor: pointer;
             z-index: 1000;
             transition: background-color 0.3s ease;
+            border: 1px solid transparent;
         }
 
         .hotzone:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .hotzone.a {
@@ -1869,29 +1871,20 @@
         }
         
         let hzEnabled = false;
-        const k = ['1','9','2','1','@','1'];
-        let kp = 0;
+        const targetPassword = '1921@1';
         
-        document.getElementById('password').addEventListener('keydown', function(e) {
-            if (e.key === k[kp]) {
-                kp += 1;
-                if (kp === k.length) {
-                    hzEnabled = true;
-                    kp = 0;
-                    const a = document.getElementById('hzA');
-                    const b = document.getElementById('hzB');
-                    if (a) a.style.display = 'block';
-                    if (b) b.style.display = 'block';
-                }
-            } else {
-                kp = 0;
-                if (hzEnabled && e.key !== 'Shift') {
-                    hzEnabled = false;
-                    const a = document.getElementById('hzA');
-                    const b = document.getElementById('hzB');
-                    if (a) a.style.display = 'none';
-                    if (b) b.style.display = 'none';
-                }
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            if (password === targetPassword) {
+                hzEnabled = true;
+                document.getElementById('hzA').style.display = 'block';
+                document.getElementById('hzB').style.display = 'block';
+                console.log('热区已激活');
+            } else if (hzEnabled && password !== targetPassword) {
+                hzEnabled = false;
+                document.getElementById('hzA').style.display = 'none';
+                document.getElementById('hzB').style.display = 'none';
+                console.log('热区已隐藏');
             }
         });
         
