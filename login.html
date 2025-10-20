@@ -678,6 +678,8 @@
                     if (authSource.includes('.then(')) {
                         console.warn('⚠️ 检测到旧版本的auth.js，包含.then()调用');
                         console.log('建议：清除浏览器缓存或等待GitHub Pages更新');
+                    } else {
+                        console.log('✅ auth.js版本正常，使用async/await');
                     }
                     
                     const result = await window.login(username, password);
@@ -686,6 +688,18 @@
                         return result;
                     } else {
                         console.log('auth.js认证失败');
+                        console.log('🔍 调试信息:');
+                        console.log(`   用户名: ${username}`);
+                        console.log(`   密码: ${password}`);
+                        if (typeof window.USER_CONFIG !== 'undefined') {
+                            const user = window.USER_CONFIG.defaultUsers[username];
+                            if (user) {
+                                console.log(`   存储的哈希值: ${user.passwordHash.substring(0, 20)}...`);
+                                console.log(`   完整哈希值: ${user.passwordHash}`);
+                            } else {
+                                console.log('   用户不存在于配置中');
+                            }
+                        }
                         // 在GitHub Pages环境中，不允许回退到开发环境
                         if (isGitHubPages) {
                             console.log('GitHub Pages环境，不允许开发环境回退');
