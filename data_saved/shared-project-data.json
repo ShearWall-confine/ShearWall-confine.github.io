@@ -12,7 +12,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-17",
-      "progress": 100,
+      "progress": 89,
       "subtasks": [
         {
           "title": "模态测试：CA_07+13_Mid_AA",
@@ -71,6 +71,13 @@
           "completed": true,
           "notes": "",
           "issues": []
+        },
+        {
+          "id": 1760963317537,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
@@ -109,7 +116,7 @@
       "subtasks": [
         {
           "id": 1760962200835,
-          "title": "新子任务",
+          "title": "发送相关文件",
           "completed": false,
           "notes": "",
           "issues": []
