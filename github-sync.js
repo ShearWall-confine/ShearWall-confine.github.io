@@ -7,7 +7,8 @@ class GitHubSync {
     constructor() {
         this.repoOwner = 'ShearWall-confine';
         this.repoName = 'ShearWall-confine.github.io';
-        this.dataPath = 'data_saved/shared-project-data.json';
+        // 首选1.1文件名；load时做后备兼容
+        this.dataPath = 'data_saved/shared-project-data_1.1.json';
         this.token = null; // 需要用户提供GitHub Token
         this.baseURL = 'https://api.github.com';
         
@@ -70,17 +71,32 @@ class GitHubSync {
      */
     async loadData() {
         try {
-            const response = await fetch(
-                `${this.baseURL}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
-                {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json',
-                        ...(this.token && { 'Authorization': `token ${this.token}` })
+            // 先尝试读取1.1文件，不存在则回退到1.0旧文件名
+            const tryPaths = [
+                this.dataPath,
+                'data_saved/shared-project-data.json',
+                'data_saved/shared-project-data_1.0.json'
+            ];
+            let response = null;
+            let dataJson = null;
+            for (const p of tryPaths) {
+                const r = await fetch(
+                    `${this.baseURL}/repos/${this.repoOwner}/${this.repoName}/contents/${p}`,
+                    {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json',
+                            ...(this.token && { 'Authorization': `token ${this.token}` })
+                        }
                     }
+                );
+                if (r.ok) {
+                    response = r;
+                    dataJson = await r.json();
+                    break;
                 }
-            );
+            }
 
-            if (!response.ok) {
+            if (!response || !response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 let errorMessage = `HTTP error! status: ${response.status}`;
                 
@@ -95,8 +111,7 @@ class GitHubSync {
                 throw new Error(errorMessage);
             }
 
-            const data = await response.json();
-            const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+            const content = JSON.parse(decodeURIComponent(escape(atob(dataJson.content))));
             
             console.log('从GitHub加载数据成功:', content);
             return content;
@@ -137,7 +152,7 @@ class GitHubSync {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: `更新项目数据 - ${new Date().toLocaleString()}`,
+                        message: `更新项目数据(schema 1.1.0) - ${new Date().toLocaleString()}`,
                         content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
                         sha: currentFile.sha
                     })

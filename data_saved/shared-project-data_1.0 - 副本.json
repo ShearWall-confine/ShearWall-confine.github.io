@@ -841,7 +841,7 @@
   "roadmap": [
     {
       "id": 1760788986221,
-      "title": "结构-管道组合体系工程案例分析 ",
+      "title": "管道吊架模态测试、有限元模拟及理论推导",
       "description": "测试管道吊架模态",
       "status": "in-progress",
       "type": "research",
@@ -956,19 +956,14 @@
       "createDate": "2025-10-18"
     }
   ],
-  
+  "mindmaps": [],
   "exportInfo": {
     "exportTime": "2025-10-18T15:43:57.846Z",
-    "version": "1.1.0",
-    "schemaVersion": "1.1.0",
-    "source": "project-management",
+    "version": "1.0.0",
     "taskCount": 2,
     "completedTasks": 0,
     "totalSubtasks": 4,
     "completedSubtasks": 1,
-    "timelineItems": 9,
-    "roadmapNodes": 6,
-    "filesCount": 4,
-    "resultsCount": 1
+    "timelineItems": 9
   }
 }

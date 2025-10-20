@@ -538,17 +538,8 @@
                     <div class="section-header">
                         <h2><i class="fas fa-route"></i> 技术路线图</h2>
                         <div class="roadmap-actions">
-                            <button class="btn btn-edit" onclick="editRoadmap()">
-                                <i class="fas fa-edit"></i> 编辑
-                            </button>
                             <button class="btn btn-primary" onclick="addRoadmapNode()">
                                 <i class="fas fa-plus"></i> 添加节点
-                            </button>
-                            <button class="btn btn-secondary" onclick="switchRoadmapView('list')" id="roadmap-list-btn">
-                                <i class="fas fa-list"></i> 列表
-                            </button>
-                            <button class="btn btn-secondary" onclick="switchRoadmapView('mindmap')" id="roadmap-mindmap-btn">
-                                <i class="fas fa-project-diagram"></i> 思维导图
                             </button>
                         </div>
                     </div>
@@ -557,75 +548,6 @@
                         <div class="roadmap-list" id="roadmap-list-container">
                             <div class="roadmap-container" id="roadmap-container">
                                 <!-- 技术路线图节点将在这里动态生成 -->
-                            </div>
-                        </div>
-                        
-                        <!-- 思维导图视图 -->
-                        <div class="roadmap-mindmap" id="roadmap-mindmap-container">
-                            <div class="mindmap-import">
-                                <h4><i class="fas fa-file-import"></i> 导入文件生成思维导图</h4>
-                                <div class="mindmap-import-options">
-                                    <button class="btn btn-primary" onclick="selectMarkdownFile()">
-                                        <i class="fas fa-file-upload"></i> 选择Markdown文件
-                                    </button>
-                                    <button class="btn btn-primary" onclick="selectExcelFile()">
-                                        <i class="fas fa-file-excel"></i> 选择Excel文件
-                                    </button>
-                                    <span class="import-divider">或</span>
-                                    <button class="btn btn-secondary" onclick="toggleTextInput()">
-                                        <i class="fas fa-keyboard"></i> 手动输入
-                                    </button>
-                                </div>
-                                <div id="mindmap-text-input" class="mindmap-text-input" style="display: none;">
-                                    <textarea id="mindmap-md-input" placeholder="请输入 Markdown 格式的文本，例如：
-
-# 项目技术路线
-
-## 第一阶段：需求分析
-- 用户需求调研
-- 功能需求分析
-- 技术需求评估
-
-## 第二阶段：系统设计
-- 架构设计
-- 数据库设计
-- 接口设计
-
-## 第三阶段：开发实现
-- 前端开发
-- 后端开发
-- 测试验证"></textarea>
-                                </div>
-                                <div class="mindmap-import-actions">
-                                    <button class="btn btn-primary" onclick="generateMindmapFromMD()">
-                                        <i class="fas fa-magic"></i> 生成思维导图
-                                    </button>
-                                    <button class="btn btn-secondary" onclick="clearMindmap()">
-                                        <i class="fas fa-trash"></i> 清空
-                                    </button>
-                                    <button class="btn btn-info" onclick="openMindmapViewer()" id="view-mindmap-btn" style="display: none;">
-                                        <i class="fas fa-external-link-alt"></i> 全屏查看
-                                    </button>
-                                    <button class="btn btn-secondary" onclick="toggleMindmapHistory()">
-                                        <i class="fas fa-history"></i> 历史记录
-                                    </button>
-                                    <button class="btn btn-secondary" onclick="testMarkdownParsing()" title="测试Markdown解析">
-                                        <i class="fas fa-bug"></i> 测试解析
-                                    </button>
-                                </div>
-                                
-                                <!-- 思维导图历史记录 -->
-                                <div id="mindmap-history" class="mindmap-history" style="display: none;">
-                                    <h5><i class="fas fa-history"></i> 思维导图历史记录</h5>
-                                    <div id="mindmap-history-list" class="mindmap-history-list">
-                                        <!-- 历史记录将在这里动态生成 -->
-                                    </div>
-                                </div>
-                                <input type="file" id="markdown-file-input" accept=".md,.txt" style="display: none;" onchange="handleMarkdownFileUpload(event)">
-                                <input type="file" id="excel-file-input" accept=".xlsx,.xls" style="display: none;" onchange="handleExcelFileUpload(event)">
-                            </div>
-                            <div class="mindmap-container" id="mindmap-container">
-                                <!-- 思维导图将在这里动态生成 -->
                             </div>
                         </div>
                     </div>

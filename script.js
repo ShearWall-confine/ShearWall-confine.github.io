@@ -19,6 +19,8 @@ let subtaskFilterModeEdit = 'all';
 // 工作清单视图：是否全折叠子任务（默认全折叠）
 let listSubtasksCollapsed = true;
 let currentEditingSection = null;
+// 任务列表拖拽排序开关（临时禁用以避免卡顿）
+let taskDragEnabled = false;
 let currentEditingRoadmapNode = null;
 let currentEditingFolder = null;
 let currentEditingTimelineItem = null;
@@ -27,7 +29,9 @@ let fileViewMode = 'tree'; // 文件视图模式：只使用树形视图
 let filesDirHandle = null; // File System Access API 目录句柄
 let fsAccessEnabled = false; // 是否启用文件系统访问
 let timelineViewMode = 'list'; // 时间线视图模式：list 或 calendar
-let roadmapViewMode = 'list'; // 技术路线图视图模式：list 或 mindmap
+let roadmapViewMode = 'list'; // 技术路线图仅保留列表视图
+// 技术路线图：父节点的子节点折叠状态（true=收起，false=展开）。默认收起
+let roadmapCollapsed = {};
 let currentCalendarDate = new Date(); // 当前日历显示的日期
 
 // 时间线过滤和管理状态
@@ -597,7 +601,7 @@ function renderAll() {
             timeline: projectData.timeline?.length || 0,
             roadmap: projectData.roadmap?.length || 0
         });
-        // 无论数据是否为空，都要调用渲染函数以显示正确状态
+        // 无论数据是否为空，都要调用渲染函数以显示正确状态（仅列表）
         renderRoadmap();
         renderTimelineVertical();
         
@@ -661,13 +665,17 @@ function renderTasks() {
         container.appendChild(taskElement);
     });
 
-    enableTaskDragAndDrop();
+    if (taskDragEnabled) {
+        enableTaskDragAndDrop();
+    }
 
     // 为每个任务的子任务列表启用拖拽
-    container.querySelectorAll('.subtasks-list').forEach(ul => {
-        const taskId = parseInt(ul.getAttribute('data-task-id'));
-        enableSubtaskDrag(ul, taskId);
-    });
+    if (taskDragEnabled) {
+        container.querySelectorAll('.subtasks-list').forEach(ul => {
+            const taskId = parseInt(ul.getAttribute('data-task-id'));
+            enableSubtaskDrag(ul, taskId);
+        });
+    }
 }
 
 // 创建任务元素
@@ -1904,18 +1912,35 @@ function exportData() {
     }
     console.log('导出权限检查通过，继续执行exportData');
     
-    // 创建增强的导出数据
+    // 基于schema 1.1.0的增强导出（移除UI/历史无关字段，如mindmaps）
+    const dataToExport = JSON.parse(JSON.stringify(projectData));
+    // 移除思维导图数据（功能已下线）
+    if (dataToExport.mindmaps) delete dataToExport.mindmaps;
+    // 组装统计信息
+    const taskCount = Array.isArray(projectData.tasks) ? projectData.tasks.length : 0;
+    const completedTasks = Array.isArray(projectData.tasks) ? projectData.tasks.filter(t => t.status === 'completed').length : 0;
+    const totalSubtasks = Array.isArray(projectData.tasks) ? projectData.tasks.reduce((sum, t) => sum + (Array.isArray(t.subtasks) ? t.subtasks.length : 0), 0) : 0;
+    const completedSubtasks = Array.isArray(projectData.tasks) ? projectData.tasks.reduce((sum, t) => sum + (Array.isArray(t.subtasks) ? t.subtasks.filter(s => s.completed).length : 0), 0) : 0;
+    const timelineItems = Array.isArray(projectData.timeline) ? projectData.timeline.length : 0;
+    const roadmapNodes = Array.isArray(projectData.roadmap) ? projectData.roadmap.length : 0;
+    const filesCount = Array.isArray(projectData.files) ? projectData.files.length : 0;
+    const resultsCount = Array.isArray(projectData.results) ? projectData.results.length : 0;
+    
     const exportData = {
-        ...projectData,
+        ...dataToExport,
         exportInfo: {
             exportTime: new Date().toISOString(),
-            version: '1.0.0',
-            taskCount: projectData.tasks ? projectData.tasks.length : 0,
-            completedTasks: projectData.tasks ? projectData.tasks.filter(t => t.status === 'completed').length : 0,
-            totalSubtasks: projectData.tasks ? projectData.tasks.reduce((sum, t) => sum + (t.subtasks ? t.subtasks.length : 0), 0) : 0,
-            completedSubtasks: projectData.tasks ? projectData.tasks.reduce((sum, t) => 
-                sum + (t.subtasks ? t.subtasks.filter(s => s.completed).length : 0), 0) : 0,
-            timelineItems: projectData.timeline ? projectData.timeline.length : 0
+            version: '1.1.0',
+            schemaVersion: '1.1.0',
+            source: 'project-management',
+            taskCount,
+            completedTasks,
+            totalSubtasks,
+            completedSubtasks,
+            timelineItems,
+            roadmapNodes,
+            filesCount,
+            resultsCount
         }
     };
     
@@ -2061,12 +2086,14 @@ function handleImport(event) {
             try {
                 const importedData = JSON.parse(e.target.result);
                 
-                // 检查是否为进度对比模式
+                // 规范化导入：兼容旧版；如果包含exportInfo则进入对比模式
                 if (importedData.exportInfo) {
                     showProgressComparison(importedData);
                 } else {
-                    // 直接导入模式
-                    projectData = importedData;
+                    // 直接导入模式：清理无用字段，保证schema一致
+                    const normalized = { ...importedData };
+                    if (normalized.mindmaps) delete normalized.mindmaps; // 移除已下线字段
+                    projectData = normalized;
                     saveData();
                     renderAll();
                     showNotification('数据导入成功！', 'success');
@@ -2100,7 +2127,9 @@ function showProgressComparison(importedData) {
                         <h4><i class="fas fa-calendar"></i> 导出时间信息</h4>
                         <div class="export-info">
                             <p><strong>导出时间：</strong>${new Date(comparisonData.exportInfo.exportTime).toLocaleString('zh-CN')}</p>
-                            <p><strong>版本：</strong>${comparisonData.exportInfo.version}</p>
+                            <p><strong>版本：</strong>${comparisonData.exportInfo.version || comparisonData.exportInfo.schemaVersion || '1.0.0'}</p>
+                            ${comparisonData.exportInfo.schemaVersion ? `<p><strong>Schema：</strong>${comparisonData.exportInfo.schemaVersion}</p>` : ''}
+                            ${comparisonData.exportInfo.source ? `<p><strong>来源：</strong>${comparisonData.exportInfo.source}</p>` : ''}
                         </div>
                     </div>
                     
@@ -2155,9 +2184,19 @@ function showProgressComparison(importedData) {
                                 <div class="comparison-label">时间线项目</div>
                                 <div class="comparison-values">
                                     <span class="current">当前: ${currentData.timeline ? currentData.timeline.length : 0}</span>
-                                    <span class="imported">导出时: ${comparisonData.exportInfo.timelineItems}</span>
+                                    <span class="imported">导出时: ${comparisonData.exportInfo.timelineItems ?? 0}</span>
                                     <span class="change ${(currentData.timeline ? currentData.timeline.length : 0) - comparisonData.exportInfo.timelineItems >= 0 ? 'positive' : 'negative'}">
-                                        ${(currentData.timeline ? currentData.timeline.length : 0) - comparisonData.exportInfo.timelineItems >= 0 ? '+' : ''}${(currentData.timeline ? currentData.timeline.length : 0) - comparisonData.exportInfo.timelineItems}
+                                        ${(currentData.timeline ? currentData.timeline.length : 0) - (comparisonData.exportInfo.timelineItems ?? 0) >= 0 ? '+' : ''}${(currentData.timeline ? currentData.timeline.length : 0) - (comparisonData.exportInfo.timelineItems ?? 0)}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-label">路线图节点</div>
+                                <div class="comparison-values">
+                                    <span class="current">当前: ${currentData.roadmap ? currentData.roadmap.length : 0}</span>
+                                    <span class="imported">导出时: ${(comparisonData.exportInfo.roadmapNodes ?? (Array.isArray(comparisonData.roadmap) ? comparisonData.roadmap.length : 0))}</span>
+                                    <span class="change ${(currentData.roadmap ? currentData.roadmap.length : 0) - (comparisonData.exportInfo.roadmapNodes ?? 0) >= 0 ? 'positive' : 'negative'}">
+                                        ${(currentData.roadmap ? currentData.roadmap.length : 0) - (comparisonData.exportInfo.roadmapNodes ?? 0) >= 0 ? '+' : ''}${(currentData.roadmap ? currentData.roadmap.length : 0) - (comparisonData.exportInfo.roadmapNodes ?? 0)}
                                     </span>
                                 </div>
                             </div>
@@ -2518,6 +2557,7 @@ function renderRoadmap() {
     const rootNodes = projectData.roadmap.filter(node => !node.parentId);
     
     rootNodes.forEach((node, index) => {
+        if (roadmapCollapsed[node.id] === undefined) roadmapCollapsed[node.id] = true; // 默认子节点收起
         const nodeElement = createRoadmapNodeWithChildren(node, index);
         flow.appendChild(nodeElement);
     });
@@ -2546,9 +2586,6 @@ function createRoadmapNode(node, index) {
                 <button class="btn btn-primary" onclick="addChildNode(${node.id})" title="添加子节点">
                     <i class="fas fa-plus"></i>
                 </button>
-                <button class="btn btn-edit" onclick="editRoadmapNode(${node.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
                 <button class="btn btn-danger" onclick="deleteRoadmapNode(${node.id})">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -2575,6 +2612,8 @@ function createRoadmapNodeWithChildren(node, index) {
     if (childNodes.length > 0) {
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'roadmap-children';
+        const isCollapsed = roadmapCollapsed[node.id] !== false; // 默认收起
+        childrenContainer.style.display = isCollapsed ? 'none' : 'block';
         
         childNodes.forEach((childNode, childIndex) => {
             const childElement = createRoadmapNodeWithChildren(childNode, childIndex);
@@ -2582,10 +2621,71 @@ function createRoadmapNodeWithChildren(node, index) {
             childrenContainer.appendChild(childElement);
         });
         
+        // 在主节点上添加折叠/展开按钮
+        const header = nodeElement.querySelector('.roadmap-node-header');
+        if (header) {
+            const rightControls = document.createElement('div');
+            rightControls.style.display = 'inline-flex';
+            rightControls.style.gap = '6px';
+            rightControls.style.marginLeft = 'auto';
+
+            const upBtn = document.createElement('button');
+            upBtn.className = 'btn btn-secondary btn-sm';
+            upBtn.title = '上移';
+            upBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            upBtn.onclick = (e) => { e.stopPropagation(); moveRoadmapNode(node.id, -1); };
+
+            const downBtn = document.createElement('button');
+            downBtn.className = 'btn btn-secondary btn-sm';
+            downBtn.title = '下移';
+            downBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+            downBtn.onclick = (e) => { e.stopPropagation(); moveRoadmapNode(node.id, 1); };
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'btn btn-secondary btn-sm';
+            toggleBtn.title = isCollapsed ? '展开子节点' : '收起子节点';
+            toggleBtn.innerHTML = `<i class="fas fa-${isCollapsed ? 'chevron-down' : 'chevron-up'}"></i>`;
+            toggleBtn.onclick = (e) => {
+                e.stopPropagation();
+                const current = roadmapCollapsed[node.id] !== false; // 当前是否收起
+                roadmapCollapsed[node.id] = !current; // 取反
+                saveData();
+                renderRoadmap();
+            };
+
+            rightControls.appendChild(upBtn);
+            rightControls.appendChild(downBtn);
+            rightControls.appendChild(toggleBtn);
+            header.appendChild(rightControls);
+        }
+        
         wrapper.appendChild(childrenContainer);
     }
     
     return wrapper;
+}
+
+// 移动技术路线图节点在同级中的顺序
+function moveRoadmapNode(nodeId, direction) {
+    const nodeIndex = projectData.roadmap.findIndex(n => n.id === nodeId);
+    if (nodeIndex === -1) return;
+    const node = projectData.roadmap[nodeIndex];
+    const parentId = node.parentId || null;
+    // 收集同级节点索引
+    const siblingIndices = projectData.roadmap
+        .map((n, idx) => ({ n, idx }))
+        .filter(x => (x.n.parentId || null) === parentId)
+        .map(x => x.idx);
+    const pos = siblingIndices.indexOf(nodeIndex);
+    const targetPos = pos + direction;
+    if (pos === -1 || targetPos < 0 || targetPos >= siblingIndices.length) return;
+    const otherIndex = siblingIndices[targetPos];
+    // 交换在全局数组中的位置
+    const tmp = projectData.roadmap[nodeIndex];
+    projectData.roadmap[nodeIndex] = projectData.roadmap[otherIndex];
+    projectData.roadmap[otherIndex] = tmp;
+    saveData();
+    renderRoadmap();
 }
 
 // 添加技术路线图节点
@@ -4373,31 +4473,13 @@ function syncTasksToTimeline() {
     }
 }
 
-// ==================== 技术路线图思维导图功能 ====================
+// ==================== 技术路线图（仅列表，支持分级收纳） ====================
 
 // 切换技术路线图视图
-function switchRoadmapView(view) {
-    roadmapViewMode = view;
-    
-    // 更新按钮状态
-    const listBtn = document.getElementById('roadmap-list-btn');
-    const mindmapBtn = document.getElementById('roadmap-mindmap-btn');
-    
-    if (listBtn) listBtn.classList.toggle('active', view === 'list');
-    if (mindmapBtn) mindmapBtn.classList.toggle('active', view === 'mindmap');
-    
-    // 显示/隐藏对应视图
+function switchRoadmapView() {
+    // 思维导图已移除，仅保留列表，无需切换
     const listContainer = document.getElementById('roadmap-list-container');
-    const mindmapContainer = document.getElementById('roadmap-mindmap-container');
-    
-    if (listContainer) listContainer.style.display = view === 'list' ? 'block' : 'none';
-    if (mindmapContainer) mindmapContainer.style.display = view === 'mindmap' ? 'block' : 'none';
-    
-    // 如果切换到思维导图视图，确保容器存在
-    if (view === 'mindmap' && mindmapContainer) {
-        // 可以在这里添加思维导图的初始化逻辑
-        console.log('切换到思维导图视图');
-    }
+    if (listContainer) listContainer.style.display = 'block';
 }
 
 // 选择Markdown文件
