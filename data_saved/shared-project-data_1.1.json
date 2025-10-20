@@ -472,7 +472,7 @@
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
-      "startDate": "2025-10-31",
+      "startDate": "2025-09-01",
       "endDate": "2026-01-31",
       "progress": 0,
       "subtasks": [],
@@ -633,7 +633,7 @@
     },
     {
       "id": "task-start-1760964968979",
-      "date": "2025-10-31",
+      "date": "2025-09-01",
       "title": "开始：管道吊架模态测试数据分析",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
