@@ -1485,6 +1485,58 @@
                 'viewer': 'TongGi8271@Viewer'
             };
             
+            // 尝试不同的密码格式
+            const passwordVariants = {
+                'admin': [
+                    'TongGi13246@Admin',
+                    'TongGi13246@admin',
+                    'TongGi13246@ADMIN',
+                    'Tongji2024@Admin',
+                    'Tongji2024@admin',
+                    'Tongji2024@ADMIN',
+                    'admin',
+                    'Admin',
+                    'ADMIN',
+                    'TongGi13246',
+                    'Tongji2024',
+                    'Tongji2024@Admin',
+                    'Tongji2024@Editor',
+                    'Tongji2024@Viewer'
+                ],
+                'editor': [
+                    'TongGi9519@Editor',
+                    'TongGi9519@editor',
+                    'TongGi9519@EDITOR',
+                    'Tongji2024@Editor',
+                    'Tongji2024@editor',
+                    'Tongji2024@EDITOR',
+                    'editor',
+                    'Editor',
+                    'EDITOR',
+                    'TongGi9519',
+                    'Tongji2024',
+                    'Tongji2024@Admin',
+                    'Tongji2024@Editor',
+                    'Tongji2024@Viewer'
+                ],
+                'viewer': [
+                    'TongGi8271@Viewer',
+                    'TongGi8271@viewer',
+                    'TongGi8271@VIEWER',
+                    'Tongji2024@Viewer',
+                    'Tongji2024@viewer',
+                    'Tongji2024@VIEWER',
+                    'viewer',
+                    'Viewer',
+                    'VIEWER',
+                    'TongGi8271',
+                    'Tongji2024',
+                    'Tongji2024@Admin',
+                    'Tongji2024@Editor',
+                    'Tongji2024@Viewer'
+                ]
+            };
+            
             const successMessage = document.getElementById('successMessage');
             const errorMessage = document.getElementById('errorMessage');
             
@@ -1496,32 +1548,67 @@
                 const users = window.USER_CONFIG.defaultUsers;
                 let testResults = '🧪 实际密码验证测试:\n\n';
                 let allPassed = true;
+                let foundPasswords = {};
                 
                 for (const [role, userInfo] of Object.entries(users)) {
-                    const actualPassword = actualPasswords[role];
-                    if (actualPassword) {
+                    testResults += `👤 ${role.toUpperCase()} 测试:\n`;
+                    testResults += `   🔐 哈希值: ${userInfo.passwordHash.substring(0, 20)}...\n`;
+                    
+                    const variants = passwordVariants[role] || [];
+                    let found = false;
+                    
+                    for (const password of variants) {
                         try {
-                            console.log(`测试 ${role} 的实际密码: ${actualPassword}`);
-                            const isValid = await window.verifyPassword(actualPassword, userInfo.passwordHash);
+                            console.log(`测试 ${role} 的密码: ${password}`);
+                            const isValid = await window.verifyPassword(password, userInfo.passwordHash);
                             console.log(`${role} 验证结果: ${isValid}`);
                             
                             if (isValid) {
-                                testResults += `✅ ${role}: ${actualPassword} - 验证通过\n`;
-                            } else {
-                                testResults += `❌ ${role}: ${actualPassword} - 验证失败\n`;
-                                allPassed = false;
+                                testResults += `   ✅ 找到密码: ${password}\n`;
+                                foundPasswords[role] = password;
+                                found = true;
+                                break;
                             }
                         } catch (error) {
-                            testResults += `⚠️ ${role}: ${actualPassword} - 验证异常: ${error.message}\n`;
-                            allPassed = false;
+                            console.warn(`测试密码 ${password} 失败:`, error);
                         }
-                    } else {
-                        testResults += `❓ ${role}: 未找到对应的实际密码\n`;
+                    }
+                    
+                    if (!found) {
+                        testResults += `   ❌ 未找到有效密码\n`;
                         allPassed = false;
                     }
+                    testResults += `\n`;
+                }
+                
+                // 显示找到的密码
+                if (Object.keys(foundPasswords).length > 0) {
+                    testResults += `🎉 找到的有效密码:\n`;
+                    for (const [role, password] of Object.entries(foundPasswords)) {
+                        testResults += `   ${role}: ${role} / ${password}\n`;
+                    }
+                    testResults += `\n`;
                 }
                 
                 testResults += `\n📊 测试结果: ${allPassed ? '全部通过' : '部分失败'}\n`;
+                
+                // 添加哈希值分析
+                testResults += `\n🔍 哈希值分析:\n`;
+                for (const [role, userInfo] of Object.entries(users)) {
+                    const hash = userInfo.passwordHash;
+                    if (hash.includes(':')) {
+                        const [salt, hashPart] = hash.split(':');
+                        testResults += `   ${role}: salt=${salt.substring(0, 8)}..., hash=${hashPart.substring(0, 8)}...\n`;
+                    } else {
+                        testResults += `   ${role}: 未知哈希格式\n`;
+                    }
+                }
+                
+                testResults += `\n💡 可能的原因:\n`;
+                testResults += `   • GitHub Secrets中的哈希值可能不是用这些密码生成的\n`;
+                testResults += `   • 密码格式或编码可能不匹配\n`;
+                testResults += `   • 哈希算法参数可能不同\n`;
+                testResults += `   • 需要检查实际的密码生成过程\n`;
                 
                 if (allPassed) {
                     testResults += `\n💡 建议: 使用上述密码进行登录`;
