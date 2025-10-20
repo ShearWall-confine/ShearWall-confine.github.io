@@ -270,7 +270,7 @@ function simpleHash(str) {
 }
 
 // 登录函数
-function login(username, password) {
+async function login(username, password) {
     console.log('开始用户认证...');
     
     // 检查是否在GitHub Pages环境
@@ -279,7 +279,7 @@ function login(username, password) {
     if (isGitHubPages) {
         // GitHub Pages环境：只使用GitHub Secrets，不允许开发环境回退
         console.log('GitHub Pages环境，仅使用GitHub Secrets认证');
-        return authenticateWithGitHubSecrets(username, password);
+        return await authenticateWithGitHubSecrets(username, password);
     } else {
         // 本地开发环境：使用临时认证
         console.log('本地开发环境，使用开发环境认证');
@@ -288,7 +288,7 @@ function login(username, password) {
 }
 
 // GitHub Pages环境认证（使用GitHub Secrets）
-function authenticateWithGitHubSecrets(username, password) {
+async function authenticateWithGitHubSecrets(username, password) {
     console.log('使用GitHub Secrets进行认证...');
     
     // 从user-config.js获取用户配置
@@ -306,7 +306,8 @@ function authenticateWithGitHubSecrets(username, password) {
     // 使用user-config.js中的密码验证
     if (typeof verifyPassword === 'function') {
         // 处理异步密码验证
-        return verifyPassword(password, user.passwordHash).then(isValid => {
+        try {
+            const isValid = await verifyPassword(password, user.passwordHash);
             if (isValid) {
                 const userData = {
                     username: user.username || username,
@@ -329,10 +330,10 @@ function authenticateWithGitHubSecrets(username, password) {
                 console.log('密码错误');
                 return false;
             }
-        }).catch(error => {
+        } catch (error) {
             console.error('密码验证异常:', error);
             return false;
-        });
+        }
     } else {
         console.error('verifyPassword函数未找到，请确保user-config.js已正确引入');
         return false;

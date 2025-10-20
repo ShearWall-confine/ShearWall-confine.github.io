@@ -684,6 +684,8 @@
                     }
                 } catch (error) {
                     console.warn('auth.js登录异常:', error);
+                    console.error('错误详情:', error.message);
+                    console.error('错误堆栈:', error.stack);
                 }
             }
             
