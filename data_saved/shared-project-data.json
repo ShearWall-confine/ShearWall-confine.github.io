@@ -761,7 +761,9 @@
       "estimatedTime": "1个月",
       "dependencies": [],
       "parentId": 1760788986221,
-      "children": [],
+      "children": [
+        1760964830382
+      ],
       "keyPoints": [],
       "expectedOutcomes": ""
     },
@@ -777,6 +779,17 @@
       "children": [],
       "keyPoints": [],
       "expectedOutcomes": ""
+    },
+    {
+      "id": 1760964830382,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760799476110,
+      "children": []
     }
   ],
   "folders": [
