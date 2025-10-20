@@ -696,6 +696,56 @@
                             if (user) {
                                 console.log(`   存储的哈希值: ${user.passwordHash.substring(0, 20)}...`);
                                 console.log(`   完整哈希值: ${user.passwordHash}`);
+                                
+                                // 分析哈希值
+                                const hashParts = user.passwordHash.split(':');
+                                if (hashParts.length === 2) {
+                                    const salt = hashParts[0];
+                                    const hash = hashParts[1];
+                                    console.log(`   Salt: ${salt}`);
+                                    console.log(`   Hash: ${hash.substring(0, 20)}...`);
+                                    console.log(`   Hash长度: ${hash.length} 字符`);
+                                    
+                                    // 检查是否是PBKDF2格式
+                                    if (salt.length === 32 && hash.length === 128) {
+                                        console.log('   ✅ 哈希格式正确 (PBKDF2-SHA512)');
+                                        
+                                        // 测试常见密码
+                                        console.log('   🔍 测试常见密码...');
+                                        const commonPasswords = [
+                                            'TongGi13246@Admin',
+                                            'TongGi9519@Editor', 
+                                            'TongGi8271@Viewer',
+                                            'Tongji2024@Admin',
+                                            'Tongji2024@Editor',
+                                            'Tongji2024@Viewer',
+                                            'admin',
+                                            'editor',
+                                            'viewer',
+                                            'password',
+                                            '123456'
+                                        ];
+                                        
+                                        // 异步测试密码
+                                        setTimeout(async () => {
+                                            for (const testPassword of commonPasswords) {
+                                                try {
+                                                    const isValid = await window.verifyPassword(testPassword, user.passwordHash);
+                                                    if (isValid) {
+                                                        console.log(`   ✅ 找到匹配密码: ${testPassword}`);
+                                                        break;
+                                                    } else {
+                                                        console.log(`   ❌ 不匹配: ${testPassword}`);
+                                                    }
+                                                } catch (error) {
+                                                    console.log(`   ❌ 测试失败: ${testPassword} - ${error.message}`);
+                                                }
+                                            }
+                                        }, 100);
+                                    } else {
+                                        console.log('   ❌ 哈希格式异常');
+                                    }
+                                }
                             } else {
                                 console.log('   用户不存在于配置中');
                             }
