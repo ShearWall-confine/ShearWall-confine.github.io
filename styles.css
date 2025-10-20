@@ -1,3 +1,48 @@
+/* 管理员工具区主题化样式 */
+.admin-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: var(--text-on-primary);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.admin-section .admin-btn {
+    background: rgba(255,255,255,0.16);
+    color: var(--text-on-primary);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.admin-section .admin-btn:hover {
+    background: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+}
+
+/* 编辑任务模态标题条着色 */
+#taskModal .modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--text-on-primary);
+}
+
+/* 全局浮动关闭按钮：固定在右上角，可随滚动可见 */
+.modal .floating-close {
+    position: fixed;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    z-index: 999999; /* 确保高于任何滚动内容与遮罩 */
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    pointer-events: auto;
+}
+
+.modal .floating-close:hover {
+    background: rgba(0,0,0,0.75);
+}
 /* CSS变量 - 默认主题 */
 :root {
     --primary-color: #667eea;
@@ -3248,6 +3293,52 @@ textarea.form-control {
 .timeline-vertical-item.synced {
     background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 144, 220, 0.05) 100%);
     border-left-color: var(--accent-color);
+}
+/* 拖拽把手样式（适配主题） */
+.drag-handle {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px dashed var(--border-color);
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.drag-handle i {
+    color: var(--text-secondary);
+}
+
+.task-item[draggable="true"].dragging,
+.subtask-row.dragging {
+    opacity: 0.7;
+    transform: scale(0.995);
+}
+
+/* 小尺寸按钮统一（与主题色融合） */
+.btn.btn-secondary.btn-sm {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.btn.btn-secondary.btn-sm.active {
+    background: var(--primary-color);
+    color: var(--text-on-primary);
+    border-color: var(--primary-color);
+}
+
+/* 子任务折叠控制条 */
+.subtask-collapse-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+.subtask-collapse-controls .subtask-controls {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
 }
 
 .timeline-vertical-item.synced:hover {

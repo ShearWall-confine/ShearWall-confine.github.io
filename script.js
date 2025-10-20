@@ -12,6 +12,10 @@ let projectData = {
 };
 
 let currentEditingTask = null;
+// 子任务折叠模式：'none' | 'completed' | 'all'
+// 子任务显示筛选：'all' | 'pending' | 'in-progress' | 'completed'
+let subtaskFilterModeList = 'all';
+let subtaskFilterModeEdit = 'all';
 let currentEditingSection = null;
 let currentEditingRoadmapNode = null;
 let currentEditingFolder = null;
@@ -633,6 +637,20 @@ function renderTasks() {
     const container = document.getElementById('tasks-container');
     container.innerHTML = '';
 
+    // 渲染子任务显示筛选工具条
+    const controls = document.createElement('div');
+    controls.className = 'subtask-collapse-controls';
+    controls.innerHTML = `
+        <div class="subtask-controls">
+            <span style="font-weight:600; color: var(--text-color);">子任务显示:</span>
+            <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='all'?'active':''}" onclick="setSubtaskFilterModeList('all')">全部</button>
+            <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='pending'?'active':''}" onclick="setSubtaskFilterModeList('pending')">待开始</button>
+            <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='in-progress'?'active':''}" onclick="setSubtaskFilterModeList('in-progress')">进行中</button>
+            <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='completed'?'active':''}" onclick="setSubtaskFilterModeList('completed')">已完成</button>
+        </div>
+    `;
+    container.appendChild(controls);
+
     projectData.tasks.forEach((task, index) => {
         const taskElement = createTaskElement(task, index);
         container.appendChild(taskElement);
@@ -712,8 +730,13 @@ function createTaskElement(task, index) {
         <div class="task-subtasks">
             <strong>子任务:</strong>
             <ul class="subtasks-list" data-task-id="${task.id}">
-                ${task.subtasks.map((subtask, sIndex) => `
-                    <li class="subtask-row" data-index="${sIndex}" draggable="true" aria-grabbed="false" style="display:flex; align-items:center; gap:8px; color: ${subtask.completed ? '#28a745' : '#6c757d'}">
+                ${task.subtasks.map((subtask, sIndex) => {
+                    const showByFilter = (subtaskFilterModeList === 'all') ||
+                        (subtaskFilterModeList === 'completed' && subtask.completed) ||
+                        ((subtaskFilterModeList === 'pending' || subtaskFilterModeList === 'in-progress') && !subtask.completed);
+                    const shouldHide = !showByFilter;
+                    return `
+                    <li class="subtask-row" data-index="${sIndex}" draggable="true" aria-grabbed="false" style="${shouldHide ? 'display:none;' : 'display:flex;'} align-items:center; gap:8px; color: ${subtask.completed ? '#28a745' : '#6c757d'}">
                         <button class="btn btn-secondary btn-sm drag-handle" title="拖拽子任务" aria-label="拖拽子任务" style="cursor: grab;">
                             <i class="fas fa-grip-vertical"></i>
                         </button>
@@ -726,7 +749,7 @@ function createTaskElement(task, index) {
                             <i class="fas fa-arrow-down"></i>
                         </button>
                     </li>
-                `).join('')}
+                `}).join('')}
             </ul>
         </div>
     `;
@@ -1241,9 +1264,30 @@ function editTask(taskId) {
         </div>
         <div class="form-group">
             <label>子任务</label>
+            <div class="subtask-controls" style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:600; color: var(--text-color);">子任务显示:</span>
+                <button class="btn btn-secondary btn-sm ${subtaskFilterModeEdit==='all'?'active':''}" onclick="setSubtaskFilterModeEdit('all')">全部</button>
+                <button class="btn btn-secondary btn-sm ${subtaskFilterModeEdit==='pending'?'active':''}" onclick="setSubtaskFilterModeEdit('pending')">待开始</button>
+                <button class="btn btn-secondary btn-sm ${subtaskFilterModeEdit==='in-progress'?'active':''}" onclick="setSubtaskFilterModeEdit('in-progress')">进行中</button>
+                <button class="btn btn-secondary btn-sm ${subtaskFilterModeEdit==='completed'?'active':''}" onclick="setSubtaskFilterModeEdit('completed')">已完成</button>
+                <span style="flex:1"></span>
+                <button class="btn btn-primary btn-sm" onclick="toggleSubtaskImportArea()">导入子任务名</button>
+            </div>
+            <div id="subtask-import-area" style="display:none; margin-bottom:10px;">
+                <textarea id="subtask-import-text" class="form-control" rows="6" placeholder="每行一个子任务名称，例如:\n需求分析\n接口设计\n核心算法实现"></textarea>
+                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
+                    <button class="btn btn-secondary btn-sm" onclick="toggleSubtaskImportArea()">取消</button>
+                    <button class="btn btn-primary btn-sm" onclick="applySubtaskImport()">添加</button>
+                </div>
+            </div>
             <div id="subtasks-container">
-                ${task.subtasks.map((subtask, index) => `
-                    <div class="subtask-item" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: var(--card-bg);">
+                ${task.subtasks.map((subtask, index) => {
+                    const showByFilter = (subtaskFilterModeEdit === 'all') ||
+                        (subtaskFilterModeEdit === 'completed' && subtask.completed) ||
+                        ((subtaskFilterModeEdit === 'pending' || subtaskFilterModeEdit === 'in-progress') && !subtask.completed);
+                    const styleDisplay = showByFilter ? '' : 'display:none;';
+                    return `
+                    <div class="subtask-item" style="${styleDisplay} border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: var(--card-bg);">
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
                             <input type="checkbox" ${subtask.completed ? 'checked' : ''} onchange="toggleSubtask(${index})" style="margin-right: 10px;">
                             <input type="text" class="form-control" value="${subtask.title}" onchange="updateSubtaskTitle(${index}, this.value)" style="flex: 1; margin-right: 10px;">
@@ -1283,7 +1327,7 @@ function editTask(taskId) {
                             </div>
                         ` : ''}
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
             <button class="btn btn-primary" onclick="addSubtask()">
                 <i class="fas fa-plus"></i> 添加子任务
@@ -1380,6 +1424,41 @@ function closeTaskModal() {
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     currentEditingTask = null;
+}
+
+// 切换导入子任务输入区显示
+function toggleSubtaskImportArea() {
+    const area = document.getElementById('subtask-import-area');
+    if (!area) return;
+    area.style.display = (area.style.display === 'none' || area.style.display === '') ? 'block' : 'none';
+}
+
+// 批量添加子任务（基于分行文本）
+function applySubtaskImport() {
+    if (!currentEditingTask) return;
+    const textarea = document.getElementById('subtask-import-text');
+    if (!textarea) return;
+    const lines = textarea.value.split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    if (lines.length === 0) {
+        showNotification && showNotification('未检测到有效的子任务名称', 'warning');
+        return;
+    }
+    const now = Date.now();
+    lines.forEach((title, idx) => {
+        currentEditingTask.subtasks.push({
+            id: now + idx,
+            title,
+            completed: false,
+            notes: '',
+            issues: []
+        });
+    });
+    saveData();
+    updateTaskProgressFromSubtasks(currentEditingTask.id);
+    editTask(currentEditingTask.id);
+    showNotification && showNotification(`已添加 ${lines.length} 个子任务`, 'success');
 }
 
 // 删除任务
@@ -1531,6 +1610,19 @@ function editSection(sectionId) {
     }
     
     modal.style.display = 'block';
+}
+// 设置列表视图子任务折叠模式
+function setSubtaskFilterModeList(mode) {
+    subtaskFilterModeList = mode;
+    renderTasks();
+}
+
+// 设置编辑模态子任务折叠模式
+function setSubtaskFilterModeEdit(mode) {
+    subtaskFilterModeEdit = mode;
+    if (currentEditingTask) {
+        editTask(currentEditingTask.id);
+    }
 }
 
 // 保存模态框
