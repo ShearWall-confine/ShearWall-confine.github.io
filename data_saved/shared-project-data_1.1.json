@@ -569,14 +569,24 @@
     },
     {
       "id": 1760966693207,
-      "title": "mei'zh",
+      "title": "每周组会",
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
-      "startDate": "2025-10-20",
-      "endDate": "2025-11-19",
+      "startDate": "2023-09-01",
+      "endDate": "2029-03-19",
       "progress": 0,
-      "subtasks": [],
+      "subtasks": [
+        {
+          "id": 1760966714306,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-10-24T21:25",
+          "timeDescription": ""
+        }
+      ],
       "attachments": [],
       "autoProgress": true
     }
@@ -805,8 +815,8 @@
     },
     {
       "id": "task-start-1760966693207",
-      "date": "2025-10-20",
-      "title": "开始：mei'zh",
+      "date": "2023-09-01",
+      "title": "开始：每周组会",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760966693207,
@@ -819,8 +829,8 @@
     },
     {
       "id": "task-end-1760966693207",
-      "date": "2025-11-19",
-      "title": "完成：mei'zh",
+      "date": "2029-03-19",
+      "title": "完成：每周组会",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760966693207,
@@ -830,6 +840,25 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760966693207-0",
+      "date": "2025-10-24",
+      "time": "21:25",
+      "title": "完成：新子任务",
+      "description": "完成子任务：新子任务",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周组会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周组会",
+      "isSubtask": true
     }
   ],
   "files": [
