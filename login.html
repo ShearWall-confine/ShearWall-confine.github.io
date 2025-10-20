@@ -423,6 +423,40 @@
                 font-size: 14px;
             }
         }
+        
+        /* 调试信息样式 */
+        .debug-btn:hover {
+            background: #5a32a3 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+            cursor: pointer !important;
+        }
+        
+        #debugInfo {
+            animation: slideDown 0.3s ease;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        #debugContent {
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -474,9 +508,28 @@
                 <i class="fas fa-sign-out-alt"></i> 退出游客模式
             </button>
             <br>
+            <button type="button" onclick="showDebugInfo()" class="debug-btn" style="background: #6f42c1; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
+                <i class="fas fa-key"></i> 显示账号密码
+            </button>
+            <br>
             <a href="index.html" class="back-btn" style="display: inline-block; margin-top: 10px; transition: all 0.3s ease;">
                 <i class="fas fa-arrow-left"></i> 返回课题组首页
             </a>
+        </div>
+        
+        <!-- 调试信息显示区域 -->
+        <div id="debugInfo" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; text-align: left;">
+            <h4 style="color: #495057; margin-bottom: 15px; text-align: center;">
+                <i class="fas fa-info-circle"></i> 当前可用账号密码
+            </h4>
+            <div id="debugContent" style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6;">
+                <!-- 调试信息将在这里显示 -->
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button type="button" onclick="hideDebugInfo()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    <i class="fas fa-times"></i> 隐藏信息
+                </button>
+            </div>
         </div>
     </div>
 
@@ -795,10 +848,90 @@
             }
         });
         
+        // 显示调试信息函数
+        function showDebugInfo() {
+            console.log('显示调试信息被调用');
+            
+            const debugInfo = document.getElementById('debugInfo');
+            const debugContent = document.getElementById('debugContent');
+            
+            if (!debugInfo || !debugContent) {
+                console.error('调试信息元素未找到');
+                return;
+            }
+            
+            // 检查当前环境
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            
+            let debugText = '';
+            debugText += `🌐 当前环境: ${isGitHubPages ? 'GitHub Pages' : isLocalhost ? '本地开发' : '其他环境'}\n`;
+            debugText += `📍 主机名: ${window.location.hostname}\n`;
+            debugText += `🔗 完整URL: ${window.location.href}\n\n`;
+            
+            // 显示GitHub Secrets信息（如果可用）
+            if (typeof window.GITHUB_SECRETS !== 'undefined') {
+                debugText += `🔐 GitHub Secrets 配置:\n`;
+                debugText += `   ADMIN_PASSWORD_HASH: ${window.GITHUB_SECRETS.ADMIN_PASSWORD_HASH}\n`;
+                debugText += `   EDITOR_PASSWORD_HASH: ${window.GITHUB_SECRETS.EDITOR_PASSWORD_HASH}\n`;
+                debugText += `   VIEWER_PASSWORD_HASH: ${window.GITHUB_SECRETS.VIEWER_PASSWORD_HASH}\n\n`;
+            } else {
+                debugText += `⚠️ GitHub Secrets 配置未加载\n\n`;
+            }
+            
+            // 显示用户配置信息（如果可用）
+            if (typeof window.USER_CONFIG !== 'undefined') {
+                debugText += `👥 用户配置信息:\n`;
+                const users = window.USER_CONFIG.defaultUsers;
+                for (const [role, userInfo] of Object.entries(users)) {
+                    debugText += `   角色: ${role}\n`;
+                    debugText += `   用户名: ${userInfo.username}\n`;
+                    debugText += `   姓名: ${userInfo.name}\n`;
+                    debugText += `   邮箱: ${userInfo.email}\n`;
+                    debugText += `   密码哈希: ${userInfo.passwordHash.substring(0, 20)}...\n\n`;
+                }
+            } else {
+                debugText += `⚠️ 用户配置未加载\n\n`;
+            }
+            
+            // 显示可用的测试账号密码
+            debugText += `🧪 测试账号密码 (仅用于调试):\n`;
+            debugText += `   管理员: admin / Tongji2024@Admin\n`;
+            debugText += `   编辑者: editor / Tongji2024@Editor\n`;
+            debugText += `   查看者: viewer / Tongji2024@Viewer\n\n`;
+            
+            // 显示认证函数状态
+            debugText += `🔧 认证函数状态:\n`;
+            debugText += `   window.login: ${typeof window.login === 'function' ? '✅ 可用' : '❌ 不可用'}\n`;
+            debugText += `   window.verifyPassword: ${typeof window.verifyPassword === 'function' ? '✅ 可用' : '❌ 不可用'}\n`;
+            debugText += `   window.USER_CONFIG: ${typeof window.USER_CONFIG !== 'undefined' ? '✅ 可用' : '❌ 不可用'}\n`;
+            debugText += `   window.GITHUB_SECRETS: ${typeof window.GITHUB_SECRETS !== 'undefined' ? '✅ 可用' : '❌ 不可用'}\n\n`;
+            
+            // 显示当前时间
+            debugText += `⏰ 显示时间: ${new Date().toLocaleString('zh-CN')}\n`;
+            debugText += `🔄 页面加载时间: ${new Date().toLocaleString('zh-CN')}\n`;
+            
+            debugContent.textContent = debugText;
+            debugInfo.style.display = 'block';
+            
+            // 滚动到调试信息区域
+            debugInfo.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 隐藏调试信息函数
+        function hideDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo) {
+                debugInfo.style.display = 'none';
+            }
+        }
+        
         // 确保函数在全局作用域
         window.testInputs = testInputs;
         window.enterGuestMode = enterGuestMode;
         window.exitGuestMode = exitGuestMode;
+        window.showDebugInfo = showDebugInfo;
+        window.hideDebugInfo = hideDebugInfo;
         
     </script>
 </body>
