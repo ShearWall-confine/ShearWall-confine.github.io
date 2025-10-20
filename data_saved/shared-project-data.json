@@ -467,13 +467,26 @@
       "autoProgress": true
     },
     {
+      "id": 1760964968979,
+      "title": "管道吊架模态测试数据分析",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-31",
+      "endDate": "2025-11-19",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
       "id": 1760787494825,
       "title": "开题",
       "description": "请输入任务描述",
       "status": "in-progress",
       "priority": "medium",
       "startDate": "2025-09-01",
-      "endDate": "2025-11-26",
+      "endDate": "2025-11-30",
       "progress": 0,
       "subtasks": [
         {
@@ -483,13 +496,22 @@
         {
           "title": "开题报告PPT",
           "completed": false
+        },
+        {
+          "id": 1760965450485,
+          "title": "开题汇报",
+          "completed": false,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-11-26T21:04",
+          "timeDescription": ""
         }
       ],
       "attachments": []
     },
     {
       "id": 1760950677382,
-      "title": "本科毕业论文指导",
+      "title": "本科毕业论文/管道易损性指标",
       "description": "黎亚琪",
       "status": "in-progress",
       "priority": "medium",
@@ -517,6 +539,29 @@
           "completed": false,
           "notes": "",
           "issues": []
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1760965498124,
+      "title": "每周例会",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2023-09-20",
+      "endDate": "2029-03-19",
+      "progress": 0,
+      "subtasks": [
+        {
+          "id": 1760965508292,
+          "title": "与西北院开会/例会",
+          "completed": false,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-10-23T21:05",
+          "timeDescription": ""
         }
       ],
       "attachments": [],
@@ -587,6 +632,34 @@
       "type": "task-end"
     },
     {
+      "id": "task-start-1760964968979",
+      "date": "2025-10-31",
+      "title": "开始：管道吊架模态测试数据分析",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760964968979,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760964968979",
+      "date": "2025-11-19",
+      "title": "完成：管道吊架模态测试数据分析",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760964968979,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
       "id": "task-start-1760787494825",
       "date": "2025-09-01",
       "title": "开始：开题",
@@ -602,7 +675,7 @@
     },
     {
       "id": "task-end-1760787494825",
-      "date": "2025-11-26",
+      "date": "2025-11-30",
       "title": "完成：开题",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
@@ -615,9 +688,28 @@
       "type": "task-end"
     },
     {
+      "id": "subtask-completion-1760787494825-2",
+      "date": "2025-11-26",
+      "time": "21:04",
+      "title": "完成：开题汇报",
+      "description": "完成子任务：开题汇报",
+      "status": "pending",
+      "linkedTaskId": 1760787494825,
+      "linkedSubtaskIndex": 2,
+      "tags": [
+        "子任务",
+        "完成",
+        "开题"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "开题",
+      "isSubtask": true
+    },
+    {
       "id": "task-start-1760950677382",
       "date": "2025-09-01",
-      "title": "开始：本科毕业论文指导",
+      "title": "开始：本科毕业论文/管道易损性指标",
       "description": "开始执行任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -631,7 +723,7 @@
     {
       "id": "task-end-1760950677382",
       "date": "2026-06-30",
-      "title": "完成：本科毕业论文指导",
+      "title": "完成：本科毕业论文/管道易损性指标",
       "description": "完成任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -641,6 +733,53 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "task-start-1760965498124",
+      "date": "2023-09-20",
+      "title": "开始：每周例会",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760965498124",
+      "date": "2029-03-19",
+      "title": "完成：每周例会",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760965498124-0",
+      "date": "2025-10-23",
+      "time": "21:05",
+      "title": "完成：与西北院开会/例会",
+      "description": "完成子任务：与西北院开会/例会",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
     }
   ],
   "files": [
@@ -710,70 +849,74 @@
       "dependencies": [],
       "children": [
         1760793979798,
-        1760799476110
+        1760799476110,
+        1760965334007
       ],
       "keyPoints": [],
       "expectedOutcomes": ""
     },
     {
       "id": 1760789502136,
-      "title": "新技术节点",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": []
-    },
-    {
-      "id": 1760793979798,
-      "title": "12",
+      "title": "管道系统动力特性与节点性能研究",
       "description": "请描述这个技术节点的具体内容和目标",
       "status": "pending",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
-      "parentId": 1760788986221,
-      "children": [
-        1760799233374
-      ],
       "keyPoints": [],
       "expectedOutcomes": ""
     },
     {
-      "id": 1760799233374,
+      "id": 1760964658846,
       "title": "新技术节点",
       "description": "请描述这个技术节点的具体内容和目标",
       "status": "pending",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
-      "parentId": 1760793979798,
-      "children": [
-        1760799790522
-      ]
-    },
-    {
-      "id": 1760799476110,
-      "title": "新技术节点",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": [],
-      "parentId": 1760788986221,
+      "parentId": null,
       "children": [],
       "keyPoints": [],
       "expectedOutcomes": ""
     },
     {
-      "id": 1760799790522,
-      "title": "新技术节点",
+      "id": 1760965334007,
+      "title": "管道吊架",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "in-progress",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
-      "parentId": 1760799233374,
+      "parentId": 1760788986221,
+      "children": [
+        1760965341288,
+        1760965361816
+      ],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    },
+    {
+      "id": 1760965341288,
+      "title": "管道吊架模态测试",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "in-progress",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760965334007,
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
+    },
+    {
+      "id": 1760965361816,
+      "title": "管道/管道吊架有限元模拟方法",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "completed",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": 1760965334007,
       "children": [],
       "keyPoints": [],
       "expectedOutcomes": ""
