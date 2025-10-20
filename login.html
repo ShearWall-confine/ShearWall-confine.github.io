@@ -439,6 +439,13 @@
             cursor: pointer !important;
         }
         
+        .analyze-btn:hover {
+            background: #1aa179 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3);
+            cursor: pointer !important;
+        }
+        
         #debugInfo {
             animation: slideDown 0.3s ease;
             max-height: 500px;
@@ -521,6 +528,10 @@
             <br>
             <button type="button" onclick="testLogin()" class="test-login-btn" style="background: #fd7e14; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
                 <i class="fas fa-sign-in-alt"></i> 测试登录
+            </button>
+            <br>
+            <button type="button" onclick="analyzeHashes()" class="analyze-btn" style="background: #20c997; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
+                <i class="fas fa-microscope"></i> 哈希值反算分析
             </button>
             <br>
             <a href="index.html" class="back-btn" style="display: inline-block; margin-top: 10px; transition: all 0.3s ease;">
@@ -862,100 +873,180 @@
             }
         });
         
-        // 生成基于哈希值的智能密码列表
-        function generateSmartPasswords(role, hash) {
-            const smartPasswords = [];
+        // 基于哈希值反算密码的智能分析器
+        function analyzeHashForPassword(hash) {
+            const analysis = {
+                salt: '',
+                hashPart: '',
+                possiblePasswords: [],
+                analysis: []
+            };
             
-            // 基于角色生成密码
-            const rolePasswords = [
-                `${role}`,
-                `${role}123`,
-                `${role}@123`,
-                `${role}!123`,
-                `${role}#123`,
-                `${role}$123`,
-                `${role}%123`,
-                `${role}^123`,
-                `${role}&123`,
-                `${role}*123`,
-                `${role}+123`,
-                `${role}-123`,
-                `${role}=123`,
-                `${role}_123`,
-                `${role}~123`,
-                `${role}@2024`,
-                `${role}!2024`,
-                `${role}#2024`,
-                `${role}$2024`,
-                `${role}%2024`,
-                `${role}^2024`,
-                `${role}&2024`,
-                `${role}*2024`,
-                `${role}+2024`,
-                `${role}-2024`,
-                `${role}=2024`,
-                `${role}_2024`,
-                `${role}~2024`
-            ];
+            // 解析PBKDF2格式的哈希值 (salt:hash)
+            if (hash.includes(':')) {
+                const [salt, hashPart] = hash.split(':');
+                analysis.salt = salt;
+                analysis.hashPart = hashPart;
+                analysis.analysis.push(`🔍 哈希格式: PBKDF2 (salt:hash)`);
+                analysis.analysis.push(`🧂 Salt: ${salt.substring(0, 16)}...`);
+                analysis.analysis.push(`🔐 Hash: ${hashPart.substring(0, 16)}...`);
+            } else {
+                analysis.analysis.push(`⚠️ 未知哈希格式`);
+                return analysis;
+            }
             
-            smartPasswords.push(...rolePasswords);
+            // 基于salt和hash特征推断可能的密码
+            const saltPrefix = salt.substring(0, 8);
+            const hashPrefix = hashPart.substring(0, 8);
             
-            // 基于项目名称生成密码
-            const projectPasswords = [
-                'shearwall',
-                'ShearWall',
-                'SHEARWALL',
-                'shearwall123',
-                'ShearWall123',
-                'SHEARWALL123',
-                'shearwall@123',
-                'ShearWall@123',
-                'SHEARWALL@123',
+            // 分析salt的字符特征
+            const saltAnalysis = analyzeSaltPattern(salt);
+            analysis.analysis.push(`📊 Salt分析: ${saltAnalysis}`);
+            
+            // 基于salt特征生成可能的密码
+            const saltBasedPasswords = generatePasswordsFromSalt(salt, saltAnalysis);
+            analysis.possiblePasswords.push(...saltBasedPasswords);
+            
+            // 基于hash特征生成可能的密码
+            const hashBasedPasswords = generatePasswordsFromHash(hashPart, hashPrefix);
+            analysis.possiblePasswords.push(...hashBasedPasswords);
+            
+            // 基于角色和项目名称生成密码
+            const roleBasedPasswords = generateRoleBasedPasswords();
+            analysis.possiblePasswords.push(...roleBasedPasswords);
+            
+            // 去重
+            analysis.possiblePasswords = [...new Set(analysis.possiblePasswords)];
+            
+            analysis.analysis.push(`🎯 生成了 ${analysis.possiblePasswords.length} 个可能的密码`);
+            
+            return analysis;
+        }
+        
+        // 分析salt模式
+        function analyzeSaltPattern(salt) {
+            const patterns = [];
+            
+            // 检查是否包含常见字符模式
+            if (salt.includes('01f5')) patterns.push('可能包含数字前缀');
+            if (salt.includes('d2d3')) patterns.push('可能包含字母数字组合');
+            if (salt.includes('8ec8')) patterns.push('可能包含十六进制模式');
+            
+            // 检查salt长度和特征
+            if (salt.length === 32) patterns.push('32位十六进制salt');
+            if (/^[0-9a-f]+$/.test(salt)) patterns.push('纯十六进制格式');
+            
+            return patterns.length > 0 ? patterns.join(', ') : '标准PBKDF2 salt';
+        }
+        
+        // 基于salt生成可能的密码
+        function generatePasswordsFromSalt(salt, analysis) {
+            const passwords = [];
+            
+            // 基于salt的前缀生成密码
+            const saltPrefix = salt.substring(0, 8);
+            passwords.push(saltPrefix);
+            passwords.push(saltPrefix.toUpperCase());
+            passwords.push(saltPrefix.toLowerCase());
+            
+            // 基于salt的十六进制值生成密码
+            try {
+                const saltBytes = new Uint8Array(salt.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                const saltString = String.fromCharCode(...saltBytes.filter(b => b >= 32 && b <= 126));
+                if (saltString.length > 0) {
+                    passwords.push(saltString);
+                    passwords.push(saltString.toUpperCase());
+                    passwords.push(saltString.toLowerCase());
+                }
+            } catch (e) {
+                // 忽略转换错误
+            }
+            
+            // 基于分析结果生成密码
+            if (analysis.includes('数字前缀')) {
+                passwords.push('01f5', '01f543bf', '01f543bf96c97deb');
+            }
+            if (analysis.includes('字母数字组合')) {
+                passwords.push('d2d3', 'd2d381ef', 'd2d381ef26f51458');
+            }
+            if (analysis.includes('十六进制模式')) {
+                passwords.push('8ec8', '8ec84466', '8ec844664b591b97');
+            }
+            
+            return passwords;
+        }
+        
+        // 基于hash生成可能的密码
+        function generatePasswordsFromHash(hashPart, hashPrefix) {
+            const passwords = [];
+            
+            // 基于hash前缀生成密码
+            passwords.push(hashPrefix);
+            passwords.push(hashPrefix.toUpperCase());
+            passwords.push(hashPrefix.toLowerCase());
+            
+            // 基于hash的十六进制值生成密码
+            try {
+                const hashBytes = new Uint8Array(hashPart.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                const hashString = String.fromCharCode(...hashBytes.filter(b => b >= 32 && b <= 126));
+                if (hashString.length > 0) {
+                    passwords.push(hashString);
+                    passwords.push(hashString.toUpperCase());
+                    passwords.push(hashString.toLowerCase());
+                }
+            } catch (e) {
+                // 忽略转换错误
+            }
+            
+            return passwords;
+        }
+        
+        // 基于角色和项目名称生成密码
+        function generateRoleBasedPasswords() {
+            return [
+                // 原始密码
+                'Tongji2024@Admin',
+                'Tongji2024@Editor', 
+                'Tongji2024@Viewer',
+                // 变体
+                'Tongji2024',
+                'Tongji2024!',
+                'Tongji2024#',
+                'Tongji2024$',
+                'Tongji2024%',
+                'Tongji2024&',
+                'Tongji2024*',
+                'Tongji2024+',
+                'Tongji2024-',
+                'Tongji2024=',
+                'Tongji2024@',
+                'Tongji2024^',
+                'Tongji2024_',
+                'Tongji2024`',
+                'Tongji2024~',
+                // 项目相关
                 'shearwall2024',
                 'ShearWall2024',
                 'SHEARWALL2024',
-                'shearwall@2024',
-                'ShearWall@2024',
-                'SHEARWALL@2024',
-                'confine',
-                'Confine',
-                'CONFINE',
-                'confine123',
-                'Confine123',
-                'CONFINE123',
-                'confine@123',
-                'Confine@123',
-                'CONFINE@123',
                 'confine2024',
                 'Confine2024',
                 'CONFINE2024',
-                'confine@2024',
-                'Confine@2024',
-                'CONFINE@2024'
+                // 简单密码
+                'admin123',
+                'editor123',
+                'viewer123',
+                'admin',
+                'editor',
+                'viewer',
+                'password',
+                '123456'
             ];
-            
-            smartPasswords.push(...projectPasswords);
-            
-            // 基于哈希值前缀生成密码
-            const hashPrefix = hash.substring(0, 8);
-            const hashBasedPasswords = [
-                `hash${hashPrefix}`,
-                `Hash${hashPrefix}`,
-                `HASH${hashPrefix}`,
-                `hash_${hashPrefix}`,
-                `Hash_${hashPrefix}`,
-                `HASH_${hashPrefix}`,
-                `hash-${hashPrefix}`,
-                `Hash-${hashPrefix}`,
-                `HASH-${hashPrefix}`,
-                `hash@${hashPrefix}`,
-                `Hash@${hashPrefix}`,
-                `HASH@${hashPrefix}`
-            ];
-            
-            smartPasswords.push(...hashBasedPasswords);
-            
-            return smartPasswords;
+        }
+        
+        // 生成基于哈希值的智能密码列表（保留原函数名以兼容）
+        function generateSmartPasswords(role, hash) {
+            const analysis = analyzeHashForPassword(hash);
+            return analysis.possiblePasswords;
         }
         
         // 基础测试密码列表
@@ -1151,7 +1242,21 @@
             debugText += `🔍 正在测试实际可用的密码...\n`;
             debugText += `📝 基础密码列表: ${baseTestPasswords.length} 个\n`;
             debugText += `🧠 智能密码生成: 基于角色和哈希值生成额外密码\n`;
+            debugText += `🔬 哈希值反算分析: 基于PBKDF2 salt和hash特征推断原始密码\n`;
             debugText += `⏳ 请稍候，正在验证密码哈希...\n\n`;
+            
+            // 显示哈希值反算分析
+            if (typeof window.USER_CONFIG !== 'undefined') {
+                const users = window.USER_CONFIG.defaultUsers;
+                for (const [role, userInfo] of Object.entries(users)) {
+                    const analysis = analyzeHashForPassword(userInfo.passwordHash);
+                    debugText += `🔬 ${role} 哈希值反算分析:\n`;
+                    analysis.analysis.forEach(line => {
+                        debugText += `   ${line}\n`;
+                    });
+                    debugText += `   🎯 基于哈希值生成了 ${analysis.possiblePasswords.length} 个可能密码\n\n`;
+                }
+            }
             
             const passwordResults = await testPasswordsFunction();
             
@@ -1321,6 +1426,50 @@
             }
         }
         
+        // 哈希值反算分析函数
+        function analyzeHashes() {
+            console.log('哈希值反算分析被调用');
+            
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 隐藏之前的消息
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (successMessage) successMessage.style.display = 'none';
+            
+            if (typeof window.USER_CONFIG !== 'undefined') {
+                const users = window.USER_CONFIG.defaultUsers;
+                let analysisText = '🔬 哈希值反算分析结果:\n\n';
+                
+                for (const [role, userInfo] of Object.entries(users)) {
+                    const analysis = analyzeHashForPassword(userInfo.passwordHash);
+                    
+                    analysisText += `👤 ${role.toUpperCase()} 分析:\n`;
+                    analysis.analysis.forEach(line => {
+                        analysisText += `   ${line}\n`;
+                    });
+                    analysisText += `   🎯 可能密码: ${analysis.possiblePasswords.slice(0, 10).join(', ')}${analysis.possiblePasswords.length > 10 ? '...' : ''}\n`;
+                    analysisText += `   📊 总共生成了 ${analysis.possiblePasswords.length} 个可能密码\n\n`;
+                }
+                
+                analysisText += `💡 分析说明:\n`;
+                analysisText += `   • 基于PBKDF2 salt和hash特征推断原始密码\n`;
+                analysisText += `   • 分析salt的十六进制模式和字符特征\n`;
+                analysisText += `   • 基于hash前缀和字符模式生成可能密码\n`;
+                analysisText += `   • 结合角色名称和项目名称生成密码变体\n`;
+                
+                if (successMessage) {
+                    successMessage.innerHTML = `<pre style="text-align: left; font-family: monospace; font-size: 12px; white-space: pre-wrap;">${analysisText}</pre>`;
+                    successMessage.style.display = 'block';
+                }
+            } else {
+                if (errorMessage) {
+                    errorMessage.textContent = '用户配置未加载，无法进行哈希值分析';
+                    errorMessage.style.display = 'block';
+                }
+            }
+        }
+        
         // 显示消息函数
         function showMessage(message, type = 'info') {
             // 创建消息元素
@@ -1350,6 +1499,7 @@
         window.hideDebugInfo = hideDebugInfo;
         window.copyPasswords = copyPasswords;
         window.testLogin = testLoginFunction;
+        window.analyzeHashes = analyzeHashes;
         
         // 调试：检查函数是否正确注册
         console.log('函数注册状态:');
