@@ -778,36 +778,6 @@
       "expectedOutcomes": ""
     },
     {
-      "id": 1760793979798,
-      "title": "管道吊架模态测试",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "in-progress",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": [],
-      "parentId": 1760788986221,
-      "children": [
-        1760799233374
-      ],
-      "keyPoints": [],
-      "expectedOutcomes": ""
-    },
-    {
-      "id": 1760799476110,
-      "title": "管道/管道吊架有限元模拟方法",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": [],
-      "parentId": 1760788986221,
-      "children": [
-        1760964830382
-      ],
-      "keyPoints": [],
-      "expectedOutcomes": ""
-    },
-    {
       "id": 1760964658846,
       "title": "新技术节点",
       "description": "请描述这个技术节点的具体内容和目标",
@@ -824,7 +794,7 @@
       "id": 1760965334007,
       "title": "管道吊架",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "in-progress",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
@@ -840,7 +810,7 @@
       "id": 1760965341288,
       "title": "管道吊架模态测试",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "in-progress",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
@@ -851,14 +821,16 @@
     },
     {
       "id": 1760965361816,
-      "title": "新技术节点",
+      "title": "管道/管道吊架有限元模拟方法",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "completed",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
       "parentId": 1760965334007,
-      "children": []
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
     }
   ],
   "folders": [
