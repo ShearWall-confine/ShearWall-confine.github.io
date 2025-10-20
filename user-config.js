@@ -11,21 +11,21 @@ const USER_CONFIG = {
       role: 'admin',
       name: '系统管理员',
       email: 'admin@example.com',
-      passwordHash: '09208fc77dde6d10c1963a1939108648:737b69d98f350265393c47428feb988fa3f1c18bd4a950471ea23fb238e93df0f5701f2382f9b1c669d217bf1aebbf4f1413b0cdd98204a92dee9a444527087e'
+      passwordHash: 'a8a25210f4cdcd8b629ebadb6c46d0a7:30c9ae72fd755ff377c812b048cfc13ebd1086f982eb2c9f4077261863b49e111366921326518e879a5506160fb4f3d4ad63d4d86ad47dc0ccd3c003a91485be'
     },
     'editor': {
       username: 'editor', 
       role: 'editor',
       name: '编辑者',
       email: 'editor@example.com',
-      passwordHash: 'b77b6cd029cebc863f611aca856aa81f:f8fc82988fbbbdefc9b44a86836c6040762340a583e437f999701161621d44180c7275dbf1693ae3592c652547479a290e8e299a53cd2af25ff3bffa7f54ec67'
+      passwordHash: 'f023a309ea6013e489f7862e6dc28cf2:1c86b766ad2a81624c1c6b798fb04b3cef46fea8053bf1de5651bca70025ae06e990bc62355bc9aacd5639392f85c302aa18591688880eb3fe6936572bbb5367'
     },
     'viewer': {
       username: 'viewer',
       role: 'viewer', 
       name: '查看者',
       email: 'viewer@example.com',
-      passwordHash: '53b1ea9f096995a077150f127f312a4b:1f9185b9a418bc11c4a1925d969c7fbb09bda3fb2fdeecf9e27ae1b6e4385134eb0d35da53daccc47bdcc3f843adaa88c273137215e3270624482ca183bffa2b'
+      passwordHash: '4a61575d58676013b7ed6f5a2ff22ef3:806e9644907204002f9970a1bc58bb7811213794827d63dce2da67cca7a4e9d59fc5b9edca5c5a10d99ea2b1f8f0d5d7bfa316b71ea599fd2f1878b260a6611d'
     }
   }
 };
