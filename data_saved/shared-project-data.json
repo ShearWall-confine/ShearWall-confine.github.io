@@ -40,7 +40,7 @@
       "description": "请输入任务描述",
       "status": "in-progress",
       "priority": "medium",
-      "startDate": "2025-10-18",
+      "startDate": "2025-09-01",
       "endDate": "2025-11-17",
       "progress": 0,
       "subtasks": [
@@ -102,6 +102,15 @@
       "status": "in-progress",
       "linkedTaskId": 1760787494825,
       "endDate": "2025-11-17"
+    },
+    {
+      "id": 1760950197915,
+      "title": "实验室参观",
+      "description": "10月23日下午16:15-16:30振动台实验室，德国伊尔梅瑙工业大学的校长代表团来访，",
+      "date": "2025-10-23",
+      "status": "pending",
+      "tags": [],
+      "isSynced": false
     },
     {
       "id": "task-start-1760787461942",
@@ -171,7 +180,7 @@
     },
     {
       "id": "task-start-1760787494825",
-      "date": "2025-10-18",
+      "date": "2025-09-01",
       "title": "开始：开题",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
@@ -224,15 +233,6 @@
       ],
       "isSynced": true,
       "type": "task-end"
-    },
-    {
-      "id": 1760950197915,
-      "title": "实验室参观",
-      "description": "10月23日下午16:15-16:30振动台实验室，德国伊尔梅瑙工业大学的校长代表团来访，",
-      "date": "2025-10-23",
-      "status": "pending",
-      "tags": [],
-      "isSynced": false
     }
   ],
   "files": [
