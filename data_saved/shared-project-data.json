@@ -28,7 +28,7 @@
           "startTime": "2025-10-19T22:48",
           "endTime": "2025-10-30T22:48",
           "timeDescription": null,
-          "completionTime": null
+          "completionTime": "2025-10-19T22:48"
         },
         {
           "id": 1760961963474,
@@ -250,6 +250,19 @@
       ],
       "attachments": [],
       "autoProgress": true
+    },
+    {
+      "id": 1760963799458,
+      "title": "新任务",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-20",
+      "endDate": "2025-11-19",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -314,6 +327,25 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760787461942-1",
+      "date": "2025-10-19",
+      "time": "22:48",
+      "title": "完成：模态测试：CA_07+13_Mid_AR",
+      "description": "完成子任务：模态测试：CA_07+13_Mid_AR",
+      "status": "completed",
+      "linkedTaskId": 1760787461942,
+      "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "管道吊架模态测试"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "管道吊架模态测试",
+      "isSubtask": true
     },
     {
       "id": "task-start-1760787494825",
