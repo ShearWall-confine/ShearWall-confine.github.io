@@ -760,19 +760,22 @@
       "dependencies": [],
       "children": [
         1760793979798,
-        1760799476110
+        1760799476110,
+        1760965334007
       ],
       "keyPoints": [],
       "expectedOutcomes": ""
     },
     {
       "id": 1760789502136,
-      "title": "新技术节点",
+      "title": "管道系统动力特性与节点性能研究",
       "description": "请描述这个技术节点的具体内容和目标",
       "status": "pending",
       "type": "research",
       "estimatedTime": "1个月",
-      "dependencies": []
+      "dependencies": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
     },
     {
       "id": 1760793979798,
@@ -791,7 +794,7 @@
     },
     {
       "id": 1760799476110,
-      "title": "新技术节点",
+      "title": "管道/管道吊架有限元模拟方法",
       "description": "请描述这个技术节点的具体内容和目标",
       "status": "pending",
       "type": "research",
@@ -818,17 +821,15 @@
       "expectedOutcomes": ""
     },
     {
-      "id": 1760964830382,
-      "title": "管道吊架有限元模拟",
+      "id": 1760965334007,
+      "title": "新技术节点",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "completed",
+      "status": "pending",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
-      "parentId": 1760799476110,
-      "children": [],
-      "keyPoints": [],
-      "expectedOutcomes": ""
+      "parentId": 1760788986221,
+      "children": []
     }
   ],
   "folders": [
