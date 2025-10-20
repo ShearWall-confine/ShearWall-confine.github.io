@@ -473,7 +473,7 @@
       "status": "in-progress",
       "priority": "medium",
       "startDate": "2025-09-01",
-      "endDate": "2025-11-17",
+      "endDate": "2025-11-26",
       "progress": 0,
       "subtasks": [
         {
@@ -588,7 +588,7 @@
     },
     {
       "id": "task-end-1760787494825",
-      "date": "2025-11-17",
+      "date": "2025-11-26",
       "title": "完成：开题",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
