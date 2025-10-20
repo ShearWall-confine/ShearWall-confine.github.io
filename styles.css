@@ -1392,8 +1392,8 @@ body {
 
 .calendar-day {
     background: white;
-    min-height: 60px;
-    padding: 4px;
+    min-height: 110px; /* 增大单元格高度 */
+    padding: 6px;
     position: relative;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -1419,16 +1419,24 @@ body {
 }
 
 .calendar-day-number {
-    font-size: 12px;
+    font-size: 14px; /* 放大日期字号 */
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
+}
+
+.calendar-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: calc(100% - 24px); /* 留出日期数字空间 */
+    overflow: auto; /* 内容过多时滚动，而不撑开单元格 */
 }
 
 .calendar-event {
-    font-size: 9px;
-    padding: 1px 3px;
-    border-radius: 2px;
-    margin-bottom: 1px;
+    font-size: 11px; /* 放大事件字号但保持紧凑 */
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 0; /* 间距由容器gap控制 */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

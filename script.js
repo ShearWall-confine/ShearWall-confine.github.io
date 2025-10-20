@@ -4354,7 +4354,11 @@ function renderCalendar() {
     for (let day = 1; day <= daysInMonth; day++) {
         const dayElement = document.createElement('div');
         const currentDate = new Date(year, month, day);
-        const dateString = currentDate.toISOString().split('T')[0];
+        // 使用本地年月日拼接，避免 toISOString 引起的时区偏移导致日期+1
+        const yyyy = currentDate.getFullYear();
+        const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(currentDate.getDate()).padStart(2, '0');
+        const dateString = `${yyyy}-${mm}-${dd}`;
         
         dayElement.className = 'calendar-day';
         dayElement.dataset.date = dateString;
@@ -4373,9 +4377,11 @@ function renderCalendar() {
         
         dayElement.innerHTML = `
             <div class="calendar-day-number">${day}</div>
-            ${dayEvents.map(event => `
-                <div class="calendar-event ${event.status}">${event.title}</div>
-            `).join('')}
+            <div class="calendar-events">
+                ${dayEvents.map(event => `
+                    <div class="calendar-event ${event.status}" title="${event.title}">${event.title}</div>
+                `).join('')}
+            </div>
         `;
         
         // 点击事件
