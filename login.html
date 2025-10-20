@@ -570,7 +570,7 @@
         }
         
         // 智能登录验证（支持GitHub Secrets和开发环境）
-        function smartLogin(username, password) {
+        async function smartLogin(username, password) {
             console.log('智能登录验证开始，用户名:', username);
             
             // 检查是否在GitHub Pages环境
@@ -581,7 +581,7 @@
             if (typeof window.login === 'function') {
                 try {
                     console.log('尝试使用auth.js进行认证...');
-                    const result = window.login(username, password);
+                    const result = await window.login(username, password);
                     if (result) {
                         console.log('auth.js认证成功');
                         return result;
@@ -739,31 +739,39 @@
                     if (loginBtn) loginBtn.disabled = true;
                     if (loading) loading.style.display = 'block';
                     
-                    setTimeout(() => {
-                        // 使用smartLogin函数，它包含回退机制
-                        const result = smartLogin(username, password);
-                        
-                        if (result) {
-                            sessionStorage.setItem('currentUser', JSON.stringify(result));
+                    setTimeout(async () => {
+                        try {
+                            // 使用smartLogin函数，它包含回退机制
+                            const result = await smartLogin(username, password);
                             
-                            if (successMessage) {
-                                successMessage.textContent = '登录成功！正在跳转...';
-                                successMessage.style.display = 'block';
+                            if (result) {
+                                sessionStorage.setItem('currentUser', JSON.stringify(result));
+                                
+                                if (successMessage) {
+                                    successMessage.textContent = '登录成功！正在跳转...';
+                                    successMessage.style.display = 'block';
+                                }
+                                
+                                setTimeout(() => {
+                                    window.location.href = 'project-management.html';
+                                }, 1500);
+                            } else {
+                                if (errorMessage) {
+                                    errorMessage.textContent = '用户名或密码错误，请重试';
+                                    errorMessage.style.display = 'block';
+                                }
                             }
-                            
-                            setTimeout(() => {
-                                window.location.href = 'project-management.html';
-                            }, 1500);
-                        } else {
+                        } catch (error) {
+                            console.error('登录过程异常:', error);
                             if (errorMessage) {
-                                errorMessage.textContent = '用户名或密码错误，请重试';
+                                errorMessage.textContent = '登录过程出现异常，请重试';
                                 errorMessage.style.display = 'block';
                             }
+                        } finally {
+                            // 恢复按钮状态
+                            if (loginBtn) loginBtn.disabled = false;
+                            if (loading) loading.style.display = 'none';
                         }
-                        
-                        // 恢复按钮状态
-                        if (loginBtn) loginBtn.disabled = false;
-                        if (loading) loading.style.display = 'none';
                     }, 800);
                 });
             }

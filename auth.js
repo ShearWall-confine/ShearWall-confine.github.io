@@ -305,29 +305,34 @@ function authenticateWithGitHubSecrets(username, password) {
     
     // 使用user-config.js中的密码验证
     if (typeof verifyPassword === 'function') {
-        const isValid = verifyPassword(password, user.passwordHash);
-        if (isValid) {
-            const userData = {
-                username: user.username || username,
-                role: user.role,
-                name: user.name,
-                email: user.email,
-                loginTime: new Date().toISOString()
-            };
-            
-            // 保存用户信息到sessionStorage
-            sessionStorage.setItem('currentUser', JSON.stringify(userData));
-            currentUser = userData;
-            setUserPermissions();
-            updateUIForUserRole();
-            showUserInfo();
-            
-            console.log('GitHub Secrets认证成功:', userData);
-            return true;
-        } else {
-            console.log('密码错误');
+        // 处理异步密码验证
+        return verifyPassword(password, user.passwordHash).then(isValid => {
+            if (isValid) {
+                const userData = {
+                    username: user.username || username,
+                    role: user.role,
+                    name: user.name,
+                    email: user.email,
+                    loginTime: new Date().toISOString()
+                };
+                
+                // 保存用户信息到sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                currentUser = userData;
+                setUserPermissions();
+                updateUIForUserRole();
+                showUserInfo();
+                
+                console.log('GitHub Secrets认证成功:', userData);
+                return true;
+            } else {
+                console.log('密码错误');
+                return false;
+            }
+        }).catch(error => {
+            console.error('密码验证异常:', error);
             return false;
-        }
+        });
     } else {
         console.error('verifyPassword函数未找到，请确保user-config.js已正确引入');
         return false;
