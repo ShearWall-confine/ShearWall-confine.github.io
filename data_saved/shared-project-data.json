@@ -764,6 +764,19 @@
       "children": [],
       "keyPoints": [],
       "expectedOutcomes": ""
+    },
+    {
+      "id": 1760964658846,
+      "title": "新技术节点",
+      "description": "请描述这个技术节点的具体内容和目标",
+      "status": "pending",
+      "type": "research",
+      "estimatedTime": "1个月",
+      "dependencies": [],
+      "parentId": null,
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
     }
   ],
   "folders": [
