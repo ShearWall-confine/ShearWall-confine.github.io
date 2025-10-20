@@ -959,7 +959,7 @@
         }
         
         // 基础测试密码列表
-        const testPasswords = [
+        const baseTestPasswords = [
             // 原始密码
             'Tongji2024@Admin',
             'Tongji2024@Editor', 
@@ -1046,7 +1046,7 @@
         ];
         
         // 测试密码函数 - 找出实际可用的密码
-        async function testPasswords() {
+        async function testPasswordsFunction() {
             const results = {};
             
             if (typeof window.USER_CONFIG !== 'undefined' && typeof window.verifyPassword === 'function') {
@@ -1059,7 +1059,7 @@
                     
                     // 生成智能密码列表
                     const smartPasswords = generateSmartPasswords(role, userInfo.passwordHash);
-                    const allPasswords = [...testPasswords, ...smartPasswords];
+                    const allPasswords = [...baseTestPasswords, ...smartPasswords];
                     
                     console.log(`为 ${role} 生成了 ${smartPasswords.length} 个智能密码，总共测试 ${allPasswords.length} 个密码`);
                     
@@ -1149,11 +1149,11 @@
             
             // 测试实际可用的密码
             debugText += `🔍 正在测试实际可用的密码...\n`;
-            debugText += `📝 基础密码列表: ${testPasswords.length} 个\n`;
+            debugText += `📝 基础密码列表: ${baseTestPasswords.length} 个\n`;
             debugText += `🧠 智能密码生成: 基于角色和哈希值生成额外密码\n`;
             debugText += `⏳ 请稍候，正在验证密码哈希...\n\n`;
             
-            const passwordResults = await testPasswords();
+            const passwordResults = await testPasswordsFunction();
             
             debugText += `✅ 实际可用的账号密码:\n`;
             let foundCount = 0;
@@ -1220,7 +1220,7 @@
         // 复制密码到剪贴板函数
         async function copyPasswords() {
             // 测试实际可用的密码
-            const passwordResults = await testPasswords();
+            const passwordResults = await testPasswordsFunction();
             
             let passwords = '实际可用的账号密码:\n';
             for (const [role, result] of Object.entries(passwordResults)) {
@@ -1273,7 +1273,7 @@
         async function testLogin() {
             console.log('测试登录被调用');
             
-            const passwordResults = await testPasswords();
+            const passwordResults = await testPasswordsFunction();
             const successMessage = document.getElementById('successMessage');
             const errorMessage = document.getElementById('errorMessage');
             
@@ -1350,6 +1350,12 @@
         window.hideDebugInfo = hideDebugInfo;
         window.copyPasswords = copyPasswords;
         window.testLogin = testLogin;
+        
+        // 调试：检查函数是否正确注册
+        console.log('函数注册状态:');
+        console.log('showDebugInfo:', typeof window.showDebugInfo);
+        console.log('testLogin:', typeof window.testLogin);
+        console.log('testPasswordsFunction:', typeof testPasswordsFunction);
         
     </script>
 </body>
