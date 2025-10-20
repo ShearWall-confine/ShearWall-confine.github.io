@@ -598,6 +598,19 @@
       ],
       "attachments": [],
       "autoProgress": true
+    },
+    {
+      "id": 1760967096858,
+      "title": "管道吊架模态论文",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-20",
+      "endDate": "2025-11-19",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -776,6 +789,25 @@
       "type": "task-end"
     },
     {
+      "id": "subtask-completion-1760950677382-0",
+      "date": "2025-10-19",
+      "time": "21:27",
+      "title": "完成：见面会谈",
+      "description": "完成子任务：见面会谈",
+      "status": "completed",
+      "linkedTaskId": 1760950677382,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "本科毕业论文/管道易损性指标"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "本科毕业论文/管道易损性指标",
+      "isSubtask": true
+    },
+    {
       "id": "task-start-1760965498124",
       "date": "2023-09-20",
       "title": "开始：每周例会",
@@ -854,8 +886,8 @@
       "id": "subtask-completion-1760966693207-0",
       "date": "2025-10-24",
       "time": "21:25",
-      "title": "完成：新子任务",
-      "description": "完成子任务：新子任务",
+      "title": "完成：开题ppt",
+      "description": "完成子任务：开题ppt",
       "status": "pending",
       "linkedTaskId": 1760966693207,
       "linkedSubtaskIndex": 0,
@@ -870,23 +902,32 @@
       "isSubtask": true
     },
     {
-      "id": "subtask-completion-1760950677382-3",
-      "date": "2025-10-19",
-      "time": "21:27",
-      "title": "完成：见面会谈",
-      "description": "完成子任务：见面会谈",
-      "status": "completed",
-      "linkedTaskId": 1760950677382,
-      "linkedSubtaskIndex": 3,
+      "id": "task-start-1760967096858",
+      "date": "2025-10-20",
+      "title": "开始：管道吊架模态论文",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967096858,
       "tags": [
-        "子任务",
-        "完成",
-        "本科毕业论文/管道易损性指标"
+        "工作清单",
+        "开始"
       ],
       "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "本科毕业论文/管道易损性指标",
-      "isSubtask": true
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760967096858",
+      "date": "2025-11-19",
+      "title": "完成：管道吊架模态论文",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967096858,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
     }
   ],
   "files": [
