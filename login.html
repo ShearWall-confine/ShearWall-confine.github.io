@@ -432,6 +432,13 @@
             cursor: pointer !important;
         }
         
+        .test-login-btn:hover {
+            background: #e55a00 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+            cursor: pointer !important;
+        }
+        
         #debugInfo {
             animation: slideDown 0.3s ease;
             max-height: 500px;
@@ -510,6 +517,10 @@
             <br>
             <button type="button" onclick="showDebugInfo()" class="debug-btn" style="background: #6f42c1; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
                 <i class="fas fa-key"></i> 显示账号密码
+            </button>
+            <br>
+            <button type="button" onclick="testLogin()" class="test-login-btn" style="background: #fd7e14; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin: 10px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">
+                <i class="fas fa-sign-in-alt"></i> 测试登录
             </button>
             <br>
             <a href="index.html" class="back-btn" style="display: inline-block; margin-top: 10px; transition: all 0.3s ease;">
@@ -851,6 +862,47 @@
             }
         });
         
+        // 测试密码函数 - 找出实际可用的密码
+        async function testPasswords() {
+            const testPasswords = [
+                'Tongji2024@Admin',
+                'Tongji2024@Editor', 
+                'Tongji2024@Viewer',
+                'admin123',
+                'editor123',
+                'viewer123',
+                'password',
+                '123456',
+                'admin',
+                'editor',
+                'viewer'
+            ];
+            
+            const results = {};
+            
+            if (typeof window.USER_CONFIG !== 'undefined' && typeof window.verifyPassword === 'function') {
+                const users = window.USER_CONFIG.defaultUsers;
+                
+                for (const [role, userInfo] of Object.entries(users)) {
+                    results[role] = { found: false, password: null };
+                    
+                    for (const testPassword of testPasswords) {
+                        try {
+                            const isValid = await window.verifyPassword(testPassword, userInfo.passwordHash);
+                            if (isValid) {
+                                results[role] = { found: true, password: testPassword };
+                                break;
+                            }
+                        } catch (error) {
+                            console.warn(`测试密码 ${testPassword} 失败:`, error);
+                        }
+                    }
+                }
+            }
+            
+            return results;
+        }
+        
         // 从哈希值获取对应的明文密码（用于调试显示）
         function getPasswordFromHash(hash) {
             // 这是一个调试函数，用于显示GitHub Secrets中存储的密码
@@ -889,7 +941,7 @@
         }
         
         // 显示调试信息函数
-        function showDebugInfo() {
+        async function showDebugInfo() {
             console.log('显示调试信息被调用');
             
             const debugInfo = document.getElementById('debugInfo');
@@ -900,6 +952,10 @@
                 return;
             }
             
+            // 显示加载状态
+            debugContent.textContent = '🔍 正在测试密码...';
+            debugInfo.style.display = 'block';
+            
             // 检查当前环境
             const isGitHubPages = window.location.hostname.includes('github.io');
             const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -908,6 +964,20 @@
             debugText += `🌐 当前环境: ${isGitHubPages ? 'GitHub Pages' : isLocalhost ? '本地开发' : '其他环境'}\n`;
             debugText += `📍 主机名: ${window.location.hostname}\n`;
             debugText += `🔗 完整URL: ${window.location.href}\n\n`;
+            
+            // 测试实际可用的密码
+            debugText += `🔍 正在测试实际可用的密码...\n`;
+            const passwordResults = await testPasswords();
+            
+            debugText += `\n✅ 实际可用的账号密码:\n`;
+            for (const [role, result] of Object.entries(passwordResults)) {
+                if (result.found) {
+                    debugText += `   ${role}: ${role} / ${result.password}\n`;
+                } else {
+                    debugText += `   ${role}: ❌ 未找到匹配的密码\n`;
+                }
+            }
+            debugText += `\n`;
             
             // 显示GitHub Secrets信息（如果可用）
             if (typeof window.GITHUB_SECRETS !== 'undefined') {
@@ -934,36 +1004,6 @@
                 debugText += `⚠️ 用户配置未加载\n\n`;
             }
             
-            // 显示可用的测试账号密码
-            debugText += `🧪 测试账号密码 (仅用于调试):\n`;
-            debugText += `   管理员: admin / Tongji2024@Admin\n`;
-            debugText += `   编辑者: editor / Tongji2024@Editor\n`;
-            debugText += `   查看者: viewer / Tongji2024@Viewer\n\n`;
-            
-            // 显示GitHub Secrets对应的明文密码（如果可用）
-            if (typeof window.GITHUB_SECRETS !== 'undefined') {
-                debugText += `🔑 GitHub Secrets 对应的明文密码:\n`;
-                debugText += `   管理员密码: ${getPasswordFromHash(window.GITHUB_SECRETS.ADMIN_PASSWORD_HASH)}\n`;
-                debugText += `   编辑者密码: ${getPasswordFromHash(window.GITHUB_SECRETS.EDITOR_PASSWORD_HASH)}\n`;
-                debugText += `   查看者密码: ${getPasswordFromHash(window.GITHUB_SECRETS.VIEWER_PASSWORD_HASH)}\n\n`;
-            }
-            
-            // 显示当前环境下的实际可用密码
-            debugText += `💡 当前环境实际可用密码:\n`;
-            if (isGitHubPages) {
-                debugText += `   🌐 GitHub Pages环境:\n`;
-                debugText += `      管理员: admin / Tongji2024@Admin\n`;
-                debugText += `      编辑者: editor / Tongji2024@Editor\n`;
-                debugText += `      查看者: viewer / Tongji2024@Viewer\n`;
-                debugText += `      (密码通过GitHub Secrets配置)\n\n`;
-            } else {
-                debugText += `   🏠 本地开发环境:\n`;
-                debugText += `      管理员: admin / Tongji2024@Admin\n`;
-                debugText += `      编辑者: editor / Tongji2024@Editor\n`;
-                debugText += `      查看者: viewer / Tongji2024@Viewer\n`;
-                debugText += `      (使用开发环境临时密码)\n\n`;
-            }
-            
             // 显示认证函数状态
             debugText += `🔧 认证函数状态:\n`;
             debugText += `   window.login: ${typeof window.login === 'function' ? '✅ 可用' : '❌ 不可用'}\n`;
@@ -976,7 +1016,6 @@
             debugText += `🔄 页面加载时间: ${new Date().toLocaleString('zh-CN')}\n`;
             
             debugContent.textContent = debugText;
-            debugInfo.style.display = 'block';
             
             // 滚动到调试信息区域
             debugInfo.scrollIntoView({ behavior: 'smooth' });
@@ -991,14 +1030,22 @@
         }
         
         // 复制密码到剪贴板函数
-        function copyPasswords() {
-            const passwords = `管理员: admin / Tongji2024@Admin
-编辑者: editor / Tongji2024@Editor
-查看者: viewer / Tongji2024@Viewer`;
+        async function copyPasswords() {
+            // 测试实际可用的密码
+            const passwordResults = await testPasswords();
+            
+            let passwords = '实际可用的账号密码:\n';
+            for (const [role, result] of Object.entries(passwordResults)) {
+                if (result.found) {
+                    passwords += `${role}: ${role} / ${result.password}\n`;
+                } else {
+                    passwords += `${role}: ❌ 未找到匹配的密码\n`;
+                }
+            }
             
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(passwords).then(() => {
-                    showMessage('密码已复制到剪贴板！', 'success');
+                    showMessage('实际可用密码已复制到剪贴板！', 'success');
                 }).catch(err => {
                     console.error('复制失败:', err);
                     fallbackCopyTextToClipboard(passwords);
@@ -1034,6 +1081,58 @@
             document.body.removeChild(textArea);
         }
         
+        // 测试登录函数
+        async function testLogin() {
+            console.log('测试登录被调用');
+            
+            const passwordResults = await testPasswords();
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 隐藏之前的消息
+            if (errorMessage) errorMessage.style.display = 'none';
+            if (successMessage) successMessage.style.display = 'none';
+            
+            let testResults = '🧪 登录测试结果:\n\n';
+            let hasValidPassword = false;
+            
+            for (const [role, result] of Object.entries(passwordResults)) {
+                if (result.found) {
+                    testResults += `✅ ${role}: ${result.password} - 密码有效\n`;
+                    hasValidPassword = true;
+                    
+                    // 尝试实际登录
+                    try {
+                        const loginResult = await smartLogin(role, result.password);
+                        if (loginResult) {
+                            testResults += `   🎉 登录成功！\n`;
+                        } else {
+                            testResults += `   ❌ 登录失败\n`;
+                        }
+                    } catch (error) {
+                        testResults += `   ⚠️ 登录异常: ${error.message}\n`;
+                    }
+                } else {
+                    testResults += `❌ ${role}: 未找到有效密码\n`;
+                }
+                testResults += `\n`;
+            }
+            
+            if (hasValidPassword) {
+                testResults += `💡 建议: 使用上述有效密码进行登录`;
+                if (successMessage) {
+                    successMessage.innerHTML = `<pre style="text-align: left; font-family: monospace; font-size: 12px;">${testResults}</pre>`;
+                    successMessage.style.display = 'block';
+                }
+            } else {
+                testResults += `⚠️ 警告: 未找到任何有效密码，请检查配置`;
+                if (errorMessage) {
+                    errorMessage.innerHTML = `<pre style="text-align: left; font-family: monospace; font-size: 12px;">${testResults}</pre>`;
+                    errorMessage.style.display = 'block';
+                }
+            }
+        }
+        
         // 显示消息函数
         function showMessage(message, type = 'info') {
             // 创建消息元素
@@ -1062,6 +1161,7 @@
         window.showDebugInfo = showDebugInfo;
         window.hideDebugInfo = hideDebugInfo;
         window.copyPasswords = copyPasswords;
+        window.testLogin = testLogin;
         
     </script>
 </body>
