@@ -15,6 +15,12 @@
       "progress": 50,
       "subtasks": [
         {
+          "title": "模态测试：CA_07+13_Mid_AA",
+          "completed": false,
+          "completionTime": "2025-10-19T23:39",
+          "timeDescription": ""
+        },
+        {
           "title": "模态测试：CA_13_R",
           "completed": true,
           "issues": [],
@@ -23,12 +29,6 @@
           "endTime": "2025-10-30T22:48",
           "timeDescription": "",
           "completionTime": "2025-10-19T23:07"
-        },
-        {
-          "title": "模态测试：CA_07_R",
-          "completed": false,
-          "completionTime": "2025-10-19T23:39",
-          "timeDescription": ""
         }
       ],
       "attachments": [],
