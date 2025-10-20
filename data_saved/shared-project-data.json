@@ -12,7 +12,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-17",
-      "progress": 80,
+      "progress": 47,
       "subtasks": [
         {
           "title": "模态测试：CA_07+13_Mid_AA",
@@ -81,7 +81,56 @@
         },
         {
           "id": 1760963352666,
-          "title": "新子任务",
+          "title": "模态测试：CA_07_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963358785,
+          "title": "模态测试：CA_13_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963365235,
+          "title": "模态测试：CA_13_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963367201,
+          "title": "模态测试：CA_07_Top_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963372568,
+          "title": "模态测试：CA_07_Top_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963375814,
+          "title": "模态测试：CA_13_Top_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963379751,
+          "title": "模态测试：CA_13_Top_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760963386255,
+          "title": "模态测试：CS_07_A",
           "completed": false,
           "notes": "",
           "issues": []
