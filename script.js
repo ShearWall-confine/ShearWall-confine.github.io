@@ -16,6 +16,8 @@ let currentEditingTask = null;
 // 子任务显示筛选：'all' | 'pending' | 'in-progress' | 'completed'
 let subtaskFilterModeList = 'all';
 let subtaskFilterModeEdit = 'all';
+// 工作清单视图：是否全折叠子任务（默认全折叠）
+let listSubtasksCollapsed = true;
 let currentEditingSection = null;
 let currentEditingRoadmapNode = null;
 let currentEditingFolder = null;
@@ -637,7 +639,7 @@ function renderTasks() {
     const container = document.getElementById('tasks-container');
     container.innerHTML = '';
 
-    // 渲染子任务显示筛选工具条
+    // 渲染子任务显示筛选和折叠工具条
     const controls = document.createElement('div');
     controls.className = 'subtask-collapse-controls';
     controls.innerHTML = `
@@ -647,6 +649,9 @@ function renderTasks() {
             <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='pending'?'active':''}" onclick="setSubtaskFilterModeList('pending')">待开始</button>
             <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='in-progress'?'active':''}" onclick="setSubtaskFilterModeList('in-progress')">进行中</button>
             <button class="btn btn-secondary btn-sm ${subtaskFilterModeList==='completed'?'active':''}" onclick="setSubtaskFilterModeList('completed')">已完成</button>
+            <span style="width:12px;"></span>
+            <button class="btn btn-secondary btn-sm ${listSubtasksCollapsed?'active':''}" onclick="toggleListSubtasksCollapsed()">全部折叠</button>
+            <button class="btn btn-secondary btn-sm ${!listSubtasksCollapsed?'active':''}" onclick="toggleListSubtasksExpanded()">全部展开</button>
         </div>
     `;
     container.appendChild(controls);
@@ -727,7 +732,7 @@ function createTaskElement(task, index) {
                 <div class="progress-fill" style="width: ${task.progress}%"></div>
             </div>
         </div>
-        <div class="task-subtasks">
+        <div class="task-subtasks" style="${listSubtasksCollapsed ? 'display:none;' : ''}">
             <strong>子任务:</strong>
             <ul class="subtasks-list" data-task-id="${task.id}">
                 ${task.subtasks.map((subtask, sIndex) => {
@@ -893,6 +898,17 @@ function moveSubtaskByButton(taskId, fromIndex, direction) {
     const [moved] = task.subtasks.splice(fromIndex, 1);
     task.subtasks.splice(toIndex, 0, moved);
     saveData();
+    renderTasks();
+}
+
+// 全部折叠/展开控制
+function toggleListSubtasksCollapsed() {
+    listSubtasksCollapsed = true;
+    renderTasks();
+}
+
+function toggleListSubtasksExpanded() {
+    listSubtasksCollapsed = false;
     renderTasks();
 }
 
