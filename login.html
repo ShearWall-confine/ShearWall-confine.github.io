@@ -862,20 +862,188 @@
             }
         });
         
+        // 生成基于哈希值的智能密码列表
+        function generateSmartPasswords(role, hash) {
+            const smartPasswords = [];
+            
+            // 基于角色生成密码
+            const rolePasswords = [
+                `${role}`,
+                `${role}123`,
+                `${role}@123`,
+                `${role}!123`,
+                `${role}#123`,
+                `${role}$123`,
+                `${role}%123`,
+                `${role}^123`,
+                `${role}&123`,
+                `${role}*123`,
+                `${role}+123`,
+                `${role}-123`,
+                `${role}=123`,
+                `${role}_123`,
+                `${role}~123`,
+                `${role}@2024`,
+                `${role}!2024`,
+                `${role}#2024`,
+                `${role}$2024`,
+                `${role}%2024`,
+                `${role}^2024`,
+                `${role}&2024`,
+                `${role}*2024`,
+                `${role}+2024`,
+                `${role}-2024`,
+                `${role}=2024`,
+                `${role}_2024`,
+                `${role}~2024`
+            ];
+            
+            smartPasswords.push(...rolePasswords);
+            
+            // 基于项目名称生成密码
+            const projectPasswords = [
+                'shearwall',
+                'ShearWall',
+                'SHEARWALL',
+                'shearwall123',
+                'ShearWall123',
+                'SHEARWALL123',
+                'shearwall@123',
+                'ShearWall@123',
+                'SHEARWALL@123',
+                'shearwall2024',
+                'ShearWall2024',
+                'SHEARWALL2024',
+                'shearwall@2024',
+                'ShearWall@2024',
+                'SHEARWALL@2024',
+                'confine',
+                'Confine',
+                'CONFINE',
+                'confine123',
+                'Confine123',
+                'CONFINE123',
+                'confine@123',
+                'Confine@123',
+                'CONFINE@123',
+                'confine2024',
+                'Confine2024',
+                'CONFINE2024',
+                'confine@2024',
+                'Confine@2024',
+                'CONFINE@2024'
+            ];
+            
+            smartPasswords.push(...projectPasswords);
+            
+            // 基于哈希值前缀生成密码
+            const hashPrefix = hash.substring(0, 8);
+            const hashBasedPasswords = [
+                `hash${hashPrefix}`,
+                `Hash${hashPrefix}`,
+                `HASH${hashPrefix}`,
+                `hash_${hashPrefix}`,
+                `Hash_${hashPrefix}`,
+                `HASH_${hashPrefix}`,
+                `hash-${hashPrefix}`,
+                `Hash-${hashPrefix}`,
+                `HASH-${hashPrefix}`,
+                `hash@${hashPrefix}`,
+                `Hash@${hashPrefix}`,
+                `HASH@${hashPrefix}`
+            ];
+            
+            smartPasswords.push(...hashBasedPasswords);
+            
+            return smartPasswords;
+        }
+        
         // 测试密码函数 - 找出实际可用的密码
         async function testPasswords() {
             const testPasswords = [
+                // 原始密码
                 'Tongji2024@Admin',
                 'Tongji2024@Editor', 
                 'Tongji2024@Viewer',
+                // 变体密码
+                'Tongji2024',
+                'Tongji2024!',
+                'Tongji2024#',
+                'Tongji2024$',
+                'Tongji2024%',
+                'Tongji2024&',
+                'Tongji2024*',
+                'Tongji2024+',
+                'Tongji2024-',
+                'Tongji2024=',
+                'Tongji2024@',
+                'Tongji2024^',
+                'Tongji2024_',
+                'Tongji2024`',
+                'Tongji2024~',
+                // 简单密码
                 'admin123',
                 'editor123',
                 'viewer123',
-                'password',
-                '123456',
                 'admin',
                 'editor',
-                'viewer'
+                'viewer',
+                'password',
+                '123456',
+                'admin123456',
+                'editor123456',
+                'viewer123456',
+                // 常见密码
+                'admin@123',
+                'editor@123',
+                'viewer@123',
+                'admin!123',
+                'editor!123',
+                'viewer!123',
+                'admin#123',
+                'editor#123',
+                'viewer#123',
+                // 年份变体
+                'Tongji2023@Admin',
+                'Tongji2023@Editor',
+                'Tongji2023@Viewer',
+                'Tongji2025@Admin',
+                'Tongji2025@Editor',
+                'Tongji2025@Viewer',
+                // 大小写变体
+                'tongji2024@admin',
+                'tongji2024@editor',
+                'tongji2024@viewer',
+                'TONGJI2024@ADMIN',
+                'TONGJI2024@EDITOR',
+                'TONGJI2024@VIEWER',
+                // 特殊字符变体
+                'Tongji2024@admin',
+                'Tongji2024@editor',
+                'Tongji2024@viewer',
+                'Tongji2024@Admin1',
+                'Tongji2024@Editor1',
+                'Tongji2024@Viewer1',
+                // 数字变体
+                'Tongji2024@Admin123',
+                'Tongji2024@Editor123',
+                'Tongji2024@Viewer123',
+                'Tongji2024@Admin!',
+                'Tongji2024@Editor!',
+                'Tongji2024@Viewer!',
+                // 其他可能
+                'shearwall2024',
+                'ShearWall2024',
+                'SHEARWALL2024',
+                'shearwall2024@',
+                'ShearWall2024@',
+                'SHEARWALL2024@',
+                'confine2024',
+                'Confine2024',
+                'CONFINE2024',
+                'confine2024@',
+                'Confine2024@',
+                'CONFINE2024@'
             ];
             
             const results = {};
@@ -886,16 +1054,29 @@
                 for (const [role, userInfo] of Object.entries(users)) {
                     results[role] = { found: false, password: null };
                     
-                    for (const testPassword of testPasswords) {
+                    console.log(`开始测试 ${role} 的密码...`);
+                    
+                    // 生成智能密码列表
+                    const smartPasswords = generateSmartPasswords(role, userInfo.passwordHash);
+                    const allPasswords = [...testPasswords, ...smartPasswords];
+                    
+                    console.log(`为 ${role} 生成了 ${smartPasswords.length} 个智能密码，总共测试 ${allPasswords.length} 个密码`);
+                    
+                    for (const testPassword of allPasswords) {
                         try {
                             const isValid = await window.verifyPassword(testPassword, userInfo.passwordHash);
                             if (isValid) {
+                                console.log(`✅ 找到 ${role} 的密码: ${testPassword}`);
                                 results[role] = { found: true, password: testPassword };
                                 break;
                             }
                         } catch (error) {
                             console.warn(`测试密码 ${testPassword} 失败:`, error);
                         }
+                    }
+                    
+                    if (!results[role].found) {
+                        console.log(`❌ 未找到 ${role} 的有效密码`);
                     }
                 }
             }
@@ -967,17 +1148,23 @@
             
             // 测试实际可用的密码
             debugText += `🔍 正在测试实际可用的密码...\n`;
+            debugText += `📝 基础密码列表: ${testPasswords.length} 个\n`;
+            debugText += `🧠 智能密码生成: 基于角色和哈希值生成额外密码\n`;
+            debugText += `⏳ 请稍候，正在验证密码哈希...\n\n`;
+            
             const passwordResults = await testPasswords();
             
-            debugText += `\n✅ 实际可用的账号密码:\n`;
+            debugText += `✅ 实际可用的账号密码:\n`;
+            let foundCount = 0;
             for (const [role, result] of Object.entries(passwordResults)) {
                 if (result.found) {
                     debugText += `   ${role}: ${role} / ${result.password}\n`;
+                    foundCount++;
                 } else {
                     debugText += `   ${role}: ❌ 未找到匹配的密码\n`;
                 }
             }
-            debugText += `\n`;
+            debugText += `\n📊 测试结果: 找到 ${foundCount}/${Object.keys(passwordResults).length} 个有效密码\n\n`;
             
             // 显示GitHub Secrets信息（如果可用）
             if (typeof window.GITHUB_SECRETS !== 'undefined') {
