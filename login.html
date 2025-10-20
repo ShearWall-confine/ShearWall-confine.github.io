@@ -1123,7 +1123,7 @@
         }
         
         // 显示调试信息函数
-        async function showDebugInfo() {
+        async function showDebugInfoFunction() {
             console.log('显示调试信息被调用');
             
             const debugInfo = document.getElementById('debugInfo');
@@ -1270,7 +1270,7 @@
         }
         
         // 测试登录函数
-        async function testLogin() {
+        async function testLoginFunction() {
             console.log('测试登录被调用');
             
             const passwordResults = await testPasswordsFunction();
@@ -1346,16 +1346,28 @@
         window.testInputs = testInputs;
         window.enterGuestMode = enterGuestMode;
         window.exitGuestMode = exitGuestMode;
-        window.showDebugInfo = showDebugInfo;
+        window.showDebugInfo = showDebugInfoFunction;
         window.hideDebugInfo = hideDebugInfo;
         window.copyPasswords = copyPasswords;
-        window.testLogin = testLogin;
+        window.testLogin = testLoginFunction;
         
         // 调试：检查函数是否正确注册
         console.log('函数注册状态:');
         console.log('showDebugInfo:', typeof window.showDebugInfo);
         console.log('testLogin:', typeof window.testLogin);
         console.log('testPasswordsFunction:', typeof testPasswordsFunction);
+        console.log('showDebugInfoFunction:', typeof showDebugInfoFunction);
+        console.log('testLoginFunction:', typeof testLoginFunction);
+        
+        // 强制注册函数到全局作用域
+        if (typeof window.showDebugInfo === 'undefined') {
+            window.showDebugInfo = showDebugInfoFunction;
+            console.log('强制注册 showDebugInfo');
+        }
+        if (typeof window.testLogin === 'undefined') {
+            window.testLogin = testLoginFunction;
+            console.log('强制注册 testLogin');
+        }
         
     </script>
 </body>
