@@ -11,196 +11,453 @@
       "status": "in-progress",
       "priority": "high",
       "startDate": "2025-09-01",
-      "endDate": "2025-11-17",
-      "progress": 30,
+      "endDate": "2025-11-20",
+      "progress": 20,
       "subtasks": [
         {
+          "id": 1760964282126,
           "title": "模态测试：CA_07+13_Mid_AA",
-          "completed": true,
-          "completionTime": null,
-          "timeDescription": null
-        },
-        {
-          "title": "模态测试：CA_07+13_Mid_AR",
-          "completed": true,
-          "issues": [],
-          "notes": "",
-          "startTime": "2025-10-19T22:48",
-          "endTime": "2025-10-30T22:48",
-          "timeDescription": null,
-          "completionTime": "2025-10-19T22:48"
-        },
-        {
-          "id": 1760961963474,
-          "title": "模态测试：CA_07+13_Mid_RR",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760961967628,
+          "id": 1760964282127,
+          "title": "模态测试：CA_07+13_Mid_AR",
+          "completed": true,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282128,
           "title": "模态测试：CA_07+13_Mid_RA",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760961969530,
+          "id": 1760964282129,
+          "title": "模态测试：CA_07+13_Mid_RR",
+          "completed": true,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282130,
           "title": "模态测试：CA_13+07_Mid_AA",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760961971738,
-          "title": "模态测试：CA_07+13_Mid_AR",
+          "id": 1760964282131,
+          "title": "模态测试：CA_13+07_Mid_AR",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760962165286,
+          "id": 1760964282132,
           "title": "模态测试：CA_13+07_Mid_RA",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760962171664,
+          "id": 1760964282133,
           "title": "模态测试：CA_13+07_Mid_RR",
           "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963317537,
+          "id": 1760964282134,
           "title": "模态测试：CA_07_A",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963352666,
+          "id": 1760964282135,
           "title": "模态测试：CA_07_R",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963358785,
+          "id": 1760964282136,
           "title": "模态测试：CA_13_A",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963365235,
+          "id": 1760964282137,
           "title": "模态测试：CA_13_R",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963367201,
+          "id": 1760964282138,
           "title": "模态测试：CA_07_Top_A",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963372568,
+          "id": 1760964282139,
           "title": "模态测试：CA_07_Top_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963375814,
+          "id": 1760964282140,
           "title": "模态测试：CA_13_Top_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963379751,
+          "id": 1760964282141,
           "title": "模态测试：CA_13_Top_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963386255,
+          "id": 1760964282142,
           "title": "模态测试：CS_07_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963390639,
+          "id": 1760964282143,
           "title": "模态测试：CS_07_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963393556,
+          "id": 1760964282144,
           "title": "模态测试：CS_13_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963397011,
+          "id": 1760964282145,
           "title": "模态测试：CS_13_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963407187,
+          "id": 1760964282146,
           "title": "模态测试：TR_07_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963409400,
+          "id": 1760964282147,
           "title": "模态测试：TR_07_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963534758,
+          "id": 1760964282148,
           "title": "模态测试：TR_13_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963538008,
+          "id": 1760964282149,
           "title": "模态测试：TR_13_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963542490,
+          "id": 1760964282150,
           "title": "模态测试：TB_07_A",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963544576,
+          "id": 1760964282151,
           "title": "模态测试：TB_07_R",
           "completed": false,
           "notes": "",
           "issues": []
         },
         {
-          "id": 1760963549288,
+          "id": 1760964282152,
           "title": "模态测试：TB_13_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282153,
+          "title": "模态测试：TB_13_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282154,
+          "title": "模态测试：TB_07_Top_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282155,
+          "title": "模态测试：TB_07_Top_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282156,
+          "title": "模态测试：TB_13_Top_A",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282157,
+          "title": "模态测试：TB_13_Top_R",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282158,
+          "title": "模态测试：TB_07+07_Mid_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282159,
+          "title": "模态测试：TB_07+07_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282160,
+          "title": "模态测试：TB_07+07_Mid_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282161,
+          "title": "模态测试：TB_07+07_Mid_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282162,
+          "title": "模态测试：TB_07+13_Mid_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282163,
+          "title": "模态测试：TB_07+13_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282164,
+          "title": "模态测试：TB_07+13_Mid_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282165,
+          "title": "模态测试：TB_07+13_Mid_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282166,
+          "title": "模态测试：TB_13+07_Mid_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282167,
+          "title": "模态测试：TB_13+07_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282168,
+          "title": "模态测试：TB_13+07_Mid_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282169,
+          "title": "模态测试：TB_13+07_Mid_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282170,
+          "title": "模态测试：TB_13+13_Mid_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282171,
+          "title": "模态测试：TB_13+13_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282172,
+          "title": "模态测试：TB_13+13_Mid_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282173,
+          "title": "模态测试：TB_13+13_Mid_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282174,
+          "title": "模态测试：TB_07+07_Mid+Top_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282175,
+          "title": "模态测试：TB_07+07_Mid+Top_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282176,
+          "title": "模态测试：TB_07+07_Mid+Top_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282177,
+          "title": "模态测试：TB_07+07_Mid+Top_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282178,
+          "title": "模态测试：TB_07+13_Mid+Top_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282179,
+          "title": "模态测试：TB_07+13_Mid+Top_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282180,
+          "title": "模态测试：TB_07+13_Mid+Top_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282181,
+          "title": "模态测试：TB_07+13_Mid+Top_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282182,
+          "title": "模态测试：TB_13+07_Mid+Top_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282183,
+          "title": "模态测试：TB_13+07_Mid+Top_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282184,
+          "title": "模态测试：TB_13+07_Mid+Top_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282185,
+          "title": "模态测试：TB_13+07_Mid+Top_RR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282186,
+          "title": "模态测试：TB_13+13_Mid+Top_AA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282187,
+          "title": "模态测试：TB_13+13_Mid+Top_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282188,
+          "title": "模态测试：TB_13+13_Mid+Top_RA",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760964282189,
+          "title": "模态测试：TB_13+13_Mid+Top_RR",
           "completed": false,
           "notes": "",
           "issues": []
@@ -216,7 +473,7 @@
       "status": "in-progress",
       "priority": "medium",
       "startDate": "2025-09-01",
-      "endDate": "2025-11-17",
+      "endDate": "2025-11-26",
       "progress": 0,
       "subtasks": [
         {
@@ -241,42 +498,22 @@
       "progress": 0,
       "subtasks": [
         {
+          "id": 1760964495876,
+          "title": "和鲁老师开会讨论",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
           "id": 1760962200835,
           "title": "发送相关文件",
           "completed": false,
           "notes": "",
           "issues": []
-        }
-      ],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1760963799458,
-      "title": "新任务",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-20",
-      "endDate": "2025-11-19",
-      "progress": 0,
-      "subtasks": [],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1760963850116,
-      "title": "新任务",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-20",
-      "endDate": "2025-11-19",
-      "progress": 0,
-      "subtasks": [
+        },
         {
-          "id": 1760963851905,
-          "title": "新子任务",
+          "id": 1760964485244,
+          "title": "询问进度时间节点",
           "completed": false,
           "notes": "",
           "issues": []
@@ -337,7 +574,7 @@
     },
     {
       "id": "task-end-1760787461942",
-      "date": "2025-11-17",
+      "date": "2025-11-20",
       "title": "完成：管道吊架模态测试",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
@@ -348,25 +585,6 @@
       ],
       "isSynced": true,
       "type": "task-end"
-    },
-    {
-      "id": "subtask-completion-1760787461942-1",
-      "date": "2025-10-19",
-      "time": "22:48",
-      "title": "完成：模态测试：CA_07+13_Mid_AR",
-      "description": "完成子任务：模态测试：CA_07+13_Mid_AR",
-      "status": "completed",
-      "linkedTaskId": 1760787461942,
-      "linkedSubtaskIndex": 1,
-      "tags": [
-        "子任务",
-        "完成",
-        "管道吊架模态测试"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "管道吊架模态测试",
-      "isSubtask": true
     },
     {
       "id": "task-start-1760787494825",
@@ -384,7 +602,7 @@
     },
     {
       "id": "task-end-1760787494825",
-      "date": "2025-11-17",
+      "date": "2025-11-26",
       "title": "完成：开题",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
@@ -417,34 +635,6 @@
       "description": "完成任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "task-start-1760963799458",
-      "date": "2025-10-20",
-      "title": "开始：新任务",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760963799458,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1760963799458",
-      "date": "2025-11-19",
-      "title": "完成：新任务",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760963799458,
       "tags": [
         "工作清单",
         "结束"
