@@ -726,9 +726,9 @@
     },
     {
       "id": 1760793979798,
-      "title": "12",
+      "title": "管道吊架模态测试",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "in-progress",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
@@ -761,19 +761,6 @@
       "estimatedTime": "1个月",
       "dependencies": [],
       "parentId": 1760788986221,
-      "children": [],
-      "keyPoints": [],
-      "expectedOutcomes": ""
-    },
-    {
-      "id": 1760799790522,
-      "title": "新技术节点",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": [],
-      "parentId": 1760799233374,
       "children": [],
       "keyPoints": [],
       "expectedOutcomes": ""
