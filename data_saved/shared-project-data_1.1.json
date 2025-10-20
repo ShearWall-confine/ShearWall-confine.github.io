@@ -473,7 +473,7 @@
       "status": "pending",
       "priority": "medium",
       "startDate": "2025-10-31",
-      "endDate": "2025-11-19",
+      "endDate": "2026-01-31",
       "progress": 0,
       "subtasks": [],
       "attachments": [],
@@ -647,7 +647,7 @@
     },
     {
       "id": "task-end-1760964968979",
-      "date": "2025-11-19",
+      "date": "2026-01-31",
       "title": "完成：管道吊架模态测试数据分析",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
@@ -956,7 +956,6 @@
       "createDate": "2025-10-18"
     }
   ],
-  
   "exportInfo": {
     "exportTime": "2025-10-18T15:43:57.846Z",
     "version": "1.1.0",
