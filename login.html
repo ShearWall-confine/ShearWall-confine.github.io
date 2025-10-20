@@ -1617,11 +1617,19 @@
                         successMessage.style.display = 'block';
                     }
                 } else {
-                    testResults += `\n⚠️ 警告: 实际密码验证失败，请检查密码或哈希值`;
-                    if (errorMessage) {
-                        errorMessage.innerHTML = `<pre style="text-align: left; font-family: monospace; font-size: 12px;">${testResults}</pre>`;
-                        errorMessage.style.display = 'block';
-                    }
+        testResults += `\n⚠️ 警告: 实际密码验证失败，请检查密码或哈希值`;
+        testResults += `\n\n🔍 问题分析:`;
+        testResults += `\n   • GitHub Secrets 中的哈希值不是用这些密码生成的`;
+        testResults += `\n   • 或者使用了不同的算法参数（迭代次数、哈希函数等）`;
+        testResults += `\n   • 需要检查实际的密码生成过程`;
+        testResults += `\n\n💡 建议:`;
+        testResults += `\n   • 检查 GitHub Secrets 的实际来源`;
+        testResults += `\n   • 确认密码生成脚本使用的参数`;
+        testResults += `\n   • 或者重新生成匹配的哈希值`;
+        if (errorMessage) {
+            errorMessage.innerHTML = `<pre style="text-align: left; font-family: monospace; font-size: 12px;">${testResults}</pre>`;
+            errorMessage.style.display = 'block';
+        }
                 }
             } else {
                 if (errorMessage) {
