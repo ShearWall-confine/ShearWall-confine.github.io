@@ -633,18 +633,29 @@ function renderTasks() {
     const container = document.getElementById('tasks-container');
     container.innerHTML = '';
 
-    projectData.tasks.forEach(task => {
-        const taskElement = createTaskElement(task);
+    projectData.tasks.forEach((task, index) => {
+        const taskElement = createTaskElement(task, index);
         container.appendChild(taskElement);
+    });
+
+    enableTaskDragAndDrop();
+
+    // 为每个任务的子任务列表启用拖拽
+    container.querySelectorAll('.subtasks-list').forEach(ul => {
+        const taskId = parseInt(ul.getAttribute('data-task-id'));
+        enableSubtaskDrag(ul, taskId);
     });
 }
 
 // 创建任务元素
-function createTaskElement(task) {
+function createTaskElement(task, index) {
     const div = document.createElement('div');
     div.className = 'task-item';
     div.dataset.taskId = task.id;
     div.dataset.status = task.status;
+    div.dataset.index = index;
+    div.setAttribute('draggable', 'true');
+    div.setAttribute('aria-grabbed', 'false');
 
     const statusClass = `status-${task.status}`;
     const priorityIcon = task.priority === 'high' ? 'fas fa-exclamation-triangle' : 
@@ -652,11 +663,20 @@ function createTaskElement(task) {
 
     div.innerHTML = `
         <div class="task-header">
-            <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn btn-secondary btn-sm drag-handle" title="拖拽排序" aria-label="拖拽排序" style="cursor: grab;">
+                    <i class="fas fa-grip-vertical"></i>
+                </button>
                 <div class="task-title">${task.title}</div>
                 <div class="task-status ${statusClass}">${getStatusText(task.status)}</div>
             </div>
             <div class="task-actions">
+                <button class="btn btn-secondary btn-sm" onclick="moveTaskByButton(${index}, -1)" title="上移">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="moveTaskByButton(${index}, 1)" title="下移">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
                 <button class="btn btn-edit" onclick="editTask(${task.id})">
                     <i class="fas fa-edit"></i>
                 </button>
@@ -691,11 +711,20 @@ function createTaskElement(task) {
         </div>
         <div class="task-subtasks">
             <strong>子任务:</strong>
-            <ul>
-                ${task.subtasks.map(subtask => `
-                    <li style="color: ${subtask.completed ? '#28a745' : '#6c757d'}">
+            <ul class="subtasks-list" data-task-id="${task.id}">
+                ${task.subtasks.map((subtask, sIndex) => `
+                    <li class="subtask-row" data-index="${sIndex}" draggable="true" aria-grabbed="false" style="display:flex; align-items:center; gap:8px; color: ${subtask.completed ? '#28a745' : '#6c757d'}">
+                        <button class="btn btn-secondary btn-sm drag-handle" title="拖拽子任务" aria-label="拖拽子任务" style="cursor: grab;">
+                            <i class="fas fa-grip-vertical"></i>
+                        </button>
                         <i class="fas fa-${subtask.completed ? 'check' : 'circle'}"></i>
-                        ${subtask.title}
+                        <span style="flex:1;">${subtask.title}</span>
+                        <button class="btn btn-secondary btn-sm" onclick="moveSubtaskByButton(${task.id}, ${sIndex}, -1)" title="上移子任务">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="moveSubtaskByButton(${task.id}, ${sIndex}, 1)" title="下移子任务">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
                     </li>
                 `).join('')}
             </ul>
@@ -703,6 +732,145 @@ function createTaskElement(task) {
     `;
 
     return div;
+}
+
+// ==================== 任务拖拽排序 ====================
+function enableTaskDragAndDrop() {
+    const container = document.getElementById('tasks-container');
+    if (!container) return;
+
+    let dragEl = null;
+
+    container.querySelectorAll('.task-item').forEach(el => {
+        el.addEventListener('dragstart', e => {
+            dragEl = el;
+            el.classList.add('dragging');
+            el.setAttribute('aria-grabbed', 'true');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        el.addEventListener('dragend', () => {
+            if (dragEl) {
+                dragEl.classList.remove('dragging');
+                dragEl.setAttribute('aria-grabbed', 'false');
+            }
+            dragEl = null;
+        });
+    });
+
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const dragging = container.querySelector('.dragging');
+        if (!dragging) return;
+        if (afterElement == null) {
+            container.appendChild(dragging);
+        } else {
+            container.insertBefore(dragging, afterElement);
+        }
+    });
+
+    container.addEventListener('drop', () => {
+        // 读取DOM顺序并写回projectData.tasks
+        const ids = Array.from(container.querySelectorAll('.task-item')).map(el => parseInt(el.dataset.taskId));
+        const newOrder = ids.map(id => projectData.tasks.find(t => t.id === id)).filter(Boolean);
+        if (newOrder.length === projectData.tasks.length) {
+            projectData.tasks = newOrder;
+            saveData();
+            renderTasks();
+        }
+    });
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function moveTaskByButton(fromIndex, direction) {
+    const toIndex = fromIndex + direction;
+    if (toIndex < 0 || toIndex >= projectData.tasks.length) return;
+    const [moved] = projectData.tasks.splice(fromIndex, 1);
+    projectData.tasks.splice(toIndex, 0, moved);
+    saveData();
+    renderTasks();
+}
+
+// ==================== 子任务拖拽排序（列表视图） ====================
+function enableSubtaskDrag(containerUl, taskId) {
+    if (!containerUl) return;
+    let dragLi = null;
+
+    containerUl.querySelectorAll('.subtask-row').forEach(li => {
+        li.addEventListener('dragstart', e => {
+            dragLi = li;
+            li.classList.add('dragging');
+            li.setAttribute('aria-grabbed', 'true');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        li.addEventListener('dragend', () => {
+            if (dragLi) {
+                dragLi.classList.remove('dragging');
+                dragLi.setAttribute('aria-grabbed', 'false');
+            }
+            dragLi = null;
+        });
+    });
+
+    containerUl.addEventListener('dragover', e => {
+        e.preventDefault();
+        const after = getAfterLi(containerUl, e.clientY);
+        const dragging = containerUl.querySelector('.dragging');
+        if (!dragging) return;
+        if (after == null) {
+            containerUl.appendChild(dragging);
+        } else {
+            containerUl.insertBefore(dragging, after);
+        }
+    });
+
+    containerUl.addEventListener('drop', () => {
+        const indices = Array.from(containerUl.querySelectorAll('.subtask-row')).map(li => parseInt(li.dataset.index));
+        const task = projectData.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        const newOrder = indices.map(i => task.subtasks[i]).filter(Boolean);
+        if (newOrder.length === task.subtasks.length) {
+            task.subtasks = newOrder;
+            saveData();
+            renderTasks();
+        }
+    });
+}
+
+function getAfterLi(containerUl, y) {
+    const els = [...containerUl.querySelectorAll('.subtask-row:not(.dragging)')];
+    return els.reduce((closest, el) => {
+        const box = el.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset, element: el };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function moveSubtaskByButton(taskId, fromIndex, direction) {
+    const task = projectData.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    const toIndex = fromIndex + direction;
+    if (toIndex < 0 || toIndex >= task.subtasks.length) return;
+    const [moved] = task.subtasks.splice(fromIndex, 1);
+    task.subtasks.splice(toIndex, 0, moved);
+    saveData();
+    renderTasks();
 }
 
 // 获取状态文本
@@ -5532,9 +5700,11 @@ function createTimelineItemElement(item) {
                 ${isSubtask ? `<span class="subtask-parent-label">(${item.parentTask})</span>` : ''}
             </div>
             <div class="timeline-vertical-desc">${item.description || ''}</div>
-            ${tagsHTML}
-            <div class="timeline-vertical-status ${item.status}">${getStatusText(item.status)}</div>
-            ${actionButtons}
+            <div class="timeline-vertical-meta">
+                <div class="timeline-vertical-status ${item.status}">${getStatusText(item.status)}</div>
+                ${tagsHTML}
+                ${actionButtons}
+            </div>
         </div>
     `;
     
@@ -5937,9 +6107,16 @@ function renderTimelineList(timeline, container) {
         const itemDate = new Date(item.date);
         const today = new Date();
         const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const sevenDaysAgo = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
         if (itemDate < startOfToday) {
             timelineItem.classList.add('historical');
+            // 折叠逻辑：
+            // - 开关开启：折叠所有历史项
+            // - 开关关闭：仅折叠超过7天的历史项
             if (timelineFilters.isCollapsed) {
+                timelineItem.classList.add('collapsed');
+            } else if (itemDate < sevenDaysAgo) {
                 timelineItem.classList.add('collapsed');
             }
         }
