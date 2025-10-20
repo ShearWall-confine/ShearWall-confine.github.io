@@ -608,6 +608,34 @@
       "startDate": "2025-10-20",
       "endDate": "2025-11-19",
       "progress": 0,
+      "subtasks": [
+        {
+          "id": 1760967147205,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967148095,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1760967106917,
+      "title": "PVP会议投稿",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-20",
+      "endDate": "2025-11-19",
+      "progress": 0,
       "subtasks": [],
       "attachments": [],
       "autoProgress": true
@@ -922,6 +950,34 @@
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760967096858,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "task-start-1760967106917",
+      "date": "2025-10-20",
+      "title": "开始：PVP会议投稿",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967106917,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760967106917",
+      "date": "2025-11-19",
+      "title": "完成：PVP会议投稿",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967106917,
       "tags": [
         "工作清单",
         "结束"
