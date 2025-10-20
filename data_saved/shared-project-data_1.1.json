@@ -517,8 +517,17 @@
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2026-06-30",
-      "progress": 0,
+      "progress": 25,
       "subtasks": [
+        {
+          "id": 1760966832021,
+          "title": "见面会谈",
+          "completed": true,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-10-19T21:27",
+          "timeDescription": ""
+        },
         {
           "id": 1760964495876,
           "title": "和鲁老师开会讨论",
@@ -536,13 +545,6 @@
         {
           "id": 1760964485244,
           "title": "询问进度时间节点",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        },
-        {
-          "id": 1760966832021,
-          "title": "新子任务",
           "completed": false,
           "notes": "",
           "issues": []
@@ -865,6 +867,25 @@
       "isSynced": true,
       "type": "subtask-completion",
       "parentTask": "每周组会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760950677382-3",
+      "date": "2025-10-19",
+      "time": "21:27",
+      "title": "完成：见面会谈",
+      "description": "完成子任务：见面会谈",
+      "status": "completed",
+      "linkedTaskId": 1760950677382,
+      "linkedSubtaskIndex": 3,
+      "tags": [
+        "子任务",
+        "完成",
+        "本科毕业论文/管道易损性指标"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "本科毕业论文/管道易损性指标",
       "isSubtask": true
     }
   ],
