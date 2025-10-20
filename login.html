@@ -958,94 +958,95 @@
             return smartPasswords;
         }
         
+        // 基础测试密码列表
+        const testPasswords = [
+            // 原始密码
+            'Tongji2024@Admin',
+            'Tongji2024@Editor', 
+            'Tongji2024@Viewer',
+            // 变体密码
+            'Tongji2024',
+            'Tongji2024!',
+            'Tongji2024#',
+            'Tongji2024$',
+            'Tongji2024%',
+            'Tongji2024&',
+            'Tongji2024*',
+            'Tongji2024+',
+            'Tongji2024-',
+            'Tongji2024=',
+            'Tongji2024@',
+            'Tongji2024^',
+            'Tongji2024_',
+            'Tongji2024`',
+            'Tongji2024~',
+            // 简单密码
+            'admin123',
+            'editor123',
+            'viewer123',
+            'admin',
+            'editor',
+            'viewer',
+            'password',
+            '123456',
+            'admin123456',
+            'editor123456',
+            'viewer123456',
+            // 常见密码
+            'admin@123',
+            'editor@123',
+            'viewer@123',
+            'admin!123',
+            'editor!123',
+            'viewer!123',
+            'admin#123',
+            'editor#123',
+            'viewer#123',
+            // 年份变体
+            'Tongji2023@Admin',
+            'Tongji2023@Editor',
+            'Tongji2023@Viewer',
+            'Tongji2025@Admin',
+            'Tongji2025@Editor',
+            'Tongji2025@Viewer',
+            // 大小写变体
+            'tongji2024@admin',
+            'tongji2024@editor',
+            'tongji2024@viewer',
+            'TONGJI2024@ADMIN',
+            'TONGJI2024@EDITOR',
+            'TONGJI2024@VIEWER',
+            // 特殊字符变体
+            'Tongji2024@admin',
+            'Tongji2024@editor',
+            'Tongji2024@viewer',
+            'Tongji2024@Admin1',
+            'Tongji2024@Editor1',
+            'Tongji2024@Viewer1',
+            // 数字变体
+            'Tongji2024@Admin123',
+            'Tongji2024@Editor123',
+            'Tongji2024@Viewer123',
+            'Tongji2024@Admin!',
+            'Tongji2024@Editor!',
+            'Tongji2024@Viewer!',
+            // 其他可能
+            'shearwall2024',
+            'ShearWall2024',
+            'SHEARWALL2024',
+            'shearwall2024@',
+            'ShearWall2024@',
+            'SHEARWALL2024@',
+            'confine2024',
+            'Confine2024',
+            'CONFINE2024',
+            'confine2024@',
+            'Confine2024@',
+            'CONFINE2024@'
+        ];
+        
         // 测试密码函数 - 找出实际可用的密码
         async function testPasswords() {
-            const testPasswords = [
-                // 原始密码
-                'Tongji2024@Admin',
-                'Tongji2024@Editor', 
-                'Tongji2024@Viewer',
-                // 变体密码
-                'Tongji2024',
-                'Tongji2024!',
-                'Tongji2024#',
-                'Tongji2024$',
-                'Tongji2024%',
-                'Tongji2024&',
-                'Tongji2024*',
-                'Tongji2024+',
-                'Tongji2024-',
-                'Tongji2024=',
-                'Tongji2024@',
-                'Tongji2024^',
-                'Tongji2024_',
-                'Tongji2024`',
-                'Tongji2024~',
-                // 简单密码
-                'admin123',
-                'editor123',
-                'viewer123',
-                'admin',
-                'editor',
-                'viewer',
-                'password',
-                '123456',
-                'admin123456',
-                'editor123456',
-                'viewer123456',
-                // 常见密码
-                'admin@123',
-                'editor@123',
-                'viewer@123',
-                'admin!123',
-                'editor!123',
-                'viewer!123',
-                'admin#123',
-                'editor#123',
-                'viewer#123',
-                // 年份变体
-                'Tongji2023@Admin',
-                'Tongji2023@Editor',
-                'Tongji2023@Viewer',
-                'Tongji2025@Admin',
-                'Tongji2025@Editor',
-                'Tongji2025@Viewer',
-                // 大小写变体
-                'tongji2024@admin',
-                'tongji2024@editor',
-                'tongji2024@viewer',
-                'TONGJI2024@ADMIN',
-                'TONGJI2024@EDITOR',
-                'TONGJI2024@VIEWER',
-                // 特殊字符变体
-                'Tongji2024@admin',
-                'Tongji2024@editor',
-                'Tongji2024@viewer',
-                'Tongji2024@Admin1',
-                'Tongji2024@Editor1',
-                'Tongji2024@Viewer1',
-                // 数字变体
-                'Tongji2024@Admin123',
-                'Tongji2024@Editor123',
-                'Tongji2024@Viewer123',
-                'Tongji2024@Admin!',
-                'Tongji2024@Editor!',
-                'Tongji2024@Viewer!',
-                // 其他可能
-                'shearwall2024',
-                'ShearWall2024',
-                'SHEARWALL2024',
-                'shearwall2024@',
-                'ShearWall2024@',
-                'SHEARWALL2024@',
-                'confine2024',
-                'Confine2024',
-                'CONFINE2024',
-                'confine2024@',
-                'Confine2024@',
-                'CONFINE2024@'
-            ];
-            
             const results = {};
             
             if (typeof window.USER_CONFIG !== 'undefined' && typeof window.verifyPassword === 'function') {
