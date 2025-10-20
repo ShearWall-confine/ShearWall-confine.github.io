@@ -467,6 +467,19 @@
       "autoProgress": true
     },
     {
+      "id": 1760964968979,
+      "title": "管道吊架模态测试数据分析",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-31",
+      "endDate": "2025-11-19",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
       "id": 1760787494825,
       "title": "开题",
       "description": "请输入任务描述",
@@ -519,19 +532,6 @@
           "issues": []
         }
       ],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1760964968979,
-      "title": "管道吊架模态测试",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-20",
-      "endDate": "2025-11-19",
-      "progress": 0,
-      "subtasks": [],
       "attachments": [],
       "autoProgress": true
     }
@@ -657,8 +657,8 @@
     },
     {
       "id": "task-start-1760964968979",
-      "date": "2025-10-20",
-      "title": "开始：管道吊架模态测试",
+      "date": "2025-10-31",
+      "title": "开始：管道吊架模态测试数据分析",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760964968979,
@@ -672,7 +672,7 @@
     {
       "id": "task-end-1760964968979",
       "date": "2025-11-19",
-      "title": "完成：管道吊架模态测试",
+      "title": "完成：管道吊架模态测试数据分析",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1760964968979,
@@ -682,6 +682,15 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": 1760965186420,
+      "title": "例行开会",
+      "description": "与西北院开会/例会",
+      "date": "2025-10-23",
+      "status": "pending",
+      "tags": [],
+      "isSynced": false
     }
   ],
   "files": [
