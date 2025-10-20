@@ -489,7 +489,7 @@
     },
     {
       "id": 1760950677382,
-      "title": "本科毕业论文指导",
+      "title": "本科毕业论文/管道易损性指标",
       "description": "黎亚琪",
       "status": "in-progress",
       "priority": "medium",
@@ -617,7 +617,7 @@
     {
       "id": "task-start-1760950677382",
       "date": "2025-09-01",
-      "title": "开始：本科毕业论文指导",
+      "title": "开始：本科毕业论文/管道易损性指标",
       "description": "开始执行任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -631,7 +631,7 @@
     {
       "id": "task-end-1760950677382",
       "date": "2026-06-30",
-      "title": "完成：本科毕业论文指导",
+      "title": "完成：本科毕业论文/管道易损性指标",
       "description": "完成任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -782,14 +782,16 @@
     },
     {
       "id": 1760964830382,
-      "title": "新技术节点",
+      "title": "管道吊架有限元模拟",
       "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
+      "status": "completed",
       "type": "research",
       "estimatedTime": "1个月",
       "dependencies": [],
       "parentId": 1760799476110,
-      "children": []
+      "children": [],
+      "keyPoints": [],
+      "expectedOutcomes": ""
     }
   ],
   "folders": [
