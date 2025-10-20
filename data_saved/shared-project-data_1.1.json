@@ -5,6 +5,52 @@
   "description": "针对发电厂在地震作用下的汽水管道,其在地震中的响应影响着电厂的正常发电工作，因此对于地震中管道使用状态的评判极为重要",
   "tasks": [
     {
+      "id": 1760965498124,
+      "title": "每周例会",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2023-09-20",
+      "endDate": "2029-03-19",
+      "progress": 0,
+      "subtasks": [
+        {
+          "id": 1760965508292,
+          "title": "与西北院开会/例会",
+          "completed": false,
+          "notes": "考试卷子处理",
+          "issues": [],
+          "completionTime": "2025-10-23T21:05",
+          "timeDescription": ""
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1760966693207,
+      "title": "每周组会",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2023-09-01",
+      "endDate": "2029-03-19",
+      "progress": 0,
+      "subtasks": [
+        {
+          "id": 1760966714306,
+          "title": "开题ppt",
+          "completed": false,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-10-24T21:25",
+          "timeDescription": ""
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
       "id": 1760787461942,
       "title": "管道吊架模态测试",
       "description": "请输入任务描述",
@@ -472,8 +518,8 @@
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
-      "startDate": "2025-10-31",
-      "endDate": "2025-11-19",
+      "startDate": "2025-09-01",
+      "endDate": "2026-01-31",
       "progress": 0,
       "subtasks": [],
       "attachments": [],
@@ -511,14 +557,23 @@
     },
     {
       "id": 1760950677382,
-      "title": "本科毕业论文/管道易损性指标",
+      "title": "2025本科毕业论文/管道易损性指标",
       "description": "黎亚琪",
       "status": "in-progress",
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2026-06-30",
-      "progress": 0,
+      "progress": 25,
       "subtasks": [
+        {
+          "id": 1760966832021,
+          "title": "见面会谈",
+          "completed": true,
+          "notes": "",
+          "issues": [],
+          "completionTime": "2025-10-19T21:27",
+          "timeDescription": ""
+        },
         {
           "id": 1760964495876,
           "title": "和鲁老师开会讨论",
@@ -545,22 +600,64 @@
       "autoProgress": true
     },
     {
-      "id": 1760965498124,
-      "title": "每周例会",
+      "id": 1760967096858,
+      "title": "管道吊架模态论文",
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
-      "startDate": "2023-09-20",
-      "endDate": "2029-03-19",
-      "progress": 0,
+      "startDate": "2025-10-01",
+      "endDate": "2026-03-01",
+      "progress": 33,
       "subtasks": [
         {
-          "id": 1760965508292,
-          "title": "与西北院开会/例会",
+          "id": 1760967147205,
+          "title": "底稿",
+          "completed": true,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967148095,
+          "title": "实验内容",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967158530,
+          "title": "完成定稿",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1760967106917,
+      "title": "PVP会议投稿",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-09-01",
+      "endDate": "2025-11-19",
+      "progress": 50,
+      "subtasks": [
+        {
+          "id": 1760967177915,
+          "title": "提交摘要",
+          "completed": true,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967191730,
+          "title": "确认是否接受",
           "completed": false,
           "notes": "",
           "issues": [],
-          "completionTime": "2025-10-23T21:05",
+          "completionTime": "2025-11-10T21:33",
           "timeDescription": ""
         }
       ],
@@ -604,6 +701,15 @@
       "isSynced": false
     },
     {
+      "id": 1760966687027,
+      "title": "星星集",
+      "description": "",
+      "date": "2025-10-31",
+      "status": "pending",
+      "tags": [],
+      "isSynced": false
+    },
+    {
       "id": "task-start-1760787461942",
       "date": "2025-09-01",
       "title": "开始：管道吊架模态测试",
@@ -633,7 +739,7 @@
     },
     {
       "id": "task-start-1760964968979",
-      "date": "2025-10-31",
+      "date": "2025-09-01",
       "title": "开始：管道吊架模态测试数据分析",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
@@ -647,7 +753,7 @@
     },
     {
       "id": "task-end-1760964968979",
-      "date": "2025-11-19",
+      "date": "2026-01-31",
       "title": "完成：管道吊架模态测试数据分析",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
@@ -709,7 +815,7 @@
     {
       "id": "task-start-1760950677382",
       "date": "2025-09-01",
-      "title": "开始：本科毕业论文/管道易损性指标",
+      "title": "开始：2025本科毕业论文/管道易损性指标",
       "description": "开始执行任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -723,7 +829,7 @@
     {
       "id": "task-end-1760950677382",
       "date": "2026-06-30",
-      "title": "完成：本科毕业论文/管道易损性指标",
+      "title": "完成：2025本科毕业论文/管道易损性指标",
       "description": "完成任务：黎亚琪",
       "status": "pending",
       "linkedTaskId": 1760950677382,
@@ -733,6 +839,25 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760950677382-0",
+      "date": "2025-10-19",
+      "time": "21:27",
+      "title": "完成：见面会谈",
+      "description": "完成子任务：见面会谈",
+      "status": "completed",
+      "linkedTaskId": 1760950677382,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "2025本科毕业论文/管道易损性指标"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "2025本科毕业论文/管道易损性指标",
+      "isSubtask": true
     },
     {
       "id": "task-start-1760965498124",
@@ -779,6 +904,128 @@
       "isSynced": true,
       "type": "subtask-completion",
       "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "task-start-1760966693207",
+      "date": "2023-09-01",
+      "title": "开始：每周组会",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760966693207",
+      "date": "2029-03-19",
+      "title": "完成：每周组会",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760966693207-0",
+      "date": "2025-10-24",
+      "time": "21:25",
+      "title": "完成：开题ppt",
+      "description": "完成子任务：开题ppt",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周组会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周组会",
+      "isSubtask": true
+    },
+    {
+      "id": "task-start-1760967096858",
+      "date": "2025-10-01",
+      "title": "开始：管道吊架模态论文",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967096858,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760967096858",
+      "date": "2026-03-01",
+      "title": "完成：管道吊架模态论文",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967096858,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "task-start-1760967106917",
+      "date": "2025-09-01",
+      "title": "开始：PVP会议投稿",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967106917,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760967106917",
+      "date": "2025-11-19",
+      "title": "完成：PVP会议投稿",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760967106917,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760967106917-1",
+      "date": "2025-11-10",
+      "time": "21:33",
+      "title": "完成：确认是否接受",
+      "description": "完成子任务：确认是否接受",
+      "status": "pending",
+      "linkedTaskId": 1760967106917,
+      "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "PVP会议投稿"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "PVP会议投稿",
       "isSubtask": true
     }
   ],
@@ -956,7 +1203,6 @@
       "createDate": "2025-10-18"
     }
   ],
-  
   "exportInfo": {
     "exportTime": "2025-10-18T15:43:57.846Z",
     "version": "1.1.0",
