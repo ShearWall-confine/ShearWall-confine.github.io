@@ -526,6 +526,9 @@
                 <!-- 调试信息将在这里显示 -->
             </div>
             <div style="text-align: center; margin-top: 15px;">
+                <button type="button" onclick="copyPasswords()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 10px;">
+                    <i class="fas fa-copy"></i> 复制密码
+                </button>
                 <button type="button" onclick="hideDebugInfo()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
                     <i class="fas fa-times"></i> 隐藏信息
                 </button>
@@ -848,6 +851,43 @@
             }
         });
         
+        // 从哈希值获取对应的明文密码（用于调试显示）
+        function getPasswordFromHash(hash) {
+            // 这是一个调试函数，用于显示GitHub Secrets中存储的密码
+            // 在实际部署中，这些密码应该从GitHub Secrets中获取
+            const passwordMap = {
+                // 开发环境的哈希值映射
+                'dev_hash_admin_2024': 'Tongji2024@Admin',
+                'dev_hash_editor_2024': 'Tongji2024@Editor', 
+                'dev_hash_viewer_2024': 'Tongji2024@Viewer',
+                // 生产环境的哈希值映射（这些值应该在GitHub Secrets中配置）
+                '{{ secrets.ADMIN_PASSWORD_HASH }}': 'Tongji2024@Admin',
+                '{{ secrets.EDITOR_PASSWORD_HASH }}': 'Tongji2024@Editor',
+                '{{ secrets.VIEWER_PASSWORD_HASH }}': 'Tongji2024@Viewer'
+            };
+            
+            // 如果哈希值在映射表中，返回对应的明文密码
+            if (passwordMap[hash]) {
+                return passwordMap[hash];
+            }
+            
+            // 如果哈希值包含模板变量，说明是GitHub Actions构建时的占位符
+            if (hash.includes('{{') && hash.includes('}}')) {
+                return '🔒 密码已通过GitHub Secrets配置';
+            }
+            
+            // 如果哈希值看起来是真实的哈希，尝试从已知密码中匹配
+            const knownPasswords = {
+                'Tongji2024@Admin': 'Tongji2024@Admin',
+                'Tongji2024@Editor': 'Tongji2024@Editor', 
+                'Tongji2024@Viewer': 'Tongji2024@Viewer'
+            };
+            
+            // 这里可以添加更复杂的哈希匹配逻辑
+            // 但为了安全，我们只显示已知的密码
+            return '🔍 需要从GitHub Secrets获取';
+        }
+        
         // 显示调试信息函数
         function showDebugInfo() {
             console.log('显示调试信息被调用');
@@ -900,6 +940,30 @@
             debugText += `   编辑者: editor / Tongji2024@Editor\n`;
             debugText += `   查看者: viewer / Tongji2024@Viewer\n\n`;
             
+            // 显示GitHub Secrets对应的明文密码（如果可用）
+            if (typeof window.GITHUB_SECRETS !== 'undefined') {
+                debugText += `🔑 GitHub Secrets 对应的明文密码:\n`;
+                debugText += `   管理员密码: ${getPasswordFromHash(window.GITHUB_SECRETS.ADMIN_PASSWORD_HASH)}\n`;
+                debugText += `   编辑者密码: ${getPasswordFromHash(window.GITHUB_SECRETS.EDITOR_PASSWORD_HASH)}\n`;
+                debugText += `   查看者密码: ${getPasswordFromHash(window.GITHUB_SECRETS.VIEWER_PASSWORD_HASH)}\n\n`;
+            }
+            
+            // 显示当前环境下的实际可用密码
+            debugText += `💡 当前环境实际可用密码:\n`;
+            if (isGitHubPages) {
+                debugText += `   🌐 GitHub Pages环境:\n`;
+                debugText += `      管理员: admin / Tongji2024@Admin\n`;
+                debugText += `      编辑者: editor / Tongji2024@Editor\n`;
+                debugText += `      查看者: viewer / Tongji2024@Viewer\n`;
+                debugText += `      (密码通过GitHub Secrets配置)\n\n`;
+            } else {
+                debugText += `   🏠 本地开发环境:\n`;
+                debugText += `      管理员: admin / Tongji2024@Admin\n`;
+                debugText += `      编辑者: editor / Tongji2024@Editor\n`;
+                debugText += `      查看者: viewer / Tongji2024@Viewer\n`;
+                debugText += `      (使用开发环境临时密码)\n\n`;
+            }
+            
             // 显示认证函数状态
             debugText += `🔧 认证函数状态:\n`;
             debugText += `   window.login: ${typeof window.login === 'function' ? '✅ 可用' : '❌ 不可用'}\n`;
@@ -926,12 +990,78 @@
             }
         }
         
+        // 复制密码到剪贴板函数
+        function copyPasswords() {
+            const passwords = `管理员: admin / Tongji2024@Admin
+编辑者: editor / Tongji2024@Editor
+查看者: viewer / Tongji2024@Viewer`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(passwords).then(() => {
+                    showMessage('密码已复制到剪贴板！', 'success');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    fallbackCopyTextToClipboard(passwords);
+                });
+            } else {
+                fallbackCopyTextToClipboard(passwords);
+            }
+        }
+        
+        // 备用复制方法
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showMessage('密码已复制到剪贴板！', 'success');
+                } else {
+                    showMessage('复制失败，请手动复制', 'warning');
+                }
+            } catch (err) {
+                console.error('复制失败:', err);
+                showMessage('复制失败，请手动复制', 'warning');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        // 显示消息函数
+        function showMessage(message, type = 'info') {
+            // 创建消息元素
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            messageDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // 添加到页面
+            document.body.appendChild(messageDiv);
+            
+            // 自动移除
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+        
         // 确保函数在全局作用域
         window.testInputs = testInputs;
         window.enterGuestMode = enterGuestMode;
         window.exitGuestMode = exitGuestMode;
         window.showDebugInfo = showDebugInfo;
         window.hideDebugInfo = hideDebugInfo;
+        window.copyPasswords = copyPasswords;
         
     </script>
 </body>
