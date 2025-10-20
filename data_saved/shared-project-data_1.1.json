@@ -607,18 +607,25 @@
       "priority": "medium",
       "startDate": "2025-10-20",
       "endDate": "2025-11-19",
-      "progress": 0,
+      "progress": 33,
       "subtasks": [
         {
           "id": 1760967147205,
-          "title": "新子任务",
-          "completed": false,
+          "title": "底稿",
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
           "id": 1760967148095,
-          "title": "新子任务",
+          "title": "实验内容",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967158530,
+          "title": "完成定稿",
           "completed": false,
           "notes": "",
           "issues": []
@@ -635,8 +642,23 @@
       "priority": "medium",
       "startDate": "2025-10-20",
       "endDate": "2025-11-19",
-      "progress": 0,
-      "subtasks": [],
+      "progress": 50,
+      "subtasks": [
+        {
+          "id": 1760967177915,
+          "title": "提交摘要",
+          "completed": true,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760967191730,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
       "attachments": [],
       "autoProgress": true
     }
