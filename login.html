@@ -110,11 +110,11 @@
             position: fixed;
             width: 30px;
             height: 30px;
-            background: transparent;
+            background: rgba(255, 0, 0, 0.1);
             cursor: pointer;
             z-index: 1000;
             transition: background-color 0.3s ease;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255, 0, 0, 0.3);
         }
 
         .hotzone:hover {
@@ -1902,7 +1902,7 @@
                 showMessage('登录成功！', 'success');
                 
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'project-management.html';
                 }, 1500);
             }
         });
@@ -1921,7 +1921,7 @@
                 showMessage('登录成功！', 'success');
                 
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'project-management.html';
                 }, 1500);
             }
         });
