@@ -551,9 +551,17 @@
       "status": "pending",
       "priority": "medium",
       "startDate": "2025-10-20",
-      "endDate": "2025-11-19",
+      "endDate": "2029-03-19",
       "progress": 0,
-      "subtasks": [],
+      "subtasks": [
+        {
+          "id": 1760965508292,
+          "title": "与西北院开会/例会",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
       "attachments": [],
       "autoProgress": true
     }
@@ -749,7 +757,7 @@
     },
     {
       "id": "task-end-1760965498124",
-      "date": "2025-11-19",
+      "date": "2029-03-19",
       "title": "完成：每周例会",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
