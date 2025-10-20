@@ -896,19 +896,19 @@
             }
             
             // 基于salt和hash特征推断可能的密码
-            const saltPrefix = salt.substring(0, 8);
-            const hashPrefix = hashPart.substring(0, 8);
+            const saltPrefix = analysis.salt.substring(0, 8);
+            const hashPrefix = analysis.hashPart.substring(0, 8);
             
             // 分析salt的字符特征
-            const saltAnalysis = analyzeSaltPattern(salt);
+            const saltAnalysis = analyzeSaltPattern(analysis.salt);
             analysis.analysis.push(`📊 Salt分析: ${saltAnalysis}`);
             
             // 基于salt特征生成可能的密码
-            const saltBasedPasswords = generatePasswordsFromSalt(salt, saltAnalysis);
+            const saltBasedPasswords = generatePasswordsFromSalt(analysis.salt, saltAnalysis);
             analysis.possiblePasswords.push(...saltBasedPasswords);
             
             // 基于hash特征生成可能的密码
-            const hashBasedPasswords = generatePasswordsFromHash(hashPart, hashPrefix);
+            const hashBasedPasswords = generatePasswordsFromHash(analysis.hashPart, hashPrefix);
             analysis.possiblePasswords.push(...hashBasedPasswords);
             
             // 基于角色和项目名称生成密码
