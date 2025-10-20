@@ -566,6 +566,19 @@
       ],
       "attachments": [],
       "autoProgress": true
+    },
+    {
+      "id": 1760966693207,
+      "title": "mei'zh",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-20",
+      "endDate": "2025-11-19",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -599,6 +612,15 @@
       "title": "实验室参观",
       "description": "10月23日下午16:15-16:30振动台实验室，德国伊尔梅瑙工业大学的校长代表团来访，",
       "date": "2025-10-23",
+      "status": "pending",
+      "tags": [],
+      "isSynced": false
+    },
+    {
+      "id": 1760966687027,
+      "title": "星星集",
+      "description": "",
+      "date": "2025-10-31",
       "status": "pending",
       "tags": [],
       "isSynced": false
@@ -780,6 +802,34 @@
       "type": "subtask-completion",
       "parentTask": "每周例会",
       "isSubtask": true
+    },
+    {
+      "id": "task-start-1760966693207",
+      "date": "2025-10-20",
+      "title": "开始：mei'zh",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760966693207",
+      "date": "2025-11-19",
+      "title": "完成：mei'zh",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
     }
   ],
   "files": [
