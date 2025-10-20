@@ -672,6 +672,14 @@
                     console.log('尝试使用auth.js进行认证...');
                     console.log('verifyPassword函数状态:', typeof window.verifyPassword);
                     console.log('USER_CONFIG状态:', typeof window.USER_CONFIG);
+                    
+                    // 检查auth.js版本（通过检查函数内容）
+                    const authSource = window.login.toString();
+                    if (authSource.includes('.then(')) {
+                        console.warn('⚠️ 检测到旧版本的auth.js，包含.then()调用');
+                        console.log('建议：清除浏览器缓存或等待GitHub Pages更新');
+                    }
+                    
                     const result = await window.login(username, password);
                     if (result) {
                         console.log('auth.js认证成功');
@@ -688,19 +696,33 @@
                     console.warn('auth.js登录异常:', error);
                     console.error('错误详情:', error.message);
                     console.error('错误堆栈:', error.stack);
+                    
+                    // 如果是.then错误，提供解决方案
+                    if (error.message.includes('.then is not a function')) {
+                        console.error('🔧 解决方案:');
+                        console.error('1. 清除浏览器缓存 (Ctrl+Shift+R)');
+                        console.error('2. 等待GitHub Pages更新部署');
+                        console.error('3. 或者使用游客模式登录');
+                    }
                 }
             } else {
                 console.warn('auth.js login函数不可用');
             }
             
-            // 2. 尝试使用user-config.js的验证函数
+            // 2. 尝试使用user-config.js的验证函数（绕过auth.js）
             if (typeof window.verifyPassword === 'function' && typeof window.USER_CONFIG !== 'undefined') {
                 try {
+                    console.log('绕过auth.js，直接使用user-config.js验证...');
                     const users = window.USER_CONFIG.defaultUsers;
                     for (const [role, userInfo] of Object.entries(users)) {
                         if (userInfo.username === username) {
-                            const isValid = window.verifyPassword(password, userInfo.passwordHash);
+                            console.log(`验证用户 ${username} 的密码...`);
+                            console.log(`使用的哈希值: ${userInfo.passwordHash.substring(0, 20)}...`);
+                            console.log(`测试密码: ${password}`);
+                            const isValid = await window.verifyPassword(password, userInfo.passwordHash);
+                            console.log(`密码验证结果: ${isValid}`);
                             if (isValid) {
+                                console.log('user-config.js验证成功');
                                 return {
                                     username: userInfo.username,
                                     role: userInfo.role,
