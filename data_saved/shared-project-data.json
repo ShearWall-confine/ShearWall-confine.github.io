@@ -790,19 +790,6 @@
       "expectedOutcomes": ""
     },
     {
-      "id": 1760799233374,
-      "title": "新技术节点",
-      "description": "请描述这个技术节点的具体内容和目标",
-      "status": "pending",
-      "type": "research",
-      "estimatedTime": "1个月",
-      "dependencies": [],
-      "parentId": 1760793979798,
-      "children": [
-        1760799790522
-      ]
-    },
-    {
       "id": 1760799476110,
       "title": "新技术节点",
       "description": "请描述这个技术节点的具体内容和目标",
