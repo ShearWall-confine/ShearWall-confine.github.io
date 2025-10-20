@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth.js 修复测试</title>
+</head>
+<body>
+    <h1>Auth.js 修复测试</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // 测试 verifyPassword 函数
+        async function testVerifyPassword() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h2>测试结果:</h2>';
+            
+            // 检查函数是否存在
+            if (typeof window.verifyPassword === 'function') {
+                results.innerHTML += '<p>✅ verifyPassword 函数存在</p>';
+                
+                // 测试异步调用
+                try {
+                    const testResult = await window.verifyPassword('test', 'test:hash');
+                    results.innerHTML += `<p>✅ verifyPassword 异步调用成功，结果: ${testResult}</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p>❌ verifyPassword 异步调用失败: ${error.message}</p>`;
+                }
+            } else {
+                results.innerHTML += '<p>❌ verifyPassword 函数不存在</p>';
+            }
+            
+            // 检查 login 函数
+            if (typeof window.login === 'function') {
+                results.innerHTML += '<p>✅ login 函数存在</p>';
+                
+                // 测试异步调用
+                try {
+                    const loginResult = await window.login('admin', 'test');
+                    results.innerHTML += `<p>✅ login 异步调用成功，结果: ${loginResult}</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p>❌ login 异步调用失败: ${error.message}</p>`;
+                }
+            } else {
+                results.innerHTML += '<p>❌ login 函数不存在</p>';
+            }
+        }
+        
+        // 页面加载后运行测试
+        window.addEventListener('load', testVerifyPassword);
+    </script>
+    
+    <!-- 加载必要的脚本 -->
+    <script src="unupload_github/user-config.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

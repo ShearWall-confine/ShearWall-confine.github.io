@@ -670,6 +670,8 @@
             if (typeof window.login === 'function') {
                 try {
                     console.log('尝试使用auth.js进行认证...');
+                    console.log('verifyPassword函数状态:', typeof window.verifyPassword);
+                    console.log('USER_CONFIG状态:', typeof window.USER_CONFIG);
                     const result = await window.login(username, password);
                     if (result) {
                         console.log('auth.js认证成功');
@@ -687,6 +689,8 @@
                     console.error('错误详情:', error.message);
                     console.error('错误堆栈:', error.stack);
                 }
+            } else {
+                console.warn('auth.js login函数不可用');
             }
             
             // 2. 尝试使用user-config.js的验证函数
