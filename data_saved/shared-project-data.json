@@ -12,7 +12,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-17",
-      "progress": 50,
+      "progress": 17,
       "subtasks": [
         {
           "title": "模态测试：CA_07+13_Mid_AA",
@@ -21,7 +21,7 @@
           "timeDescription": ""
         },
         {
-          "title": "模态测试：CA_13_R",
+          "title": "模态测试：CA_07+13_Mid_AR",
           "completed": true,
           "issues": [],
           "notes": "",
@@ -29,6 +29,34 @@
           "endTime": "2025-10-30T22:48",
           "timeDescription": "",
           "completionTime": "2025-10-19T23:07"
+        },
+        {
+          "id": 1760961963474,
+          "title": "CA_07+13_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760961967628,
+          "title": "CA_07+13_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760961969530,
+          "title": "CA_07+13_Mid_AR",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1760961971738,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
