@@ -551,6 +551,13 @@
           "issues": [],
           "completionTime": "2025-11-26T21:04",
           "timeDescription": ""
+        },
+        {
+          "id": 1761026516469,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": []
@@ -710,6 +717,100 @@
       "isSynced": false
     },
     {
+      "id": "task-start-1760965498124",
+      "date": "2023-09-20",
+      "title": "开始：每周例会",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760965498124",
+      "date": "2029-03-19",
+      "title": "完成：每周例会",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760965498124-0",
+      "date": "2025-10-23",
+      "time": "21:05",
+      "title": "完成：与西北院开会/例会",
+      "description": "完成子任务：与西北院开会/例会",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "task-start-1760966693207",
+      "date": "2023-09-01",
+      "title": "开始：每周组会",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1760966693207",
+      "date": "2029-03-19",
+      "title": "完成：每周组会",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760966693207-0",
+      "date": "2025-10-24",
+      "time": "21:25",
+      "title": "完成：开题ppt",
+      "description": "完成子任务：开题ppt",
+      "status": "pending",
+      "linkedTaskId": 1760966693207,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周组会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周组会",
+      "isSubtask": true
+    },
+    {
       "id": "task-start-1760787461942",
       "date": "2025-09-01",
       "title": "开始：管道吊架模态测试",
@@ -857,100 +958,6 @@
       "isSynced": true,
       "type": "subtask-completion",
       "parentTask": "2025本科毕业论文/管道易损性指标",
-      "isSubtask": true
-    },
-    {
-      "id": "task-start-1760965498124",
-      "date": "2023-09-20",
-      "title": "开始：每周例会",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1760965498124",
-      "date": "2029-03-19",
-      "title": "完成：每周例会",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "subtask-completion-1760965498124-0",
-      "date": "2025-10-23",
-      "time": "21:05",
-      "title": "完成：与西北院开会/例会",
-      "description": "完成子任务：与西北院开会/例会",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周例会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周例会",
-      "isSubtask": true
-    },
-    {
-      "id": "task-start-1760966693207",
-      "date": "2023-09-01",
-      "title": "开始：每周组会",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760966693207,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1760966693207",
-      "date": "2029-03-19",
-      "title": "完成：每周组会",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1760966693207,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "subtask-completion-1760966693207-0",
-      "date": "2025-10-24",
-      "time": "21:25",
-      "title": "完成：开题ppt",
-      "description": "完成子任务：开题ppt",
-      "status": "pending",
-      "linkedTaskId": 1760966693207,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周组会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周组会",
       "isSubtask": true
     },
     {
