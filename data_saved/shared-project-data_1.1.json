@@ -693,14 +693,29 @@
     },
     {
       "id": 1761047847521,
-      "title": "pvp2025论文收集",
+      "title": "论文阅读",
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
       "startDate": "2025-10-21",
       "endDate": "2025-11-20",
       "progress": 0,
-      "subtasks": [],
+      "subtasks": [
+        {
+          "id": 1761049287717,
+          "title": "pvp2025论文收集",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1761049305929,
+          "title": "isliee论文集阅读",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
       "attachments": [],
       "autoProgress": true
     }
@@ -1099,7 +1114,7 @@
     {
       "id": "task-start-1761047847521",
       "date": "2025-10-21",
-      "title": "开始：pvp2025论文收集",
+      "title": "开始：论文阅读",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047847521,
@@ -1113,7 +1128,7 @@
     {
       "id": "task-end-1761047847521",
       "date": "2025-11-20",
-      "title": "完成：pvp2025论文收集",
+      "title": "完成：论文阅读",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047847521,
