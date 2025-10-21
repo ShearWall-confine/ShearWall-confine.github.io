@@ -703,7 +703,7 @@
       "subtasks": [
         {
           "id": 1761049287717,
-          "title": "pvp2025论文收集",
+          "title": "pvp2025论文收集/同济谢强pvp邮件询问",
           "completed": false,
           "notes": "",
           "issues": []
@@ -716,19 +716,6 @@
           "issues": []
         }
       ],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1761054471151,
-      "title": "",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-21",
-      "endDate": "2025-11-20",
-      "progress": 0,
-      "subtasks": [],
       "attachments": [],
       "autoProgress": true
     }
@@ -1145,34 +1132,6 @@
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047847521,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "task-start-1761054471151",
-      "date": "2025-10-21",
-      "title": "开始：",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1761054471151,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1761054471151",
-      "date": "2025-11-20",
-      "title": "完成：",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1761054471151,
       "tags": [
         "工作清单",
         "结束"
