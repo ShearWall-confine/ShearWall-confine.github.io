@@ -677,6 +677,19 @@
       ],
       "attachments": [],
       "autoProgress": true
+    },
+    {
+      "id": 1761047664935,
+      "title": "新任务",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-21",
+      "endDate": "2025-11-20",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
