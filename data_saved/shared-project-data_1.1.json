@@ -693,7 +693,20 @@
     },
     {
       "id": 1761047847521,
-      "title": "pvp",
+      "title": "pvp2025论文收集",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-21",
+      "endDate": "2025-11-20",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
+      "id": 1761049245135,
+      "title": "新任务",
       "description": "请输入任务描述",
       "status": "pending",
       "priority": "medium",
@@ -1099,7 +1112,7 @@
     {
       "id": "task-start-1761047847521",
       "date": "2025-10-21",
-      "title": "开始：pvp",
+      "title": "开始：pvp2025论文收集",
       "description": "开始执行任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047847521,
@@ -1113,7 +1126,7 @@
     {
       "id": "task-end-1761047847521",
       "date": "2025-11-20",
-      "title": "完成：pvp",
+      "title": "完成：pvp2025论文收集",
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047847521,
