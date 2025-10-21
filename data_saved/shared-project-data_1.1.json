@@ -533,7 +533,7 @@
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2025-11-30",
-      "progress": 0,
+      "progress": 20,
       "subtasks": [
         {
           "title": "开题报告",
@@ -562,7 +562,7 @@
         {
           "id": 1761026527937,
           "title": "孙师兄ppt/报告",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         }
