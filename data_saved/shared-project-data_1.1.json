@@ -690,6 +690,19 @@
       "subtasks": [],
       "attachments": [],
       "autoProgress": true
+    },
+    {
+      "id": 1761047847521,
+      "title": "pvp",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-21",
+      "endDate": "2025-11-20",
+      "progress": 0,
+      "subtasks": [],
+      "attachments": [],
+      "autoProgress": true
     }
   ],
   "timeline": [
@@ -1076,6 +1089,34 @@
       "description": "完成任务：请输入任务描述",
       "status": "pending",
       "linkedTaskId": 1761047664935,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
+    },
+    {
+      "id": "task-start-1761047847521",
+      "date": "2025-10-21",
+      "title": "开始：pvp",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047847521,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1761047847521",
+      "date": "2025-11-20",
+      "title": "完成：pvp",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047847521,
       "tags": [
         "工作清单",
         "结束"
