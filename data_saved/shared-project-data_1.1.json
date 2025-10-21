@@ -16,7 +16,7 @@
       "subtasks": [
         {
           "id": 1760965508292,
-          "title": "与西北院开会/例会",
+          "title": "与西北院开会/例会/地铁车站管道",
           "completed": false,
           "notes": "考试卷子处理",
           "issues": [],
@@ -1054,6 +1054,34 @@
       "type": "subtask-completion",
       "parentTask": "PVP会议投稿",
       "isSubtask": true
+    },
+    {
+      "id": "task-start-1761047664935",
+      "date": "2025-10-21",
+      "title": "开始：新任务",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047664935,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1761047664935",
+      "date": "2025-11-20",
+      "title": "完成：新任务",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047664935,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
     }
   ],
   "files": [
