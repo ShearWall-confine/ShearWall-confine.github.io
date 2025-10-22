@@ -656,7 +656,7 @@
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2025-11-19",
-      "progress": 50,
+      "progress": 33,
       "subtasks": [
         {
           "id": 1760967177915,
@@ -673,6 +673,13 @@
           "issues": [],
           "completionTime": "2025-11-10T21:33",
           "timeDescription": ""
+        },
+        {
+          "id": 1761141861546,
+          "title": "发送学业证书",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
