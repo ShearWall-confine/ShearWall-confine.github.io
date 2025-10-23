@@ -25,10 +25,12 @@
         },
         {
           "id": 1761227505535,
-          "title": "新子任务",
+          "title": "汇报进度/地铁车站管道",
           "completed": false,
           "notes": "",
-          "issues": []
+          "issues": [],
+          "completionTime": "2025-10-28T21:51",
+          "timeDescription": ""
         }
       ],
       "attachments": [],
@@ -1143,6 +1145,25 @@
       "status": "completed",
       "linkedTaskId": 1760965498124,
       "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760965498124-1",
+      "date": "2025-10-28",
+      "time": "21:51",
+      "title": "完成：地铁车站管道",
+      "description": "完成子任务：地铁车站管道",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 1,
       "tags": [
         "子任务",
         "完成",
