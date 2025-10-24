@@ -60,6 +60,34 @@
       "autoProgress": true
     },
     {
+      "id": 1761047847521,
+      "title": "论文阅读",
+      "description": "请输入任务描述",
+      "status": "pending",
+      "priority": "medium",
+      "startDate": "2025-10-21",
+      "endDate": "2025-11-20",
+      "progress": 0,
+      "subtasks": [
+        {
+          "id": 1761049287717,
+          "title": "pvp2025论文收集/同济谢强pvp邮件询问",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
+          "id": 1761049305929,
+          "title": "isliee论文集阅读",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        }
+      ],
+      "attachments": [],
+      "autoProgress": true
+    },
+    {
       "id": 1760787461942,
       "title": "管道吊架模态测试",
       "description": "请输入任务描述",
@@ -704,34 +732,6 @@
       "endDate": "2025-11-20",
       "progress": 0,
       "subtasks": [],
-      "attachments": [],
-      "autoProgress": true
-    },
-    {
-      "id": 1761047847521,
-      "title": "论文阅读",
-      "description": "请输入任务描述",
-      "status": "pending",
-      "priority": "medium",
-      "startDate": "2025-10-21",
-      "endDate": "2025-11-20",
-      "progress": 0,
-      "subtasks": [
-        {
-          "id": 1761049287717,
-          "title": "pvp2025论文收集/同济谢强pvp邮件询问",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        },
-        {
-          "id": 1761049305929,
-          "title": "isliee论文集阅读",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        }
-      ],
       "attachments": [],
       "autoProgress": true
     }
