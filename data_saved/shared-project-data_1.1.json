@@ -809,6 +809,44 @@
       "type": "task-end"
     },
     {
+      "id": "subtask-completion-1760965498124-0",
+      "date": "2025-10-23",
+      "time": "21:05",
+      "title": "完成：与西北院开会/例会/地铁车站管道",
+      "description": "完成子任务：与西北院开会/例会/地铁车站管道",
+      "status": "completed",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760965498124-1",
+      "date": "2025-10-28",
+      "time": "21:51",
+      "title": "完成：汇报进度/地铁车站管道",
+      "description": "完成子任务：汇报进度/地铁车站管道",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
       "id": "task-start-1760966693207",
       "date": "2023-09-01",
       "title": "开始：每周组会",
@@ -854,6 +892,34 @@
       "type": "subtask-completion",
       "parentTask": "每周组会",
       "isSubtask": true
+    },
+    {
+      "id": "task-start-1761047847521",
+      "date": "2025-10-21",
+      "title": "开始：论文阅读",
+      "description": "开始执行任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047847521,
+      "tags": [
+        "工作清单",
+        "开始"
+      ],
+      "isSynced": true,
+      "type": "task-start"
+    },
+    {
+      "id": "task-end-1761047847521",
+      "date": "2025-11-20",
+      "title": "完成：论文阅读",
+      "description": "完成任务：请输入任务描述",
+      "status": "pending",
+      "linkedTaskId": 1761047847521,
+      "tags": [
+        "工作清单",
+        "结束"
+      ],
+      "isSynced": true,
+      "type": "task-end"
     },
     {
       "id": "task-start-1760787461942",
@@ -1107,72 +1173,6 @@
       ],
       "isSynced": true,
       "type": "task-end"
-    },
-    {
-      "id": "task-start-1761047847521",
-      "date": "2025-10-21",
-      "title": "开始：论文阅读",
-      "description": "开始执行任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1761047847521,
-      "tags": [
-        "工作清单",
-        "开始"
-      ],
-      "isSynced": true,
-      "type": "task-start"
-    },
-    {
-      "id": "task-end-1761047847521",
-      "date": "2025-11-20",
-      "title": "完成：论文阅读",
-      "description": "完成任务：请输入任务描述",
-      "status": "pending",
-      "linkedTaskId": 1761047847521,
-      "tags": [
-        "工作清单",
-        "结束"
-      ],
-      "isSynced": true,
-      "type": "task-end"
-    },
-    {
-      "id": "subtask-completion-1760965498124-0",
-      "date": "2025-10-23",
-      "time": "21:05",
-      "title": "完成：与西北院开会/例会/地铁车站管道",
-      "description": "完成子任务：与西北院开会/例会/地铁车站管道",
-      "status": "completed",
-      "linkedTaskId": 1760965498124,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周例会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周例会",
-      "isSubtask": true
-    },
-    {
-      "id": "subtask-completion-1760965498124-1",
-      "date": "2025-10-28",
-      "time": "21:51",
-      "title": "完成：地铁车站管道",
-      "description": "完成子任务：地铁车站管道",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "linkedSubtaskIndex": 1,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周例会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周例会",
-      "isSubtask": true
     }
   ],
   "files": [
@@ -1183,7 +1183,7 @@
       "size": "269.71 KB",
       "uploadDate": "2025-10-18",
       "category": "documents",
-      "folderId": 1760789062421,
+      "folderId": null,
       "file": null,
       "savedToLocal": true
     },
@@ -1316,14 +1316,6 @@
     }
   ],
   "folders": [
-    {
-      "id": 1760789062421,
-      "name": "实验鼠韩剧",
-      "parentId": null,
-      "description": "",
-      "children": [],
-      "createDate": "2025-10-18"
-    },
     {
       "id": 1760789303128,
       "name": "1231231",
