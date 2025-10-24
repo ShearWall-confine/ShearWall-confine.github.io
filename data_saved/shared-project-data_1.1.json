@@ -95,7 +95,7 @@
       "priority": "high",
       "startDate": "2025-09-01",
       "endDate": "2025-11-20",
-      "progress": 22,
+      "progress": 25,
       "subtasks": [
         {
           "id": 1760964282126,
@@ -191,7 +191,7 @@
         {
           "id": 1760964282139,
           "title": "模态测试：CA_07_Top_R",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
@@ -205,7 +205,7 @@
         {
           "id": 1760964282141,
           "title": "模态测试：CA_13_Top_R",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
