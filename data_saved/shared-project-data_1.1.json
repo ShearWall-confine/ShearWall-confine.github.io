@@ -37,7 +37,9 @@
           "title": "汇报进度/地铁车站管道/考试卷子/",
           "completed": false,
           "notes": "",
-          "issues": []
+          "issues": [],
+          "completionTime": "2025-11-04T20:49",
+          "timeDescription": ""
         }
       ],
       "attachments": [],
@@ -1171,6 +1173,25 @@
       "status": "completed",
       "linkedTaskId": 1760965498124,
       "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760965498124-2",
+      "date": "2025-11-04",
+      "time": "20:49",
+      "title": "完成：汇报进度/地铁车站管道/考试卷子/",
+      "description": "完成子任务：汇报进度/地铁车站管道/考试卷子/",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 2,
       "tags": [
         "子任务",
         "完成",
