@@ -12,7 +12,7 @@
       "priority": "medium",
       "startDate": "2023-09-20",
       "endDate": "2029-03-19",
-      "progress": 50,
+      "progress": 33,
       "subtasks": [
         {
           "id": 1760965508292,
@@ -31,6 +31,13 @@
           "issues": [],
           "completionTime": "2025-10-28T21:51",
           "timeDescription": ""
+        },
+        {
+          "id": 1761655761250,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
