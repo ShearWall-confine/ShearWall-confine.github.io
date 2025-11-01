@@ -1612,8 +1612,16 @@ Kaffeemaschine,die,咖啡机`;
                     `;
                     document.body.appendChild(tooltip);
                     
-                    // 鼠标移动时动态定位tooltip并显示
-                    box.addEventListener('mouseenter', function(e) {
+                    // 显示tooltip的函数
+                    const showTooltipFunc = function() {
+                        // 先隐藏其他tooltip
+                        document.querySelectorAll('.history-tooltip').forEach(t => {
+                            if (t !== tooltip) {
+                                t.style.opacity = '0';
+                                t.style.display = 'none';
+                            }
+                        });
+                        
                         const rect = box.getBoundingClientRect();
                         
                         // 先显示tooltip以便获取其尺寸
@@ -1628,7 +1636,7 @@ Kaffeemaschine,die,咖啡机`;
                         if (spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10) {
                             // 显示在上方
                             tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height - 8) + 'px';
-                    } else {
+                        } else {
                             // 显示在下方
                             tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
                         }
@@ -1643,20 +1651,51 @@ Kaffeemaschine,die,咖啡机`;
                         
                         // 显示tooltip
                         tooltip.style.opacity = '1';
-                    });
+                    };
                     
-                    // 鼠标离开时隐藏tooltip
-                    box.addEventListener('mouseleave', function(e) {
+                    const hideTooltipFunc = function() {
                         tooltip.style.opacity = '0';
                         setTimeout(() => {
                             tooltip.style.display = 'none';
                         }, 200);
-                    });
+                    };
                     
-                    // 点击朗读功能
+                    // 桌面端：鼠标悬停显示tooltip
+                    box.addEventListener('mouseenter', showTooltipFunc);
+                    box.addEventListener('mouseleave', hideTooltipFunc);
+                    
+                    // 点击事件：触摸设备和鼠标设备分别处理
+                    let tooltipVisibleState = false;
+                    let lastClickTime = 0;
+                    
                     box.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        speakText(historyItem.question, 'de-DE');
+                        
+                        const currentTime = Date.now();
+                        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                        
+                        if (isTouchDevice) {
+                            // 移动端：第一次点击显示tooltip，第二次点击朗读
+                            if (!tooltipVisibleState || (currentTime - lastClickTime > 3000)) {
+                                // 显示tooltip
+                                showTooltipFunc();
+                                tooltipVisibleState = true;
+                                lastClickTime = currentTime;
+                            } else {
+                                // 朗读并隐藏
+                                speakText(historyItem.question, 'de-DE');
+                                hideTooltipFunc();
+                                tooltipVisibleState = false;
+                            }
+                        } else {
+                            // 桌面端：直接朗读
+                            speakText(historyItem.question, 'de-DE');
+                        }
+                    });
+                    
+                    // 触摸开始事件（移动端）
+                    box.addEventListener('touchstart', function(e) {
+                        e.stopPropagation();
                     });
                 } else {
                     // 未完成的题目 - 显示空白方块（无tooltip）
@@ -1702,6 +1741,16 @@ Kaffeemaschine,die,咖啡机`;
 
         // 页面加载完成后初始化
         window.addEventListener('DOMContentLoaded', init);
+        
+        // 全局点击事件：点击空白处隐藏所有tooltip（移动端友好）
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.history-box')) {
+                document.querySelectorAll('.history-tooltip').forEach(tooltip => {
+                    tooltip.style.opacity = '0';
+                    setTimeout(() => tooltip.style.display = 'none', 200);
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -1066,7 +1066,16 @@ verstehen,理解,irregular,verstehe,verstehst,versteht,verstehen,versteht,verste
                     `;
                     document.body.appendChild(tooltip);
                     
-                    box.addEventListener('mouseenter', function(e) {
+                    // 显示tooltip的函数
+                    const showTooltipFunc = function() {
+                        // 先隐藏其他tooltip
+                        document.querySelectorAll('.history-tooltip').forEach(t => {
+                            if (t !== tooltip) {
+                                t.style.opacity = '0';
+                                t.style.display = 'none';
+                            }
+                        });
+                        
                         const rect = box.getBoundingClientRect();
                         tooltip.style.display = 'block';
                         tooltip.style.opacity = '0';
@@ -1088,16 +1097,49 @@ verstehen,理解,irregular,verstehe,verstehst,versteht,verstehen,versteht,verste
                         }
                         tooltip.style.left = left + 'px';
                         tooltip.style.opacity = '1';
-                    });
+                    };
                     
-                    box.addEventListener('mouseleave', function() {
+                    const hideTooltipFunc = function() {
                         tooltip.style.opacity = '0';
                         setTimeout(() => tooltip.style.display = 'none', 200);
-                    });
+                    };
+                    
+                    // 桌面端：鼠标悬停显示tooltip
+                    box.addEventListener('mouseenter', showTooltipFunc);
+                    box.addEventListener('mouseleave', hideTooltipFunc);
+                    
+                    // 点击事件：触摸设备和鼠标设备分别处理
+                    let tooltipVisibleState = false;
+                    let lastClickTime = 0;
                     
                     box.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        speakText(item.verb, 'de-DE');
+                        
+                        const currentTime = Date.now();
+                        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+                        
+                        if (isTouchDevice) {
+                            // 移动端：第一次点击显示tooltip，第二次点击朗读
+                            if (!tooltipVisibleState || (currentTime - lastClickTime > 3000)) {
+                                // 显示tooltip
+                                showTooltipFunc();
+                                tooltipVisibleState = true;
+                                lastClickTime = currentTime;
+                            } else {
+                                // 朗读并隐藏
+                                speakText(item.verb, 'de-DE');
+                                hideTooltipFunc();
+                                tooltipVisibleState = false;
+                            }
+                        } else {
+                            // 桌面端：直接朗读
+                            speakText(item.verb, 'de-DE');
+                        }
+                    });
+                    
+                    // 触摸开始事件（移动端）
+                    box.addEventListener('touchstart', function(e) {
+                        e.stopPropagation();
                     });
                 } else {
                     box.classList.add('empty');
@@ -1259,6 +1301,16 @@ verstehen,理解,irregular,verstehe,verstehst,versteht,verstehen,versteht,verste
                 if (text && text !== '答案将显示在这里') speakText(text, 'de-DE');
             });
         }
+        
+        // 全局点击事件：点击空白处隐藏所有tooltip（移动端友好）
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.history-box')) {
+                document.querySelectorAll('.history-tooltip').forEach(tooltip => {
+                    tooltip.style.opacity = '0';
+                    setTimeout(() => tooltip.style.display = 'none', 200);
+                });
+            }
+        });
     </script>
 </body>
 </html>
