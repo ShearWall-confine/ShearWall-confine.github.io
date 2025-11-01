@@ -98,8 +98,13 @@ function loadInlineHeader() {
                         <li><a href="database.html"><i class="fas fa-database"></i> 剪力墙数据库</a></li>
                     </ul>
                 </li>
+                <li><a href="#">科研工具</a>
+                    <ul>
+                        <li><a href="login.html"><i class="fas fa-tasks"></i> 课题进度管理</a></li>
+                        <li><a href="german_20251031/german_index.html"><i class="fas fa-language"></i> 德语学习工具</a></li>
+                    </ul>
+                </li>
                 <li><a href="#">交流合作</a></li>
-                <li><a href="login.html">课题进度管理</a></li>
                 <li><a href="#">联系我们</a></li>
             </ul>
         </div>
@@ -163,8 +168,13 @@ function loadFallbackHeader() {
                         <li><a href="database.html">剪力墙数据库</a></li>
                     </ul>
                 </li>
+                <li><a href="#">科研工具</a>
+                    <ul>
+                        <li><a href="login.html"><i class="fas fa-tasks"></i> 课题进度管理</a></li>
+                        <li><a href="german_20251031/german_index.html"><i class="fas fa-language"></i> 德语学习工具</a></li>
+                    </ul>
+                </li>
                 <li><a href="#">交流合作</a></li>
-                <li><a href="login.html">课题进度管理</a></li>
                 <li><a href="#">联系我们</a></li>
             </ul>
         </div>

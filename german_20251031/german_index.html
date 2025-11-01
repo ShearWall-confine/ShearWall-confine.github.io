@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德语学习工具集</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="german_common.css">
+    <style>
+        /* 页面特定样式 */
+        .container {
+            max-width: 900px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h1::after {
+            width: 60px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回主页按钮 -->
+        <a href="../index.html" class="back-to-home">← 返回主页</a>
+        
+        <h1>德语学习工具集</h1>
+        <div class="subtitle">全方位提升你的德语能力 | 动词变位 & 数字学习</div>
+
+        <div class="card-grid">
+            <!-- 动词变位工具卡片 -->
+            <div class="feature-card" id="verb-conjugation-card">
+                <div>
+                    <h2>动词变位考核器</h2>
+                    <p>练习德语动词的各种时态变位，包括规则动词、不规则动词、情态动词等。支持现在时、过去时和完成时的双向考核。</p>
+                </div>
+                <button class="btn" onclick="window.location.href='german_verb_conjugation.html'">开始练习</button>
+            </div>
+
+            <!-- 数字学习工具卡片 -->
+            <div class="feature-card" id="number-quiz-card">
+                <div>
+                    <h2>数字-德语考核器</h2>
+                    <p>学习德语数字，支持个位数、两位数和三位数的双向转换练习，帮助你快速掌握德语数词的表达方式。</p>
+                </div>
+                <button class="btn" onclick="window.location.href='german_number_quiz.html'">开始练习</button>
+            </div>
+
+            <!-- 名词及冠词考核卡片 -->
+            <div class="feature-card" id="noun-article-card">
+                <div>
+                    <h2>名词冠词考核器</h2>
+                    <p>学习德语名词及其定冠词(der/die/das)，支持德语到中文和中文到德语的双向练习，帮助记忆名词的性和冠词。</p>
+                </div>
+                <button class="btn" onclick="window.location.href='german_noun_article_quiz.html'">开始练习</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 德语学习工具集 | 设计与开发：Trae AI</p>
+        </div>
+    </div>
+
+    <script>
+        // 添加卡片点击效果
+        document.getElementById('verb-conjugation-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.btn')) {
+                window.location.href = 'german_verb_conjugation.html';
+            }
+        });
+
+        document.getElementById('number-quiz-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.btn')) {
+                window.location.href = 'german_number_quiz.html';
+            }
+        });
+
+        document.getElementById('noun-article-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.btn')) {
+                window.location.href = 'german_noun_article_quiz.html';
+            }
+        });
+    </script>
+</body>
+</html>
+

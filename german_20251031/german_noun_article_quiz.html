@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德语名词及冠词考核器</title>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="german_common.css">
+    <style>
+        /* 全新的学习卡片设计 */
+        .study-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 2rem 0;
+            min-height: 300px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .study-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-color: var(--border-dark);
+        }
+        
+        .study-card.has-question {
+            cursor: default;
+        }
+        
+        /* 问题显示区域 */
+        .card-question-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .question-text {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--foreground);
+            letter-spacing: 0.02em;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            user-select: none;
+        }
+        
+        /* DWDS链接 */
+        .dwds-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--foreground);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .dwds-link:hover {
+            background: var(--foreground);
+            color: var(--surface);
+            border-color: var(--foreground);
+            transform: translateY(-1px);
+        }
+        
+        .dwds-link i {
+            font-size: 0.9rem;
+        }
+        
+        /* 答案显示区域 */
+        .card-answer-area {
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .answer-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--border-dark), transparent);
+            margin: 2rem auto 1.5rem;
+        }
+        
+        .answer-content {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 2rem;
+            line-height: 1.3;
+        }
+        
+        /* 主操作按钮 */
+        .card-actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .primary-btn {
+            background: var(--foreground);
+            color: var(--surface);
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .primary-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 评价按钮组 */
+        .rating-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .rating-btn {
+            flex: 1;
+            max-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.2rem 2rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--foreground);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .rating-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .rating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .know-btn {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .know-btn:hover:not(:disabled) {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .know-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        .unfamiliar-btn {
+            border-color: #D32F2F;
+            color: #D32F2F;
+        }
+        
+        .unfamiliar-btn:hover:not(:disabled) {
+            background: #D32F2F;
+            color: white;
+        }
+        
+        .unfamiliar-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        .next-btn {
+            border-color: var(--border-dark);
+            color: var(--foreground);
+        }
+        
+        .next-btn:hover:not(:disabled) {
+            background: var(--foreground);
+            color: var(--surface);
+        }
+        
+        .next-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        /* 优化的历史记录样式 */
+        .history-container {
+            overflow: visible; /* 确保tooltip不被剪裁 */
+            position: relative;
+        }
+        
+        .history-words {
+            overflow: visible; /* 确保tooltip不被剪裁 */
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .history-title i {
+            color: var(--foreground);
+            opacity: 0.7;
+        }
+
+        .history-stats {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 16px;
+            border: 2px solid;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .stat-badge i {
+            font-size: 1rem;
+        }
+
+        /* 图例样式 */
+        .history-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--foreground);
+            font-weight: 500;
+        }
+        
+        .legend-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            border: 1px solid;
+            display: inline-block;
+        }
+        
+        .history-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+        
+        .history-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        .history-empty p {
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        /* 方块网格布局 */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+            gap: 4px;
+            padding: 1rem 0;
+            max-width: 100%;
+            overflow: visible; /* 确保tooltip不被剪裁 */
+        }
+        
+        .history-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        /* 空白状态 - 待完成 */
+        .history-box.empty {
+            background: #e0e0e0;
+            border: 1px dashed var(--border);
+            opacity: 0.6;
+        }
+        
+        .history-box.empty:hover {
+            opacity: 0.8;
+            border-style: solid;
+        }
+        
+        /* 认识 - 绿色 */
+        .history-box.known {
+            background: #4CAF50;
+            border-color: #388E3C;
+        }
+        
+        /* 不熟悉 - 红色 */
+        .history-box.unfamiliar {
+            background: #D32F2F;
+            border-color: #B71C1C;
+        }
+        
+        /* 用时过长 - 橙色 */
+        .history-box.slow {
+            background: #FF9800;
+            border-color: #F57C00;
+        }
+        
+        .history-box:hover {
+            transform: scale(1.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        /* 悬停时的详细信息卡片 */
+        .history-tooltip {
+            position: fixed;
+            background: var(--foreground);
+            color: var(--surface);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        
+        
+        .tooltip-time {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #FFD54F;
+        }
+        
+        .tooltip-question {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .tooltip-answer {
+            color: #81C784;
+        }
+        
+        /* 完成提示弹窗 */
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .completion-modal.show {
+            opacity: 1;
+            pointer-events: none; /* 背景允许鼠标穿透 */
+        }
+        
+        .completion-modal.show .completion-content {
+            pointer-events: auto; /* 内容卡片响应鼠标事件 */
+        }
+        
+        .completion-content {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .completion-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--foreground);
+        }
+
+        .completion-stats {
+            background: var(--surface-elevated);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .completion-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .completion-stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--foreground);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .stat-value.green {
+            color: #4CAF50;
+        }
+        
+        .stat-value.orange {
+            color: #FF9800;
+        }
+        
+        .stat-value.red {
+            color: #D32F2F;
+        }
+        
+        .completion-progress {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--surface-elevated);
+            border-radius: 8px;
+            overflow: visible;
+        }
+        
+        .completion-progress .history-grid {
+            padding: 0.5rem 0;
+        }
+        
+        .completion-message {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .completion-btn {
+            background: var(--foreground);
+            color: var(--surface);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-top: 1rem;
+        }
+        
+        .completion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .completion-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .study-card {
+                padding: 2rem 1.5rem;
+                min-height: 250px;
+            }
+            
+            .question-text {
+                font-size: 2rem;
+            }
+            
+            .answer-content {
+                font-size: 1.8rem;
+            }
+            
+            .rating-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .rating-btn {
+                max-width: 100%;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .action-btn {
+                padding: 0.9rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .history-grid {
+                grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+                gap: 3px;
+            }
+            
+            .history-box {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .history-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .study-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .question-text {
+                font-size: 1.5rem;
+            }
+            
+            .answer-content {
+                font-size: 1.4rem;
+            }
+            
+            .dwds-link {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .completion-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .completion-icon {
+                font-size: 3rem;
+            }
+            
+            .completion-title {
+                font-size: 1.5rem;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
+            }
+            
+            .completion-btn {
+                padding: 0.9rem 2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="german_index.html" class="nav-btn">← 返回主页</a>
+        <h1>德语名词及冠词考核器</h1>
+        <div class="subtitle">名词学习 | 冠词练习 | 双向考核 | 反应计时</div>
+
+        <!-- 模式选择 -->
+        <div class="option-group">
+            <span class="option-label">考核模式:</span>
+            <div class="option-buttons">
+                <button class="option-btn active" data-mode="de-to-cn">德语 → 中文</button>
+                <button class="option-btn" data-mode="cn-to-de">中文 → 德语</button>
+            </div>
+        </div>
+
+        <!-- 卡片区域 - 全新设计 -->
+        <div class="study-card" id="study-card">
+            <!-- 问题显示区 -->
+            <div class="card-question-area">
+                <div class="question-text" id="question-text">点击卡片开始学习</div>
+                <a href="#" id="dwds-link" class="dwds-link" target="_blank" style="display: none;">
+                    <i class="fas fa-book-open"></i> DWDS词典
+                </a>
+                </div>
+            
+            <!-- 答案显示区（初始隐藏） -->
+            <div class="card-answer-area" id="answer-area" style="display: none;">
+                <div class="answer-divider"></div>
+                <div class="answer-content" id="answer-content"></div>
+            </div>
+            
+            <!-- 答题按钮（始终显示） -->
+            <div class="rating-buttons" id="rating-buttons">
+                <button class="rating-btn know-btn" id="know-btn">
+                    <i class="fas fa-check-circle"></i>
+                    <span>熟悉</span>
+                </button>
+                <button class="rating-btn unfamiliar-btn" id="unfamiliar-btn">
+                    <i class="fas fa-flag"></i>
+                    <span>不熟悉</span>
+                </button>
+                <button class="rating-btn next-btn" id="next-btn" disabled>
+                    <i class="fas fa-arrow-right"></i>
+                    <span>下一题</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tip">
+            💡 提示：查看题目 → 思考答案 → 点击"熟悉"或"不熟悉"查看答案 → 点击"下一题"继续
+        </div>
+
+        <!-- 状态指示器 -->
+        <div class="status">
+            <div class="timer">时间: 00:00</div>
+            <div class="counter">已完成: 0/0</div>
+        </div>
+
+        <!-- 已考核词汇框 -->
+        <div class="history-container">
+            <div class="history-header">
+                <div class="history-title">
+                    <i class="fas fa-history"></i> 练习历史
+                </div>
+                <div class="history-stats" id="history-stats"></div>
+                <button class="clear-history-btn" id="clear-history-btn">
+                    <i class="fas fa-trash-alt"></i> 清空
+                </button>
+            </div>
+            <div class="history-legend">
+                <span class="legend-item">
+                    <span class="legend-box" style="background: var(--surface); border-color: var(--border);"></span>
+                    待完成
+                </span>
+                <span class="legend-item">
+                    <span class="legend-box" style="background: #4CAF50; border-color: #388E3C;"></span>
+                    认识
+                </span>
+                <span class="legend-item">
+                    <span class="legend-box" style="background: #FF9800; border-color: #F57C00;"></span>
+                    慢速
+                </span>
+                <span class="legend-item">
+                    <span class="legend-box" style="background: #D32F2F; border-color: #B71C1C;"></span>
+                    不熟悉
+                </span>
+            </div>
+        <div class="history-words" id="history-words">
+            <!-- 已考核的词汇将在这里动态显示 -->
+                <div class="history-empty">
+                    <i class="fas fa-inbox"></i>
+                    <p>暂无练习记录</p>
+                </div>
+        </div>
+        </div>
+        
+        <!-- 键盘快捷键提示 -->
+        <div class="keyboard-hint">
+            <kbd>空格</kbd> 下一题 | <kbd>D</kbd> 打开DWDS词典 | 双击单词朗读
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 德语学习工具集 | 设计与开发：Trae AI</p>
+        </div>
+    </div>
+    
+    <!-- 完成一轮的提示弹窗 -->
+    <div class="completion-modal" id="completion-modal">
+        <div class="completion-content">
+            <div class="completion-icon">🎉</div>
+            <h2 class="completion-title">完成一轮检验！</h2>
+            <div class="completion-stats" id="completion-stats-content">
+                <!-- 统计信息将通过JavaScript动态生成 -->
+            </div>
+            <div class="completion-progress" id="completion-progress">
+                <!-- 进度图将通过JavaScript动态生成 -->
+            </div>
+            <p class="completion-message" id="completion-message">
+                <!-- 鼓励信息将通过JavaScript动态生成 -->
+            </p>
+            <button class="completion-btn" id="completion-btn">
+                <i class="fas fa-redo"></i> 开始下一轮
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let nounsData = []; // 原始词汇数据
+        let shuffledData = []; // 打乱后的词汇数据
+        let currentMode = 'de-to-cn'; // 默认模式：德语 → 中文
+        let currentQuestionIndex = 0;
+        let currentAnswer = '';
+        let startTime = 0;
+        let timerInterval = null;
+        let totalQuestions = 0;
+        let completedQuestions = 0;
+        let currentAnswered = false; // 标记当前题是否已回答
+        let historyWords = []; // 已考核的词汇历史记录，格式: {word: string, unfamiliar: boolean, time: number}
+        let currentRoundAnswers = []; // 当前轮次的所有答题记录，用于统计（索引对应题目顺序）
+        let completedRoundSnapshot = null; // 完成轮次的数据快照，防止被覆盖
+        const MAX_HISTORY = 50; // 最大历史记录数量
+        const SUPPORTED_VOICES = []; // 支持的语音列表
+
+        // DOM元素（延迟获取，避免null引用）
+        let studyCard, questionText, dwdsLink, answerArea, answerContent;
+        let ratingButtons, knowBtn, unfamiliarBtn, nextBtn;
+        let timerDisplay, counterDisplay, historyWordsContainer, clearHistoryBtn;
+        let completionModal, completionBtn, completionStatsContent, completionProgress, completionMessage;
+        
+        function initDOMElements() {
+            studyCard = document.getElementById('study-card');
+            questionText = document.getElementById('question-text');
+            dwdsLink = document.getElementById('dwds-link');
+            answerArea = document.getElementById('answer-area');
+            answerContent = document.getElementById('answer-content');
+            ratingButtons = document.getElementById('rating-buttons');
+            knowBtn = document.getElementById('know-btn');
+            unfamiliarBtn = document.getElementById('unfamiliar-btn');
+            nextBtn = document.getElementById('next-btn');
+            timerDisplay = document.querySelector('.timer');
+            counterDisplay = document.querySelector('.counter');
+            historyWordsContainer = document.getElementById('history-words');
+            clearHistoryBtn = document.getElementById('clear-history-btn');
+            completionModal = document.getElementById('completion-modal');
+            completionBtn = document.getElementById('completion-btn');
+            completionStatsContent = document.getElementById('completion-stats-content');
+            completionProgress = document.getElementById('completion-progress');
+            completionMessage = document.getElementById('completion-message');
+        }
+
+        // 初始化函数
+        function init() {
+            // 初始化DOM元素
+            initDOMElements();
+            
+            // 直接使用嵌入的CSV数据（避免CORS问题）
+            const csvData = `noun,article,meaning
+Stuhl,der,椅子
+Bleistift,der,铅笔
+Wörterbuch,das,词典
+Bügeleisen,das,熨斗
+Fernseher,der,电视
+Computer,der,电脑
+Drucker,der,打印机
+Handy,das,手机
+MP3-Player,der,MP3播放器
+Lampe,die,台灯
+Schere,die,剪刀
+Wasserkocher,der,电水壶
+Waschmaschine,die,洗衣机
+Kuli,der,圆珠笔
+Kaffeemaschine,die,咖啡机`;
+            
+            // 使用PapaParse解析CSV字符串
+            Papa.parse(csvData, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    console.log('CSV解析成功，共', results.data.length, '条数据');
+                    nounsData = results.data.filter(row => row.noun && row.article && row.meaning);
+                    totalQuestions = nounsData.length;
+                    updateCounter();
+                    // 初始化打乱的数据并生成第一个问题
+                    shuffleQuestions();
+                    generateQuestion();
+                    // 初始化显示所有方块
+                    updateHistoryDisplay();
+                },
+                error: function(error) {
+                    console.error('CSV解析失败:', error);
+                    if (questionText) {
+                        questionText.textContent = 'CSV数据解析失败';
+                    }
+                }
+            });
+
+            // 预加载语音列表
+            loadVoices();
+            
+            // 监听语音列表变化
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            
+            // 模式选择事件监听
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新活动状态
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新模式
+                    currentMode = this.getAttribute('data-mode');
+                    
+                    // 重置并开始新一轮练习
+                    resetExercise();
+                    
+                    // 确保模式按钮保持可见
+                    document.querySelector('.option-buttons').style.display = 'flex';
+                });
+            });
+
+            // 卡片点击事件 - 开始新题
+            if (studyCard) {
+                studyCard.addEventListener('click', function(e) {
+                    // 如果点击的是DWDS链接或按钮，不触发
+                    if (e.target.closest('.dwds-link') || e.target.closest('button')) {
+                        return;
+                    }
+                    // 只有在初始状态或显示答案后才响应卡片点击
+                    if (!studyCard.classList.contains('has-question') || ratingButtons.style.display !== 'none') {
+                showQuestion();
+                    }
+                });
+            }
+            
+            // 熟悉按钮
+            if (knowBtn) {
+                knowBtn.addEventListener('click', function() {
+                    if (!currentAnswered) {
+                        showAnswer(); // 显示答案
+                        recordAnswer(false); // 记录为熟悉
+                        enableNextButton(); // 启用下一题按钮
+                        currentAnswered = true; // 标记已回答
+                    }
+                });
+            }
+            
+            // 不熟悉按钮
+            if (unfamiliarBtn) {
+                unfamiliarBtn.addEventListener('click', function() {
+                    if (!currentAnswered) {
+                        showAnswer(); // 显示答案
+                        recordAnswer(true); // 记录为不熟悉
+                        enableNextButton(); // 启用下一题按钮
+                        currentAnswered = true; // 标记已回答
+                    }
+                });
+            }
+            
+            // 下一题按钮
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    if (!nextBtn.disabled) {
+                        showQuestion(); // 进入下一题
+                    }
+                });
+            }
+            
+            // 清空历史记录按钮
+            if (clearHistoryBtn) {
+                clearHistoryBtn.addEventListener('click', clearHistory);
+            }
+            
+            // 完成一轮按钮
+            if (completionBtn) {
+                completionBtn.addEventListener('click', startNewRound);
+            }
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // 空格键：显示答案 或 下一题
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (showAnswerBtn && showAnswerBtn.style.display !== 'none') {
+                        showAnswerBtn.click();
+                    } else if (ratingButtons && ratingButtons.style.display !== 'none') {
+                        knowBtn.click(); // 默认"认识"并进入下一题
+                    }
+                }
+                // D键：打开DWDS词典
+                else if (e.code === 'KeyD' && dwdsLink && dwdsLink.style.display !== 'none') {
+                    e.preventDefault();
+                    dwdsLink.click();
+                }
+            });
+            
+            // 添加德语单词双击朗读功能
+            if (questionText) {
+                questionText.addEventListener('dblclick', function() {
+                // 只有在德语→中文模式下才朗读问题侧的德语单词
+                    if (currentMode === 'de-to-cn' && questionText.textContent !== '点击卡片开始学习') {
+                        speakText(questionText.textContent.trim(), 'de-DE');
+                    }
+                });
+            }
+            
+            // 答案内容双击朗读
+            if (answerContent) {
+                answerContent.addEventListener('dblclick', function() {
+                    const text = answerContent.textContent.trim();
+                    if (text) {
+                            // 如果是中文→德语模式或者包含德语冠词，使用德语朗读
+                            if (currentMode === 'cn-to-de' || text.match(/^(der|die|das) /)) {
+                                speakText(text, 'de-DE');
+                            } else {
+                                speakText(text, 'zh-CN');
+                        }
+                    }
+                });
+            }
+            
+
+        }
+
+        // 打乱问题顺序
+        function shuffleQuestions() {
+            // 创建原始数据的深拷贝
+            shuffledData = JSON.parse(JSON.stringify(nounsData));
+            // Fisher-Yates 洗牌算法
+            for (let i = shuffledData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledData[i], shuffledData[j]] = [shuffledData[j], shuffledData[i]];
+            }
+        }
+        
+        // 重置练习
+        function resetExercise() {
+            resetCard();
+            completedQuestions = 0;
+            updateCounter();
+            // 打乱词汇顺序开始新一轮练习
+            shuffleQuestions();
+            generateQuestion();
+            // 清空历史记录
+            historyWords = [];
+            currentRoundAnswers = []; // 清空当前轮次记录
+            updateHistoryDisplay();
+        }
+        
+        // 生成问题
+        function generateQuestion() {
+            resetCard();
+            currentAnswered = false; // 重置回答状态
+            if (shuffledData.length === 0) return;
+            
+            // 检查是否需要开始新一轮练习
+            if (completedQuestions >= totalQuestions) {
+                // 完成一轮练习，开始新的一轮
+                shuffleQuestions();
+                completedQuestions = 0;
+                updateCounter();
+            }
+            
+            // 按顺序获取下一个问题（确保不重复）
+            currentQuestionIndex = completedQuestions;
+            const currentItem = shuffledData[currentQuestionIndex];
+            
+            // 根据模式设置问题和答案
+            if (currentMode === 'de-to-cn') {
+                // 德语 → 中文
+                if (questionText) {
+                    questionText.textContent = currentItem.noun;
+                }
+                currentAnswer = currentItem.meaning;
+                // 自动朗读德语单词
+                speakText(currentItem.noun, 'de-DE');
+                // 设置DWDS链接
+                updateDWDSLink(currentItem.noun);
+            } else {
+                // 中文 → 德语（带冠词）
+                if (questionText) {
+                    questionText.textContent = currentItem.meaning;
+                }
+                currentAnswer = `${currentItem.article} ${currentItem.noun}`;
+                // 设置DWDS链接
+                updateDWDSLink(currentItem.noun);
+            }
+            
+            // 隐藏答案区域
+            if (answerArea) {
+                answerArea.style.display = 'none';
+            }
+            
+            // 确保按钮显示且下一题按钮禁用
+            if (ratingButtons) {
+                ratingButtons.style.display = 'flex';
+            }
+            if (nextBtn) {
+                nextBtn.disabled = true;
+            }
+            
+            // 标记卡片有问题
+            if (studyCard) {
+                studyCard.classList.add('has-question');
+            }
+            
+            // 重置计时器
+            resetTimer();
+            startTimer();
+        }
+
+        // 更新DWDS词典链接
+        function updateDWDSLink(noun) {
+            if (!noun || !dwdsLink) {
+                console.log('DWDS链接更新跳过：', {noun, dwdsLinkExists: !!dwdsLink});
+                return;
+            }
+            
+            // 清理名词（移除冠词和特殊字符）
+            const cleanNoun = noun.replace(/^(der|die|das)\s+/, '').trim();
+            // DWDS词典链接格式
+            const dwdsUrl = `https://www.dwds.de/wb/${encodeURIComponent(cleanNoun)}`;
+            dwdsLink.href = dwdsUrl;
+            dwdsLink.style.display = 'inline-block';
+            console.log('DWDS链接已更新：', dwdsUrl);
+        }
+        
+        // 清空历史记录
+        function clearHistory() {
+            if (historyWords.length === 0) return;
+            
+            if (confirm('确定要清空所有历史记录吗？')) {
+                historyWords = [];
+                updateHistoryDisplay();
+            }
+        }
+
+        // 显示问题
+        function showQuestion() {
+            // 如果是第一次点击或已完成所有问题，重置练习
+            if (completedQuestions === 0 || completedQuestions >= totalQuestions) {
+                resetExercise();
+            } else {
+                // 生成问题
+                generateQuestion();
+                
+                // 历史记录将在showAnswer函数中添加，以便正确标记不熟悉单词
+            }
+            // 恢复计时器启动
+            startTimer();
+        }
+
+
+        
+        // 文本朗读函数
+        function speakText(text, language = 'de-DE') {
+            
+            // 检查浏览器是否支持Web Speech API
+            if ('speechSynthesis' in window) {
+                // 停止任何正在进行的语音
+                window.speechSynthesis.cancel();
+                
+                // 创建语音实例
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = language;
+                utterance.rate = 0.9; // 稍微放慢语速
+                
+                // 如果有德语语音，优先使用
+                if (SUPPORTED_VOICES.length > 0) {
+                    const germanVoice = SUPPORTED_VOICES.find(voice => 
+                        voice.lang === 'de-DE' || voice.lang.startsWith('de-')
+                    );
+                    if (germanVoice) {
+                        utterance.voice = germanVoice;
+                    }
+                }
+                
+                // 开始朗读
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // 预加载语音列表
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                const voices = window.speechSynthesis.getVoices();
+                SUPPORTED_VOICES.length = 0;
+                SUPPORTED_VOICES.push(...voices);
+            }
+        }
+        
+        // 显示答案
+        function showAnswer() {
+            // 停止计时器
+            stopTimer();
+            
+            // 显示答案内容
+            if (answerContent) {
+                answerContent.textContent = currentAnswer;
+            }
+            if (answerArea) {
+                answerArea.style.display = 'block';
+            }
+            
+            // 在中文→德语模式下，如果答案包含德语单词，进行朗读
+            if (currentMode === 'cn-to-de') {
+                speakText(currentAnswer, 'de-DE');
+            }
+        }
+        
+        // 记录答案（用于评价按钮）
+        function recordAnswer(isUnfamiliar = false) {
+            // 添加安全检查防止异常大值
+            const elapsedTime = startTime ? Math.max(0, Math.floor((Date.now() - startTime) / 1000)) : 0;
+            
+            // 增加完成计数
+                completedQuestions++;
+                updateCounter();
+                
+                // 获取当前要添加到历史记录的单词
+                const currentItem = shuffledData[currentQuestionIndex];
+                const historyWord = currentMode === 'de-to-cn' ? currentItem.noun : currentItem.meaning;
+                
+            // 添加到历史记录（用于显示），包含时间信息
+            addToHistory(historyWord, isUnfamiliar, elapsedTime);
+            
+            // 添加到当前轮次记录（用于统计），按答题顺序存储（从左到右）
+            // 使用completedQuestions - 1作为索引，因为completedQuestions已经+1了
+            const answerIndex = completedQuestions - 1;
+            currentRoundAnswers[answerIndex] = {
+                word: historyWord,
+                unfamiliar: isUnfamiliar,
+                time: elapsedTime,
+                question: currentItem.noun,
+                answer: currentItem.article,
+                meaning: currentItem.meaning
+            };
+            
+            // 立即更新历史显示
+            updateHistoryDisplay();
+            
+            // 检查是否完成了一轮
+            if (completedQuestions >= totalQuestions) {
+                // 立即保存当前轮次的数据快照，防止被下一轮覆盖
+                completedRoundSnapshot = JSON.parse(JSON.stringify(currentRoundAnswers));
+                
+                // 禁用下一题按钮，防止误操作进入下一轮
+                if (nextBtn) {
+                    nextBtn.disabled = true;
+                }
+                
+                // 延迟显示弹窗，让用户看到最后一题的结果
+                setTimeout(showCompletionModal, 500);
+            }
+        }
+        
+        // 显示完成一轮的弹窗
+        function showCompletionModal() {
+            if (!completionModal || !completionStatsContent || !completionMessage) return;
+            
+            // 清理旧的tooltip元素
+            const oldTooltips = document.querySelectorAll('.history-tooltip');
+            oldTooltips.forEach(tooltip => tooltip.remove());
+            
+            // 使用快照数据进行统计，防止被新一轮覆盖
+            const roundData = completedRoundSnapshot || currentRoundAnswers;
+            
+            // 计算统计数据
+            const times = roundData.map(item => item.time);
+            const mean = times.length > 0 ? times.reduce((sum, time) => sum + time, 0) / times.length : 0;
+            const variance = times.length > 0 ? times.reduce((sum, time) => sum + Math.pow(time - mean, 2), 0) / times.length : 0;
+            const threshold = mean + Math.sqrt(variance);
+            
+            // 从轮次记录中统计各类答题
+            const unfamiliarCount = roundData.filter(item => item.unfamiliar).length;
+            const slowCount = roundData.filter(item => !item.unfamiliar && item.time > threshold && roundData.length > 3).length;
+            const knownCount = roundData.length - unfamiliarCount - slowCount;
+            const accuracy = roundData.length > 0 ? ((knownCount / roundData.length) * 100).toFixed(1) : 0;
+            
+            // 生成统计信息HTML
+            completionStatsContent.innerHTML = `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                        认识
+                    </span>
+                    <span class="stat-value green">${knownCount}</span>
+                </div>
+                ${slowCount > 0 ? `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-clock" style="color: #FF9800;"></i>
+                        慢速
+                    </span>
+                    <span class="stat-value orange">${slowCount}</span>
+                </div>
+                ` : ''}
+                ${unfamiliarCount > 0 ? `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-times-circle" style="color: #D32F2F;"></i>
+                        不熟悉
+                    </span>
+                    <span class="stat-value red">${unfamiliarCount}</span>
+                </div>
+                ` : ''}
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-chart-line"></i>
+                        掌握率
+                    </span>
+                    <span class="stat-value" style="color: ${accuracy >= 80 ? '#4CAF50' : accuracy >= 60 ? '#FF9800' : '#D32F2F'};">
+                        ${accuracy}%
+                    </span>
+                </div>
+            `;
+            
+            // 生成鼓励信息
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 太棒了！您已经掌握得非常好了！';
+            } else if (accuracy >= 75) {
+                message = '👍 不错！继续保持，您做得很好！';
+            } else if (accuracy >= 60) {
+                message = '💪 加油！多练几轮就能完全掌握了！';
+            } else {
+                message = '📚 不要气馁，熟能生巧！让我们再练一轮吧！';
+            }
+            
+            if (unfamiliarCount > 0) {
+                message += `\n重点复习标记为不熟悉的 ${unfamiliarCount} 个单词。`;
+            }
+            
+            completionMessage.textContent = message;
+            
+            // 生成进度图
+            if (completionProgress) {
+                completionProgress.innerHTML = '';
+                
+                // 创建方块网格
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'history-grid';
+                
+                // 显示所有题目的方块
+                for (let i = 0; i < totalQuestions; i++) {
+                    const box = document.createElement('div');
+                    box.className = 'history-box';
+                    
+                    const answerItem = roundData[i];
+                    
+                    if (answerItem) {
+                        // 确定颜色分类
+                        if (answerItem.unfamiliar) {
+                            box.classList.add('unfamiliar');
+                        } else if (roundData.length > 3 && answerItem.time > threshold) {
+                            box.classList.add('slow');
+                        } else {
+                            box.classList.add('known');
+                        }
+                        
+                        // 创建悬停提示（添加到body而不是box，避免触发滚动条）
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'history-tooltip';
+                        tooltip.innerHTML = `
+                            <div class="tooltip-time">⏱️ ${answerItem.time}s</div>
+                            <div class="tooltip-question">📝 ${answerItem.question}</div>
+                            <div class="tooltip-answer">✓ ${answerItem.answer} - ${answerItem.meaning}</div>
+                        `;
+                        document.body.appendChild(tooltip);
+                        
+                        // 鼠标移动时动态定位tooltip并显示
+                        box.addEventListener('mouseenter', function(e) {
+                            const rect = box.getBoundingClientRect();
+                            
+                            // 先显示tooltip以便获取其尺寸
+                            tooltip.style.display = 'block';
+                            tooltip.style.opacity = '0';
+                            const tooltipRect = tooltip.getBoundingClientRect();
+                            
+                            const spaceAbove = rect.top;
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            
+                            if (spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10) {
+                                tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height - 8) + 'px';
+                            } else {
+                                tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                            }
+                            
+                            let left = rect.left + window.scrollX + rect.width / 2 - tooltipRect.width / 2;
+                            if (left < 10) left = 10;
+                            if (left + tooltipRect.width > window.innerWidth - 10) {
+                                left = window.innerWidth - tooltipRect.width - 10;
+                            }
+                            tooltip.style.left = left + 'px';
+                            
+                            // 显示tooltip
+                            tooltip.style.opacity = '1';
+                        });
+                        
+                        // 鼠标离开时隐藏tooltip
+                        box.addEventListener('mouseleave', function(e) {
+                            tooltip.style.opacity = '0';
+                            setTimeout(() => {
+                                tooltip.style.display = 'none';
+                            }, 200);
+                        });
+                    } else {
+                        // 未完成的题目（无tooltip）
+                        box.classList.add('empty');
+                    }
+                    
+                    gridDiv.appendChild(box);
+                }
+                
+                completionProgress.appendChild(gridDiv);
+            }
+            
+            // 显示弹窗
+            completionModal.classList.add('show');
+        }
+        
+        // 开始新一轮
+        function startNewRound() {
+            // 隐藏弹窗
+            if (completionModal) {
+                completionModal.classList.remove('show');
+            }
+            
+            // 清空快照
+            completedRoundSnapshot = null;
+            
+            // 重置练习
+            resetExercise();
+        }
+        
+        // 更新单词的不熟悉状态
+        function updateUnfamiliarStatus() {
+            const currentItem = shuffledData[currentQuestionIndex];
+            const historyWord = currentMode === 'de-to-cn' ? currentItem.noun : currentItem.meaning;
+            
+            // 查找并更新历史记录
+            const existingWord = historyWords.find(item => item.word === historyWord);
+            if (existingWord && !existingWord.unfamiliar) {
+                existingWord.unfamiliar = true;
+                updateHistoryDisplay(); // 更新显示
+            }
+        }
+
+        // 启用下一题按钮并禁用熟悉/不熟悉按钮
+        function enableNextButton() {
+            if (nextBtn) {
+                nextBtn.disabled = false;
+            }
+            if (knowBtn) {
+                knowBtn.disabled = true;
+            }
+            if (unfamiliarBtn) {
+                unfamiliarBtn.disabled = true;
+            }
+        }
+
+        // 重置卡片
+        function resetCard() {
+            if (questionText) {
+                questionText.textContent = '点击卡片开始学习';
+            }
+            if (dwdsLink) {
+                dwdsLink.style.display = 'none';
+            }
+            if (answerArea) {
+                answerArea.style.display = 'none';
+            }
+            if (answerContent) {
+                answerContent.textContent = '';
+            }
+            if (ratingButtons) {
+                ratingButtons.style.display = 'flex';
+            }
+            // 重置按钮状态
+            if (nextBtn) {
+                nextBtn.disabled = true; // 禁用下一题按钮
+            }
+            if (knowBtn) {
+                knowBtn.disabled = false; // 启用熟悉按钮
+            }
+            if (unfamiliarBtn) {
+                unfamiliarBtn.disabled = false; // 启用不熟悉按钮
+            }
+            if (studyCard) {
+                studyCard.classList.remove('has-question');
+            }
+            resetTimer();
+        }
+
+        // 开始计时
+        function startTimer() {
+            if (timerInterval) return;
+            
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // 停止计时
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // 重置计时器
+        function resetTimer() {
+            stopTimer();
+            startTime = 0; // 显式重置开始时间
+            if (timerDisplay) {
+                timerDisplay.textContent = '时间: 00:00';
+            }
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            if (!timerDisplay) return;
+            
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+            const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `时间: ${minutes}:${seconds}`;
+        }
+
+        // 更新计数器
+        function updateCounter() {
+            if (!counterDisplay) return;
+            counterDisplay.textContent = `已完成: ${completedQuestions}/${totalQuestions}`;
+        }
+        
+        // 更新历史记录显示
+        function updateHistoryDisplay() {
+            if (!historyWordsContainer) return;
+            
+            // 清理旧的tooltip元素
+            const oldTooltips = document.querySelectorAll('.history-tooltip');
+            oldTooltips.forEach(tooltip => tooltip.remove());
+            
+            historyWordsContainer.innerHTML = '';
+            
+            // 计算统计信息
+            const stats = calculateStats();
+            const threshold = stats.mean + Math.sqrt(stats.variance);
+            const unfamiliarCount = historyWords.filter(item => item.unfamiliar).length;
+            const slowCount = historyWords.filter(item => !item.unfamiliar && item.time > threshold).length;
+            const knownCount = historyWords.length - unfamiliarCount - slowCount;
+            const emptyCount = totalQuestions - historyWords.length;
+            
+            // 更新统计信息
+            const historyStats = document.getElementById('history-stats');
+            if (historyStats) {
+                historyStats.innerHTML = `
+                    <span class="stat-badge" style="background: #E8F5E9; border-color: #4CAF50; color: #2E7D32;">
+                        <i class="fas fa-check-circle"></i> 认识: ${knownCount}
+                    </span>
+                    ${slowCount > 0 ? `
+                    <span class="stat-badge" style="background: #FFF3E0; border-color: #FF9800; color: #E65100;">
+                        <i class="fas fa-clock"></i> 慢速: ${slowCount}
+                    </span>
+                    ` : ''}
+                    ${unfamiliarCount > 0 ? `
+                    <span class="stat-badge" style="background: #FFEBEE; border-color: #D32F2F; color: #B71C1C;">
+                        <i class="fas fa-times-circle"></i> 不熟悉: ${unfamiliarCount}
+                    </span>
+                    ` : ''}
+                    ${emptyCount > 0 ? `
+                    <span class="stat-badge" style="background: var(--surface-elevated); border-color: var(--border); color: var(--text-muted);">
+                        <i class="fas fa-hourglass-half"></i> 待完成: ${emptyCount}
+                    </span>
+                    ` : ''}
+                `;
+            }
+            
+            // 创建方块网格
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'history-grid';
+            
+            // 显示所有题目的方块（包括未答的）
+            for (let i = 0; i < totalQuestions; i++) {
+                const box = document.createElement('div');
+                box.className = 'history-box';
+                
+                // 检查该题是否已完成（使用currentRoundAnswers按索引获取）
+                const historyItem = currentRoundAnswers[i];
+                
+                if (historyItem) {
+                    // 已完成的题目 - 直接使用historyItem中的数据
+                    const questionText = historyItem.question;
+                    const answerText = `${historyItem.answer} - ${historyItem.meaning}`;
+                    
+                    // 确定颜色分类
+                    if (historyItem.unfamiliar) {
+                        box.classList.add('unfamiliar');
+                    } else if (currentRoundAnswers.length > 3 && historyItem.time > threshold) {
+                        box.classList.add('slow');
+                    } else {
+                        box.classList.add('known');
+                    }
+                    
+                    // 创建悬停提示（添加到body而不是box，避免触发滚动条）
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'history-tooltip';
+                    tooltip.innerHTML = `
+                        <div class="tooltip-time">⏱️ ${historyItem.time}s</div>
+                        <div class="tooltip-question">📝 ${questionText}</div>
+                        <div class="tooltip-answer">✓ ${answerText}</div>
+                    `;
+                    document.body.appendChild(tooltip);
+                    
+                    // 鼠标移动时动态定位tooltip并显示
+                    box.addEventListener('mouseenter', function(e) {
+                        const rect = box.getBoundingClientRect();
+                        
+                        // 先显示tooltip以便获取其尺寸
+                        tooltip.style.display = 'block';
+                        tooltip.style.opacity = '0';
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        
+                        // 计算是否显示在上方或下方
+                        const spaceAbove = rect.top;
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        
+                        if (spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10) {
+                            // 显示在上方
+                            tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height - 8) + 'px';
+                    } else {
+                            // 显示在下方
+                            tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                        }
+                        
+                        // 水平居中，但确保不超出屏幕
+                        let left = rect.left + window.scrollX + rect.width / 2 - tooltipRect.width / 2;
+                        if (left < 10) left = 10;
+                        if (left + tooltipRect.width > window.innerWidth - 10) {
+                            left = window.innerWidth - tooltipRect.width - 10;
+                        }
+                        tooltip.style.left = left + 'px';
+                        
+                        // 显示tooltip
+                        tooltip.style.opacity = '1';
+                    });
+                    
+                    // 鼠标离开时隐藏tooltip
+                    box.addEventListener('mouseleave', function(e) {
+                        tooltip.style.opacity = '0';
+                        setTimeout(() => {
+                            tooltip.style.display = 'none';
+                        }, 200);
+                    });
+                    
+                    // 点击朗读功能
+                    box.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        speakText(historyItem.question, 'de-DE');
+                    });
+                } else {
+                    // 未完成的题目 - 显示空白方块（无tooltip）
+                    box.classList.add('empty');
+                }
+                
+                gridDiv.appendChild(box);
+            }
+            
+            historyWordsContainer.appendChild(gridDiv);
+        }
+        
+        // 添加到历史记录
+        // 计算均值和方差
+        function calculateStats() {
+            // 使用当前轮次的答题记录计算统计数据
+            if (currentRoundAnswers.length < 2) return { mean: 0, variance: 0 };
+            const times = currentRoundAnswers.map(item => item.time);
+            const mean = times.reduce((sum, time) => sum + time, 0) / times.length;
+            const variance = times.reduce((sum, time) => sum + Math.pow(time - mean, 2), 0) / times.length;
+            return { mean, variance };
+        }
+
+        // 添加到历史记录
+        function addToHistory(word, unfamiliar = false, time = 0) {
+            // 检查是否已存在该单词
+            const existingIndex = historyWords.findIndex(item => item.word === word);
+            
+            if (existingIndex !== -1) {
+                // 如果已存在，更新记录
+                historyWords[existingIndex].unfamiliar = unfamiliar;
+                historyWords[existingIndex].time = time;
+            } else {
+                // 如果不存在，添加新记录
+                historyWords.unshift({word, unfamiliar, time});
+                // 限制历史记录数量
+                if (historyWords.length > MAX_HISTORY) {
+                    historyWords.pop();
+                }
+                }
+                updateHistoryDisplay();
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

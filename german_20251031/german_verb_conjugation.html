@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德语动词变位考核器</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="german_common.css">
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        /* 页面特定样式 */
+        .nav-btn:hover {
+            background: var(--foreground);
+            color: var(--background);
+            border-color: var(--foreground);
+        }
+        
+        .option-btn,
+        .func-btn {
+            border-radius: 8px;
+        }
+        
+        /* DWDS词典链接样式 */
+        .dwds-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            margin-top: 1rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--foreground);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .dwds-link:hover {
+            background: var(--foreground);
+            color: var(--surface);
+            border-color: var(--foreground);
+            transform: translateY(-1px);
+        }
+        
+        .dwds-link i {
+            font-size: 0.9rem;
+        }
+        
+        /* 键盘快捷键提示 */
+        .keyboard-hint {
+            text-align: center;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            background: var(--surface-elevated);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .keyboard-hint kbd {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            margin: 0 0.3rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--foreground);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 历史记录样式 */
+        .history-container {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            overflow: visible;
+            position: relative;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .history-stats {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 16px;
+            border: 2px solid;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* 历史网格 */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+            gap: 4px;
+            padding: 1rem 0;
+            max-width: 100%;
+            overflow: visible;
+        }
+        
+        .history-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .history-box.empty {
+            background: #e0e0e0;
+            border: 1px dashed var(--border);
+            opacity: 0.6;
+        }
+        
+        .history-box.correct {
+            background: #4CAF50;
+            border-color: #388E3C;
+        }
+        
+        .history-box.slow {
+            background: #FF9800;
+            border-color: #F57C00;
+        }
+        
+        .history-box.incorrect {
+            background: #D32F2F;
+            border-color: #B71C1C;
+        }
+        
+        .history-box:hover {
+            transform: scale(1.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        /* Tooltip */
+        .history-tooltip {
+            position: fixed;
+            background: var(--foreground);
+            color: var(--surface);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        
+        .tooltip-time {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #FFD54F;
+        }
+        
+        .tooltip-question {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .tooltip-answer {
+            color: #81C784;
+        }
+        
+        /* 完成弹窗 */
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .completion-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .completion-content {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .completion-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--foreground);
+        }
+        
+        .completion-stats {
+            background: var(--surface-elevated);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .completion-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .completion-stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--foreground);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .stat-value.green { color: #4CAF50; }
+        .stat-value.orange { color: #FF9800; }
+        .stat-value.red { color: #D32F2F; }
+        
+        .completion-message {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .completion-btn {
+            background: var(--foreground);
+            color: var(--surface);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-top: 1rem;
+        }
+        
+        .completion-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 评价按钮组 */
+        .rating-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+        }
+        
+        .rating-btn {
+            flex: 1;
+            max-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.2rem 2rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--foreground);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .rating-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .rating-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .know-btn {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .know-btn:hover:not(:disabled) {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .know-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        .unfamiliar-btn {
+            border-color: #D32F2F;
+            color: #D32F2F;
+        }
+        
+        .unfamiliar-btn:hover:not(:disabled) {
+            background: #D32F2F;
+            color: white;
+        }
+        
+        .unfamiliar-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        .next-btn {
+            border-color: var(--border-dark);
+            color: var(--foreground);
+        }
+        
+        .next-btn:hover:not(:disabled) {
+            background: var(--foreground);
+            color: var(--surface);
+        }
+        
+        .next-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: var(--surface);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .rating-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .rating-btn {
+                max-width: 100%;
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <a href="german_index.html" class="nav-btn">← 返回主页</a>
+            <h1>德语动词变位考核器</h1>
+        <div class="subtitle">动词选择 | 时态选择 | 人称选择 | 双向考核 | 反应计时</div>
+
+        <!-- 动词类型选择 -->
+        <div class="option-group">
+            <span class="option-label">选择动词类型：</span>
+            <div class="option-buttons">
+                <button class="option-btn active" data-type="all">所有动词</button>
+                <button class="option-btn" data-type="regular">规则动词</button>
+                <button class="option-btn" data-type="irregular">不规则动词</button>
+                <button class="option-btn" data-type="modal">情态动词</button>
+                <button class="option-btn" data-type="special">特殊动词</button>
+            </div>
+        </div>
+
+        <!-- 时态选择 -->
+        <div class="option-group">
+            <span class="option-label">选择考核时态：</span>
+            <div class="option-buttons">
+                <button class="option-btn active" data-tense="present">现在时</button>
+                <button class="option-btn" data-tense="past">过去时</button>
+                <button class="option-btn" data-tense="perfect">完成时</button>
+                <button class="option-btn" data-tense="all">所有时态</button>
+            </div>
+        </div>
+
+        <!-- 功能按钮 -->
+        <div class="func-buttons">
+            <button class="func-btn" id="btn-start-test">开始一轮新考核</button>
+        </div>
+
+        <!-- 内容卡片 -->
+        <div class="card">
+            <div class="card-left" id="card-left">
+                <div class="timer" id="timer">00:00.00</div>
+                <div class="card-title" id="card-title">点击上方按钮开始考核</div>
+                <div class="card-instruction" id="card-instruction">将进行一轮完整的动词变位考核...</div>
+                <div class="card-content" id="card-content">——</div>
+                <a href="#" id="dwds-link" class="dwds-link" target="_blank" style="display: none;">
+                    <i class="fas fa-book-open"></i> DWDS词典
+                </a>
+            </div>
+            <div class="card-right" id="card-right">
+                <div class="answer" id="answer" style="display: none;">
+                    <span id="answer-text">答案将显示在这里</span>
+                    <div class="time-used" id="time-used"></div>
+                </div>
+                
+                <!-- 答题按钮（始终显示） -->
+                <div class="rating-buttons" id="rating-buttons">
+                    <button class="rating-btn know-btn" id="know-btn" disabled>
+                        <i class="fas fa-check-circle"></i>
+                        <span>熟悉</span>
+                    </button>
+                    <button class="rating-btn unfamiliar-btn" id="unfamiliar-btn" disabled>
+                        <i class="fas fa-flag"></i>
+                        <span>不熟悉</span>
+                    </button>
+                    <button class="rating-btn next-btn" id="next-btn" disabled>
+                        <i class="fas fa-arrow-right"></i>
+                        <span>下一题</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip">
+            💡 提示：选择选项 → 开始考核 → 思考答案 → 点击"熟悉"或"不熟悉"查看答案 → 点击"下一题"继续 | 双击动词可朗读
+        </div>
+        
+        <!-- 键盘快捷键提示 -->
+        <div class="keyboard-hint">
+            <kbd>空格</kbd> 熟悉/下一题 | <kbd>D</kbd> 打开DWDS词典 | 双击动词朗读
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="history-container">
+            <div class="history-header">
+                <div class="history-title">
+                    <i class="fas fa-history"></i> 答题历史
+                </div>
+                <div class="history-stats" id="history-stats"></div>
+                <button class="clear-history-btn" id="clear-history-btn">
+                    <i class="fas fa-trash-alt"></i> 清空
+                </button>
+            </div>
+            <div class="history-legend" style="display: flex; gap: 1.5rem; margin-bottom: 1rem; padding: 0.5rem 0; flex-wrap: wrap;">
+                <span class="legend-item" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--foreground); font-weight: 500;">
+                    <span class="legend-box" style="width: 16px; height: 16px; border-radius: 2px; border: 1px solid #388E3C; background: #4CAF50; display: inline-block;"></span>
+                    熟悉
+                </span>
+                <span class="legend-item" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--foreground); font-weight: 500;">
+                    <span class="legend-box" style="width: 16px; height: 16px; border-radius: 2px; border: 1px solid #F57C00; background: #FF9800; display: inline-block;"></span>
+                    慢速
+                </span>
+                <span class="legend-item" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--foreground); font-weight: 500;">
+                    <span class="legend-box" style="width: 16px; height: 16px; border-radius: 2px; border: 1px solid #B71C1C; background: #D32F2F; display: inline-block;"></span>
+                    不熟悉
+                </span>
+            </div>
+            <div class="history-words" id="history-words">
+                <div class="history-empty" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                    <p>暂无练习记录</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 完成弹窗 -->
+    <div class="completion-modal" id="completion-modal">
+        <div class="completion-content">
+            <div class="completion-icon">🎉</div>
+            <h2 class="completion-title">完成一轮考核！</h2>
+            <div class="completion-stats" id="completion-stats-content"></div>
+            <p class="completion-message" id="completion-message"></p>
+            <button class="completion-btn" id="completion-btn">
+                <i class="fas fa-redo"></i> 开始新一轮
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 内嵌CSV数据（解决CORS问题）
+        const EMBEDDED_CSV_DATA = `infinitive,meaning,type,present_ich,present_du,present_er,present_wir,present_ihr,present_sie,past_ich,past_du,past_er,past_wir,past_ihr,past_sie,perfect_auxiliary,perfect_participle
+arbeiten,工作,regular,arbeite,arbeitest,arbeitet,arbeiten,arbeitet,arbeitet,arbeitete,arbeitetest,arbeitete,arbeiteten,arbeitetet,arbeiteten,habe,gearbeitet
+lernen,学习,regular,lerne,lernst,lernt,lernen,lernt,lernen,lernte,lerntest,lernte,lernten,lerntet,lernten,habe,gelernt
+fragen,询问,regular,frage,fragst,fragt,fragen,fragt,fragen,fragte,fragtest,fragte,fragten,fragtet,fragten,habe,gefragt
+sagen,说,regular,sage,sagst,sagt,sagen,sagt,sagen,sprach,sprachst,sprach,sprachen,spracht,sprachen,habe,gesagt
+machen,做,regular,mache,machst,macht,machen,macht,machen,machte,machtet,machte,machten,machtet,machten,habe,gemacht
+spielen,玩,regular,spiele,spielst,spielt,spielen,spielt,spielen,spielte,spieltet,spielte,spielten,spieltet,spielten,habe,gespielt
+studieren,学习,regular,studiere,studierst,studiert,studieren,studiert,studieren,studierte,studiertet,studierte,studierten,studiertet,studierten,habe,studiert
+wohnen,居住,regular,wohne,wohnst,wohnt,wohnen,wohnt,wohnen,wohnte,wohntest,wohnte,wohnten,wohntet,wohnten,habe,gewohnt
+gehen,去,irregular,gehe,gehst,geht,gehen,geht,gehen,ging,gingst,ging,gingen,gingt,gingen,bin,gegangen
+sehen,看,irregular,sehe,siehst,sieht,sehen,seht,sehen,sah,sahst,sah,sahen,saht,sahen,habe,gesehen
+essen,吃,irregular,esse,isst,isst,essen,esst,essen,aß,aßt,aß,aßen,aßt,aßen,habe,gegessen
+kommen,来,irregular,komme,kommst,kommt,kommen,kommt,kommen,kam,kamst,kam,kamen,kamt,kamen,bin,gekommen
+singen,唱歌,irregular,singe,singst,singt,singen,singt,singen,sang,sangst,sang,saßen,sangt,saßen,habe,gesungen
+trinken,喝,irregular,trinke,trinkst,trinkt,trinken,trinkt,trinken,trank,trankst,trank,tranken,trankt,tranken,habe,getrunken
+fahren,行驶,irregular,fahre,fährst,fährt,fahren,fahrt,fahren,fuhren,fuhrenst,fuhren,fuhren,fuhret,fuhren,bin,gefahren
+kennen,认识,irregular,kenne,kennst,kennen,kennen,kennt,kennen,kannte,kantest,kannte,kanten,kantet,kanten,habe,gekannt
+können,能够,modal,kann,kannst,kann,können,könnt,können,konnte,konntest,konnte,konnten,konntet,konnten,haben,gekonnt
+müssen,必须,modal,muss,musst,muss,müssen,müsst,müssen,musste,musstest,musste,mussten,musstet,mussten,haben,gemusst
+sollen,应该,modal,soll,sollst,soll,sollen,sollt,sollen,sollte,solltet,sollte,sollten,solltet,sollten,haben,gesollt
+wollen,想要,modal,will,willst,will,wollen,wollt,wollen,wollte,wolltet,wollte,wollten,wolltet,wollten,haben,gewollt
+mögen,喜欢,modal,möchte,möchtest,möchte,möchten,möchtet,möchten,mochte,mochtest,mochte,mochten,mochtet,mochten,haben,gemocht
+sein,是,special,bin,bist,ist,sind,seid,sind,war,warst,war,waren,wart,waren,bin,gewesen
+haben,有,special,habe,hast,hat,haben,habt,haben,hatte,hattest,hatte,hatten,hattet,hatten,habe,gehabt
+lesen,读,regular,lese,liest,liest,lesen,lest,lesen,las,lasst,las,lasen,last,lasen,habe,gelesen
+schreiben,写,regular,schreibe,schreibst,schreibt,schreiben,schreibt,schreiben,schrieb,schriebst,schrieb,schrieben,schrieft,schrieben,habe,geschrieben
+tun,做,irregular,tue,tust,tut,tun,tut,tun,tat,tust,tut,tun,tut,tun,habe,getan
+tragen,携带,regular,trage,trägst,trägt,tragen,tragt,tragen,trug,trugst,trug,trugen,trugt,trugen,habe,getragen
+finden,找到,irregular,finde,findest,findet,finden,finde,finden,fand,fandest,fand,fanden,fanet,fanden,habe,gefunden
+bleiben,停留,irregular,bleibe,bleibst,bleibt,bleiben,bleibt,bleiben,blieb,bliebst,blieb,blieben,bliebet,blieben,bin,geblieben
+bauen,建造,regular,baue,baust,baut,bauen,baut,bauen,bauten,bautest,bauten,bauten,bautet,bauten,habe,gebaut
+helfen,帮助,regular,helfe,hilfst,hilft,helfen,helft,helfen,half,halfst,half,halfen,halft,halfen,habe,geholfen
+hören,听,regular,höre,hörst,hört,hören,hört,hören,hörte,hörtest,hörte,hörten,hörtet,hörten,habe,gehört
+nehmen,拿,irregular,nehme,nimmst,nimmt,nehmen,nehmt,nehmen,nahm,nahmst,nahm,nahmen,nahmt,nahmen,habe,genommen
+stehen,站,irregular,stehe,stehst,steht,stehen,steht,stehen,stand,standest,stand,standen,standet,standen,habe,gestanden
+kaufen,买,regular,kaufe,kaufst,kauft,kaufen,kauft,kaufen,kaufte,kauftest,kaufte,kauften,kauftet,kauften,habe,gekauft
+bringen,带来,irregular,bringe,bringst,bringt,bringen,bringt,bringen,brachte,brachtest,brachte,brachten,brachtet,brachten,habe,gebracht
+wissen,知道,irregular,weiß,weißt,weiß,wissen,wisst,wissen,wusste,wusstest,wusste,wussten,wusstet,wussten,habe,gewusst
+werden,成为,irregular,werde,wirst,wird,werden,werdet,werden,ward,wurdest,ward,warden,wurdet,warden,bin,geworden
+geben,给,irregular,gebe,gibst,gibt,geben,gebt,geben,gab,gabst,gab,gaben,gabt,gaben,habe,gegeben
+anrufen,打电话,regular,rufe an,rufst an,ruft an,rufen an,ruft an,rufen an,rief an,riefst an,rief an,riefen an,riefet an,riefen an,habe,angerufen
+antworten,回答,regular,antworte,antwortest,antwortet,antworten,antwortet,antworten,antwortete,antwortetest,antwortete,antworteten,antwortetet,antworteten,habe,geantwortet
+verstehen,理解,irregular,verstehe,verstehst,versteht,verstehen,versteht,verstehen,verstand,verstandest,verstand,verstanden,verstandet,verstanden,habe,verstanden`;
+
+        // 核心变量
+        let currentVerbType = "all";
+        let currentTense = "present";
+        let timerInterval = null;
+        let startTime = 0;
+        let currentAnswer = "";
+        let currentQuestion = {};
+        let verbsData = [];
+        let isLoading = false;
+        let isAnswered = false;
+        let testInProgress = false;
+        let currentTestQuestions = [];
+        let currentQuestionIndex = 0;
+        let currentRoundAnswers = [];
+        let completedRoundSnapshot = null;
+        const SUPPORTED_VOICES = [];
+
+        // DOM元素
+        const btnStartTest = document.getElementById('btn-start-test');
+        const typeBtns = document.querySelectorAll('.option-btn[data-type]');
+        const tenseBtns = document.querySelectorAll('.option-btn[data-tense]');
+        const cardLeft = document.getElementById('card-left');
+        const cardRight = document.getElementById('card-right');
+        const cardTitle = document.getElementById('card-title');
+        const cardInstruction = document.getElementById('card-instruction');
+        const cardContent = document.getElementById('card-content');
+        const answer = document.getElementById('answer');
+        const answerText = document.getElementById('answer-text');
+        const timeUsed = document.getElementById('time-used');
+        const timer = document.getElementById('timer');
+        const dwdsLink = document.getElementById('dwds-link');
+        const historyWordsContainer = document.getElementById('history-words');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+        const completionModal = document.getElementById('completion-modal');
+        const completionBtn = document.getElementById('completion-btn');
+        const completionStatsContent = document.getElementById('completion-stats-content');
+        const completionMessage = document.getElementById('completion-message');
+        const knowBtn = document.getElementById('know-btn');
+        const unfamiliarBtn = document.getElementById('unfamiliar-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const ratingButtons = document.getElementById('rating-buttons');
+
+        // 页面加载
+        window.addEventListener('load', async () => {
+            try {
+                loadVerbsData();
+                isLoading = false;
+                cardTitle.textContent = "数据加载完成，请选择选项并开始考核";
+                
+                loadVoices();
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.onvoiceschanged = loadVoices;
+                }
+            } catch (error) {
+                console.error("加载动词数据失败:", error);
+                cardTitle.textContent = "数据加载失败，请刷新页面重试";
+            }
+        });
+
+        // 加载动词数据（内嵌CSV）
+        function loadVerbsData() {
+            Papa.parse(EMBEDDED_CSV_DATA, {
+                        header: true,
+                skipEmptyLines: true,
+                        complete: function(results) {
+                            verbsData = results.data.map(row => {
+                                return {
+                                    infinitive: row.infinitive,
+                                    meaning: row.meaning,
+                                    type: row.type,
+                                    conjugations: {
+                                        present: {
+                                            ich: row.present_ich,
+                                            du: row.present_du,
+                                            er: row.present_er,
+                                            wir: row.present_wir,
+                                            ihr: row.present_ihr,
+                                            sie: row.present_sie
+                                        },
+                                        past: {
+                                            ich: row.past_ich,
+                                            du: row.past_du,
+                                            er: row.past_er,
+                                            wir: row.past_wir,
+                                            ihr: row.past_ihr,
+                                            sie: row.past_sie
+                                        },
+                                        perfect: {
+                                            auxiliary: row.perfect_auxiliary,
+                                            participle: row.perfect_participle
+                                        }
+                                    }
+                                };
+                            });
+                    console.log('已加载', verbsData.length, '个动词');
+                        },
+                        error: function(error) {
+                    console.error("解析CSV失败:", error);
+                }
+            });
+        }
+
+        // 动词类型切换
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (testInProgress) return;
+                typeBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentVerbType = this.dataset.type;
+                cardTitle.textContent = `已选择${this.textContent}，请选择时态并开始`;
+            });
+        });
+
+        // 时态切换
+        tenseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (testInProgress) return;
+                tenseBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTense = this.dataset.tense;
+                cardTitle.textContent = `已选择${this.textContent}，请开始考核`;
+            });
+        });
+
+        // 开始考核
+        btnStartTest.addEventListener('click', function() {
+            if (isLoading || testInProgress) return;
+            startNewTest();
+        });
+
+        // 开始新考核
+        function startNewTest() {
+            // 过滤动词
+            let filteredVerbs = verbsData;
+            if (currentVerbType !== "all") {
+                filteredVerbs = filteredVerbs.filter(verb => verb.type === currentVerbType);
+            }
+            
+            if (filteredVerbs.length === 0) {
+                alert("没有找到符合条件的动词");
+                return;
+            }
+            
+            // 打乱顺序
+            currentTestQuestions = shuffleArray([...filteredVerbs]);
+            currentQuestionIndex = 0;
+            currentRoundAnswers = [];
+            testInProgress = true;
+            
+            // 禁用选项按钮
+            typeBtns.forEach(btn => btn.disabled = true);
+            tenseBtns.forEach(btn => btn.disabled = true);
+            btnStartTest.disabled = true;
+            
+            // 显示第一题
+            showNextQuestion();
+        }
+
+        // 显示下一题
+        function showNextQuestion() {
+            if (currentQuestionIndex >= currentTestQuestions.length) {
+                // 完成本轮
+                completeTest();
+                return;
+            }
+            
+            resetCard();
+            isAnswered = false;
+            
+            const verb = currentTestQuestions[currentQuestionIndex];
+            
+            // 随机选择时态
+            let tenses = ["present", "past", "perfect"];
+            if (currentTense !== "all") {
+                tenses = [currentTense];
+            }
+            const randomTense = tenses[Math.floor(Math.random() * tenses.length)];
+            
+            // 随机选择人称或完成时形式
+            let person, questionText, answerTextValue;
+            const persons = ["ich", "du", "er", "wir", "ihr", "sie"];
+            
+            if (randomTense === "perfect") {
+                const askAuxiliary = Math.random() > 0.5;
+                person = "perfect";
+                if (askAuxiliary) {
+                    questionText = `${verb.infinitive} (${verb.meaning}) 的完成时助动词是？`;
+                    answerTextValue = verb.conjugations.perfect.auxiliary;
+                } else {
+                    questionText = `${verb.infinitive} (${verb.meaning}) 的完成时分词是？`;
+                    answerTextValue = verb.conjugations.perfect.participle;
+                }
+            } else {
+                person = persons[Math.floor(Math.random() * persons.length)];
+                const personText = getPersonText(person);
+                const tenseText = getTenseText(randomTense);
+                questionText = `${verb.infinitive} (${verb.meaning}) ${tenseText} ${personText} 的变位是？`;
+                answerTextValue = verb.conjugations[randomTense][person];
+            }
+            
+            // 保存当前问题
+            currentQuestion = {
+                verb: verb.infinitive,
+                meaning: verb.meaning,
+                type: verb.type,
+                tense: randomTense,
+                person: person,
+                questionText: questionText
+            };
+            currentAnswer = answerTextValue;
+            
+            // 更新UI
+            cardTitle.textContent = `第 ${currentQuestionIndex + 1} / ${currentTestQuestions.length} 题`;
+            cardInstruction.textContent = questionText;
+            cardContent.textContent = verb.infinitive;
+            updateDWDSLink(verb.infinitive);
+            
+            // 隐藏答案，启用熟悉/不熟悉按钮，禁用下一题按钮
+            answer.style.display = "none";
+            if (knowBtn) knowBtn.disabled = false;
+            if (unfamiliarBtn) unfamiliarBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = true;
+            
+            // 开始计时
+            startTimer();
+        }
+
+        // 熟悉按钮
+        if (knowBtn) {
+            knowBtn.addEventListener('click', function() {
+                if (!isAnswered) {
+                    showAnswer(false); // false = 熟悉
+                }
+            });
+        }
+
+        // 不熟悉按钮
+        if (unfamiliarBtn) {
+            unfamiliarBtn.addEventListener('click', function() {
+                if (!isAnswered) {
+                    showAnswer(true); // true = 不熟悉
+                }
+            });
+        }
+
+        // 下一题按钮
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                if (!nextBtn.disabled) {
+                    currentQuestionIndex++;
+                    showNextQuestion();
+                }
+            });
+        }
+
+        // 显示答案
+        function showAnswer(isUnfamiliar) {
+            if (isAnswered) return;
+            
+            // 停止计时
+            stopTimer();
+            const elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+            
+            // 显示答案
+            answerText.textContent = currentAnswer;
+            timeUsed.textContent = `反应时间：${elapsed} 秒`;
+            answer.style.display = "block";
+            timer.style.color = "var(--success)";
+            isAnswered = true;
+            
+            // 禁用熟悉/不熟悉按钮，启用下一题按钮
+            if (knowBtn) knowBtn.disabled = true;
+            if (unfamiliarBtn) unfamiliarBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = false;
+            
+            // 记录答案
+            currentRoundAnswers[currentQuestionIndex] = {
+                verb: currentQuestion.verb,
+                meaning: currentQuestion.meaning,
+                tense: getTenseText(currentQuestion.tense),
+                person: currentQuestion.person !== 'perfect' ? getPersonText(currentQuestion.person) : '完成时',
+                question: currentQuestion.questionText,
+                answer: currentAnswer,
+                time: elapsed,
+                unfamiliar: isUnfamiliar // 记录是否不熟悉
+            };
+            
+            // 更新历史显示
+            updateHistoryDisplay();
+        }
+
+        // 完成考核
+        function completeTest() {
+            testInProgress = false;
+            completedRoundSnapshot = JSON.parse(JSON.stringify(currentRoundAnswers));
+            
+            // 启用选项按钮
+            typeBtns.forEach(btn => btn.disabled = false);
+            tenseBtns.forEach(btn => btn.disabled = false);
+            btnStartTest.disabled = false;
+            
+            // 重置卡片
+            resetCard();
+            cardTitle.textContent = "本轮考核已完成！";
+            cardInstruction.textContent = "可查看答题历史，或开始新一轮考核";
+            
+            // 显示完成弹窗
+            setTimeout(() => showCompletionModal(), 500);
+        }
+
+        // 显示完成弹窗
+        function showCompletionModal() {
+            if (!completionModal || !completedRoundSnapshot) return;
+            
+            const roundData = completedRoundSnapshot;
+            const times = roundData.map(item => item.time);
+            const mean = times.reduce((sum, t) => sum + t, 0) / times.length;
+            const variance = times.reduce((sum, t) => sum + Math.pow(t - mean, 2), 0) / times.length;
+            const threshold = mean + Math.sqrt(variance);
+            
+            // 分类统计
+            const unfamiliarCount = roundData.filter(item => item.unfamiliar).length;
+            const familiarCount = roundData.filter(item => !item.unfamiliar).length;
+            const slowCount = roundData.filter(item => !item.unfamiliar && item.time > threshold && roundData.length > 3).length;
+            const fastCount = familiarCount - slowCount;
+            const accuracy = ((familiarCount / roundData.length) * 100).toFixed(1);
+            
+            // 统计信息
+            completionStatsContent.innerHTML = `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                        熟悉
+                    </span>
+                    <span class="stat-value green">${fastCount}</span>
+                </div>
+                ${slowCount > 0 ? `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-clock" style="color: #FF9800;"></i>
+                        慢速熟悉
+                    </span>
+                    <span class="stat-value orange">${slowCount}</span>
+                </div>
+                ` : ''}
+                ${unfamiliarCount > 0 ? `
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-times-circle" style="color: #D32F2F;"></i>
+                        不熟悉
+                    </span>
+                    <span class="stat-value red">${unfamiliarCount}</span>
+                </div>
+                ` : ''}
+                <div class="completion-stat-item">
+                    <span class="stat-label">
+                        <i class="fas fa-chart-line"></i>
+                        掌握率
+                    </span>
+                    <span class="stat-value" style="color: ${accuracy >= 80 ? '#4CAF50' : accuracy >= 60 ? '#FF9800' : '#D32F2F'};">
+                        ${accuracy}%
+                    </span>
+                </div>
+            `;
+            
+            // 鼓励信息
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 太棒了！您已经掌握得非常好了！';
+            } else if (accuracy >= 75) {
+                message = '👍 不错！继续保持，您做得很好！';
+            } else if (accuracy >= 60) {
+                message = '💪 加油！多练几轮就能完全掌握了！';
+            } else {
+                message = '📚 不要气馁，熟能生巧！让我们再练一轮吧！';
+            }
+            
+            if (unfamiliarCount > 0) {
+                message += `\n重点复习标记为不熟悉的 ${unfamiliarCount} 个动词。`;
+            }
+            
+            completionMessage.textContent = message;
+            
+            completionModal.classList.add('show');
+        }
+
+        // 关闭弹窗并开始新一轮
+        completionBtn.addEventListener('click', function() {
+            completionModal.classList.remove('show');
+            completedRoundSnapshot = null;
+        });
+
+        // 更新历史显示
+        function updateHistoryDisplay() {
+            if (!historyWordsContainer || currentRoundAnswers.length === 0) return;
+            
+            // 清理旧tooltip
+            document.querySelectorAll('.history-tooltip').forEach(t => t.remove());
+            
+            historyWordsContainer.innerHTML = '';
+            
+            // 计算统计
+            const times = currentRoundAnswers.map(item => item.time);
+            const mean = times.reduce((sum, t) => sum + t, 0) / times.length;
+            const variance = times.reduce((sum, t) => sum + Math.pow(t - mean, 2), 0) / times.length;
+            const threshold = mean + Math.sqrt(variance);
+            
+            // 分类统计
+            const unfamiliarCount = currentRoundAnswers.filter(item => item.unfamiliar).length;
+            const familiarCount = currentRoundAnswers.filter(item => !item.unfamiliar).length;
+            const slowCount = currentRoundAnswers.filter(item => !item.unfamiliar && item.time > threshold).length;
+            const fastCount = familiarCount - slowCount;
+            
+            // 更新统计信息
+            const historyStats = document.getElementById('history-stats');
+            if (historyStats) {
+                historyStats.innerHTML = `
+                    <span class="stat-badge" style="background: #E8F5E9; border-color: #4CAF50; color: #2E7D32;">
+                        <i class="fas fa-check-circle"></i> 熟悉: ${fastCount}
+                    </span>
+                    ${slowCount > 0 ? `
+                    <span class="stat-badge" style="background: #FFF3E0; border-color: #FF9800; color: #E65100;">
+                        <i class="fas fa-clock"></i> 慢速: ${slowCount}
+                    </span>
+                    ` : ''}
+                    ${unfamiliarCount > 0 ? `
+                    <span class="stat-badge" style="background: #FFEBEE; border-color: #D32F2F; color: #B71C1C;">
+                        <i class="fas fa-times-circle"></i> 不熟悉: ${unfamiliarCount}
+                    </span>
+                    ` : ''}
+                `;
+            }
+            
+            // 创建方块网格
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'history-grid';
+            
+            for (let i = 0; i < currentRoundAnswers.length; i++) {
+                const box = document.createElement('div');
+                box.className = 'history-box';
+                
+                const item = currentRoundAnswers[i];
+                
+                if (item) {
+                    // 确定颜色分类
+                    if (item.unfamiliar) {
+                        box.classList.add('incorrect'); // 不熟悉 - 红色
+                    } else if (currentRoundAnswers.length > 3 && item.time > threshold) {
+                        box.classList.add('slow'); // 慢速熟悉 - 橙色
+                    } else {
+                        box.classList.add('correct'); // 熟悉 - 绿色
+                    }
+                    
+                    // Tooltip
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'history-tooltip';
+                    tooltip.innerHTML = `
+                        <div class="tooltip-time">⏱️ ${item.time}s</div>
+                        <div class="tooltip-question">📝 ${item.question}</div>
+                        <div class="tooltip-answer">✓ ${item.answer}</div>
+                    `;
+                    document.body.appendChild(tooltip);
+                    
+                    box.addEventListener('mouseenter', function(e) {
+                        const rect = box.getBoundingClientRect();
+                        tooltip.style.display = 'block';
+                        tooltip.style.opacity = '0';
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        
+                        const spaceAbove = rect.top;
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        
+                        if (spaceAbove > tooltipRect.height + 10 && spaceBelow < tooltipRect.height + 10) {
+                            tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height - 8) + 'px';
+                        } else {
+                            tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                        }
+                        
+                        let left = rect.left + window.scrollX + rect.width / 2 - tooltipRect.width / 2;
+                        if (left < 10) left = 10;
+                        if (left + tooltipRect.width > window.innerWidth - 10) {
+                            left = window.innerWidth - tooltipRect.width - 10;
+                        }
+                        tooltip.style.left = left + 'px';
+                        tooltip.style.opacity = '1';
+                    });
+                    
+                    box.addEventListener('mouseleave', function() {
+                        tooltip.style.opacity = '0';
+                        setTimeout(() => tooltip.style.display = 'none', 200);
+                    });
+                    
+                    box.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        speakText(item.verb, 'de-DE');
+                    });
+                } else {
+                    box.classList.add('empty');
+                }
+                
+                gridDiv.appendChild(box);
+            }
+            
+            historyWordsContainer.appendChild(gridDiv);
+        }
+
+        // 清空历史
+        clearHistoryBtn.addEventListener('click', function() {
+            if (testInProgress) {
+                alert('考核进行中，无法清空历史');
+                return;
+            }
+            if (currentRoundAnswers.length === 0) return;
+            if (confirm('确定要清空历史记录吗？')) {
+                currentRoundAnswers = [];
+                updateHistoryDisplay();
+                historyWordsContainer.innerHTML = `
+                    <div class="history-empty" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                        <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                        <p>暂无练习记录</p>
+                    </div>
+                `;
+            }
+        });
+
+        // 辅助函数
+        function getPersonText(person) {
+            const personMap = {
+                ich: "ich (我)",
+                du: "du (你)",
+                er: "er/sie/es (他/她/它)",
+                wir: "wir (我们)",
+                ihr: "ihr (你们)",
+                sie: "sie/Sie (他们/您)"
+            };
+            return personMap[person] || person;
+        }
+
+        function getTenseText(tense) {
+            const tenseMap = {
+                present: "现在时",
+                past: "过去时",
+                perfect: "完成时"
+            };
+            return tenseMap[tense] || tense;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timer.style.display = "inline-block";
+            timer.style.color = "var(--foreground)";
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const min = Math.floor(elapsed / 60000).toString().padStart(2, '0');
+                const sec = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                const ms = Math.floor((elapsed % 1000) / 10).toString().padStart(2, '0');
+                timer.textContent = `${min}:${sec}.${ms}`;
+            }, 10);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetCard() {
+            stopTimer();
+            timer.textContent = "00:00.00";
+            timer.style.display = "none";
+            cardContent.textContent = "——";
+            answer.style.display = "none";
+            if (dwdsLink) dwdsLink.style.display = "none";
+            currentAnswer = "";
+            currentQuestion = {};
+            
+            // 重置按钮状态
+            if (knowBtn) knowBtn.disabled = true;
+            if (unfamiliarBtn) unfamiliarBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+        }
+
+        function updateDWDSLink(verb) {
+            if (!verb || !dwdsLink) return;
+            const cleanVerb = verb.trim();
+            const dwdsUrl = `https://www.dwds.de/wb/${encodeURIComponent(cleanVerb)}`;
+            dwdsLink.href = dwdsUrl;
+            dwdsLink.style.display = 'inline-flex';
+        }
+
+        function speakText(text, language = 'de-DE') {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = language;
+                utterance.rate = 0.9;
+                if (SUPPORTED_VOICES.length > 0) {
+                    const germanVoice = SUPPORTED_VOICES.find(voice => 
+                        voice.lang === 'de-DE' || voice.lang.startsWith('de-')
+                    );
+                    if (germanVoice) utterance.voice = germanVoice;
+                }
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                const voices = window.speechSynthesis.getVoices();
+                SUPPORTED_VOICES.length = 0;
+                SUPPORTED_VOICES.push(...voices);
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (testInProgress) {
+                    if (!isAnswered && knowBtn && !knowBtn.disabled) {
+                        // 未回答时，空格键默认选择"熟悉"
+                        knowBtn.click();
+                    } else if (isAnswered && nextBtn && !nextBtn.disabled) {
+                        // 已回答时，空格键点击"下一题"
+                        nextBtn.click();
+                    }
+                }
+            } else if (e.code === 'KeyD' && dwdsLink && dwdsLink.style.display !== 'none') {
+                e.preventDefault();
+                dwdsLink.click();
+            }
+        });
+
+        // 双击朗读
+        if (cardContent) {
+            cardContent.addEventListener('dblclick', function() {
+                const text = cardContent.textContent.trim();
+                if (text && text !== '——') speakText(text, 'de-DE');
+            });
+        }
+
+        if (answerText) {
+            answerText.addEventListener('dblclick', function() {
+                const text = answerText.textContent.trim();
+                if (text && text !== '答案将显示在这里') speakText(text, 'de-DE');
+            });
+        }
+    </script>
+</body>
+</html>

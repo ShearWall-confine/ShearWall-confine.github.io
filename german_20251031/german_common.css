@@ -1,0 +1,792 @@
+/* 
+ * 德语学习工具集 - 统一样式表
+ * 适用于所有德语学习工具页面
+ */
+
+/* ========== CSS变量定义 - 简洁白底黑字风格 ========== */
+:root {
+    /* 基础色彩 */
+    --background: #ffffff;
+    --foreground: #000000;
+    --surface: #ffffff;
+    --surface-hover: #f5f5f5;
+    --surface-elevated: #fafafa;
+    
+    /* 边框色彩 */
+    --border: #cccccc;
+    --border-dark: #999999;
+    --border-light: #e5e5e5;
+    
+    /* 文本色彩 */
+    --text-muted: #666666;
+    --foreground-subtle: #888888;
+    
+    /* 状态色彩 */
+    --primary: #000000;
+    --primary-hover: #333333;
+    --success: #009900;
+    --warning: #ff8800;
+    --error: #cc0000;
+    --terminal-red: #cc0000;
+    --terminal-green: #009900;
+    
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 6px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ========== 全局样式 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+body {
+    background: var(--background);
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--foreground);
+    overflow-x: hidden;
+    font-size: 14px;
+}
+
+/* ========== 容器样式 ========== */
+.container {
+    background: var(--surface);
+    padding: 3rem;
+    border: 2px solid var(--border);
+    width: 100%;
+    max-width: 700px;
+    text-align: center;
+    position: relative;
+}
+
+/* ========== 导航按钮 ========== */
+.nav-btn {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    padding: 0.5rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.nav-btn:hover {
+    border-color: var(--border-dark);
+    background: var(--surface-hover);
+}
+
+/* 返回主页按钮（用于 german_index.html） */
+.back-to-home {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    padding: 0.5rem 1rem;
+    background: var(--foreground);
+    color: var(--background);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: opacity 0.2s ease;
+}
+
+.back-to-home:hover {
+    opacity: 0.8;
+}
+
+/* ========== 标题样式 ========== */
+h1 {
+    color: var(--foreground);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+h1::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: var(--foreground);
+    margin: 0.75rem auto;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+/* ========== 选项组/位数组 ========== */
+.option-group,
+.digit-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.option-label,
+.digit-label {
+    color: var(--foreground-subtle);
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.option-buttons,
+.digit-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.option-btn,
+.digit-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.option-btn:hover,
+.digit-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-dark);
+}
+
+.option-btn.active,
+.digit-btn.active {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+}
+
+/* ========== 功能按钮 ========== */
+.func-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.func-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.func-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-dark);
+}
+
+.func-btn.active {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+}
+
+/* ========== 卡片区域 ========== */
+.card {
+    background-color: var(--surface);
+    border: 2px solid var(--border);
+    padding: 0;
+    margin-bottom: 2rem;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+}
+
+.card-left {
+    flex: 1;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-right: 2px solid var(--border);
+}
+
+.card-left:hover {
+    background: var(--surface-hover);
+}
+
+.card-right {
+    flex: 1;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-right:hover {
+    background: var(--surface-hover);
+}
+
+.card-right.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.card-right.disabled:hover {
+    background: var(--surface);
+}
+
+.timer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: var(--terminal-red);
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: var(--surface);
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--border);
+    display: none;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.card-title {
+    color: var(--foreground-subtle);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-content {
+    font-size: 1.5rem;
+    color: var(--foreground);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    word-break: break-all;
+    min-height: 2.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+}
+
+.card-instruction {
+    font-size: 1rem;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.answer {
+    font-size: 1.25rem;
+    color: var(--foreground);
+    font-weight: 600;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+    display: none;
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: left;
+    letter-spacing: 0.5px;
+}
+
+.time-used {
+    font-size: 0.875rem;
+    color: var(--warning);
+    margin-top: 0.75rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+/* ========== 答案按钮 ========== */
+.answer-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.answer-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    margin: 0.5rem;
+    flex: 1;
+    min-width: 120px;
+}
+
+.answer-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--foreground);
+}
+
+.answer-btn.revealed {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+}
+
+.answer-column {
+    flex: 1;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.answer-column:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-dark);
+}
+
+.answer-column.active {
+    background: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+}
+
+/* ========== 提示和说明 ========== */
+.tip {
+    color: var(--foreground-subtle);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: left;
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.click-hint {
+    color: var(--foreground);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: none;
+    font-weight: 400;
+    text-align: left;
+}
+
+/* ========== 历史记录区域 ========== */
+.history-container {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.history-title {
+    font-size: 1rem;
+    color: var(--foreground);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.clear-history-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--foreground);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clear-history-btn:hover {
+    background: var(--error);
+    color: var(--background);
+    border-color: var(--error);
+}
+
+.history-words {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.history-word {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.history-word:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-dark);
+}
+
+.history-word.unfamiliar {
+    background: rgba(204, 0, 0, 0.1);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+.history-word.slow {
+    background: rgba(255, 136, 0, 0.1);
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item-word {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.history-item-answer {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.history-item-time {
+    color: var(--warning);
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+/* ========== 统计信息 ========== */
+.stats-container {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    color: var(--foreground);
+    font-weight: 700;
+}
+
+.stat-value.success {
+    color: var(--success);
+}
+
+.stat-value.warning {
+    color: var(--warning);
+}
+
+.stat-value.error {
+    color: var(--error);
+}
+
+/* ========== 页脚样式 ========== */
+.footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* ========== 卡片网格（用于 german_index.html） ========== */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 280px;
+}
+
+.feature-card:hover {
+    border-color: var(--border-dark);
+}
+
+.feature-card h2 {
+    color: var(--foreground);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+}
+
+.feature-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.feature-card .btn {
+    background: var(--foreground);
+    color: var(--background);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    align-self: flex-start;
+}
+
+.feature-card .btn:hover {
+    opacity: 0.8;
+}
+
+/* ========== 键盘快捷键提示 ========== */
+.keyboard-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.keyboard-hint:hover {
+    opacity: 1;
+}
+
+.keyboard-hint kbd {
+    background: var(--foreground);
+    color: var(--background);
+    padding: 0.15rem 0.35rem;
+    border-radius: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    margin: 0 0.2rem;
+}
+
+/* ========== 响应式设计 ========== */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 15px;
+    }
+
+    .container {
+        padding: 2rem 1.5rem;
+    }
+
+    .nav-btn,
+    .back-to-home {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h1::after {
+        width: 50px;
+        height: 3px;
+    }
+
+    .subtitle {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        flex-direction: column;
+    }
+
+    .card-left {
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        padding: 1.5rem;
+    }
+
+    .card-right {
+        padding: 1.5rem;
+    }
+
+    .card-content {
+        font-size: 1.25rem;
+    }
+
+    .history-container {
+        max-height: 150px;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .feature-card {
+        min-height: auto;
+        padding: 1.5rem;
+    }
+
+    .feature-card h2 {
+        font-size: 1.3rem;
+    }
+
+    .feature-card p {
+        font-size: 0.85rem;
+    }
+
+    .keyboard-hint {
+        display: none;
+    }
+}
+
+/* ========== 滚动条样式 ========== */
+.history-words::-webkit-scrollbar,
+.history-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.history-words::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track {
+    background: var(--surface);
+}
+
+.history-words::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.history-words::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: var(--border-dark);
+}
+
+/* ========== 动画效果 ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+

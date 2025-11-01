@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字-德语考核器</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="german_common.css">
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化应用功能
+            initializeApp();
+        });
+        
+        // 初始化应用功能
+        function initializeApp() {
+            // 核心变量（极简设计，避免任何冗余状态）
+            let currentDigit = "1"; // 当前选择的位数
+            let timerInterval = null; // 计时器定时器
+            let startTime = 0; // 计时开始时间
+            let currentAnswer = ""; // 存储当前内容的答案
+            let currentMode = "num"; // 模式：num→数字转德语，de→德语转数字，默认为数字转德语模式
+            let currentWord = ""; // 当前显示的单词
+            let historyWords = []; // 已考核的词汇历史记录，格式: [{word, answer, time}]
+            const MAX_HISTORY = 50; // 最大历史记录数量
+            let totalTime = 0; // 总用时
+            let questionCount = 0; // 题目数量
+
+            // 功能按钮
+            const btnGenNum = document.getElementById('btn-gen-num');
+            const btnGenDe = document.getElementById('btn-gen-de');
+            const digitBtns = document.querySelectorAll('.digit-btn');
+            const card = document.getElementById('card');
+            const cardLeft = document.getElementById('card-left');
+            const cardRight = document.getElementById('card-right');
+            const cardTitle = document.getElementById('card-title');
+            const cardContent = document.getElementById('card-content');
+            const answer = document.getElementById('answer');
+            const answerText = document.getElementById('answer-text');
+            const timeUsed = document.getElementById('time-used');
+            const timer = document.getElementById('timer');
+            const clickHint = document.getElementById('click-hint');
+            const historyWordsContainer = document.getElementById('history-words');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const statsContainer = document.getElementById('stats-container');
+
+            // 初始化按钮状态
+            updateButtonStates();
+            
+            // 初始化键盘快捷键
+            initKeyboardShortcuts();
+
+            // 德语数词基础数据（固定不变，直接定义）
+            const units = {
+                0: "null", 1: "eins", 2: "zwei", 3: "drei", 4: "vier", 5: "fünf",
+                6: "sechs", 7: "sieben", 8: "acht", 9: "neun", 10: "zehn",
+                11: "elf", 12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn",
+                16: "sechzehn", 17: "siebzehn", 18: "achtzehn", 19: "neunzehn"
+            };
+            const tens = {
+                20: "zwanzig", 30: "dreißig", 40: "vierzig", 50: "fünfzig",
+                60: "sechzig", 70: "siebzig", 80: "achtzig", 90: "neunzig"
+            };
+            const hundred = "hundert";
+
+            // 更新按钮状态的函数
+            function updateButtonStates() {
+                // 更新模式按钮状态
+                btnGenNum.classList.remove('active');
+                btnGenDe.classList.remove('active');
+                if (currentMode === "num") {
+                    btnGenNum.classList.add('active');
+                    clickHint.textContent = "当前模式：数字 → 德语";
+                } else {
+                    btnGenDe.classList.add('active');
+                    clickHint.textContent = "当前模式：德语 → 数字";
+                }
+                
+                // 更新右侧答案区域状态
+                cardRight.classList.add('disabled');
+                answer.style.display = "block";
+                answerText.textContent = "点击查看答案";
+                timeUsed.textContent = "";
+            }
+            
+            // 更新历史记录显示
+            function updateHistoryDisplay() {
+                historyWordsContainer.innerHTML = '';
+                
+                if (historyWords.length === 0) {
+                    const emptySpan = document.createElement('span');
+                    emptySpan.className = 'history-word';
+                    emptySpan.textContent = '暂无考核记录';
+                    historyWordsContainer.appendChild(emptySpan);
+                    return;
+                }
+                
+                // 计算平均用时，用于标记慢速题目
+                const avgTime = totalTime / questionCount;
+                const threshold = avgTime * 1.5; // 超过平均时间1.5倍标记为慢速
+                
+                // 显示最近的考核词汇（最多MAX_HISTORY个）
+                const displayWords = historyWords.slice(-MAX_HISTORY).reverse();
+                displayWords.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'history-item';
+                    
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'history-item-word';
+                    wordSpan.textContent = item.word;
+                    
+                    const answerSpan = document.createElement('span');
+                    answerSpan.className = 'history-item-answer';
+                    answerSpan.textContent = ` → ${item.answer}`;
+                    
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'history-item-time';
+                    timeSpan.textContent = ` (${item.time}s)`;
+                    
+                    // 如果用时超过阈值，标记为慢速
+                    if (item.time > threshold && questionCount > 3) {
+                        wordSpan.classList.add('slow');
+                    }
+                    
+                    itemDiv.appendChild(wordSpan);
+                    itemDiv.appendChild(answerSpan);
+                    itemDiv.appendChild(timeSpan);
+                    historyWordsContainer.appendChild(itemDiv);
+                });
+                
+                // 更新统计信息
+                updateStats();
+            }
+            
+            // 添加词汇到历史记录
+            function addToHistory(word, answer, time) {
+                // 允许重复添加同一个数字（练习场景需要）
+                historyWords.push({
+                    word: word,
+                    answer: answer,
+                    time: time
+                });
+                
+                // 更新统计数据
+                totalTime += time;
+                questionCount++;
+                
+                // 限制历史记录数量
+                if (historyWords.length > MAX_HISTORY) {
+                    const removed = historyWords.shift();
+                    totalTime -= removed.time;
+                    questionCount--;
+                }
+                
+                updateHistoryDisplay();
+            }
+            
+            // 更新统计信息
+            function updateStats() {
+                if (!statsContainer) return;
+                
+                if (questionCount === 0) {
+                    statsContainer.innerHTML = '<div class="stat-item"><div class="stat-label">暂无数据</div></div>';
+                    return;
+                }
+                
+                const avgTime = (totalTime / questionCount).toFixed(2);
+                const times = historyWords.map(item => item.time);
+                const minTime = Math.min(...times).toFixed(2);
+                const maxTime = Math.max(...times).toFixed(2);
+                
+                statsContainer.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-label">练习数量</div>
+                        <div class="stat-value">${questionCount}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">平均用时</div>
+                        <div class="stat-value">${avgTime}s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">最快</div>
+                        <div class="stat-value success">${minTime}s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">最慢</div>
+                        <div class="stat-value warning">${maxTime}s</div>
+                    </div>
+                `;
+            }
+            
+            // 清空历史记录
+            function clearHistory() {
+                if (historyWords.length === 0) return;
+                
+                if (confirm('确定要清空所有历史记录吗？')) {
+                    historyWords = [];
+                    totalTime = 0;
+                    questionCount = 0;
+                    updateHistoryDisplay();
+                }
+            }
+            
+            // 键盘快捷键
+            function initKeyboardShortcuts() {
+                document.addEventListener('keydown', function(e) {
+                    // 空格键：生成新题目
+                    if (e.code === 'Space' && cardContent.textContent === "——") {
+                        e.preventDefault();
+                        cardLeft.click();
+                    }
+                    // Enter键：查看答案
+                    else if (e.code === 'Enter' && timerInterval && !cardRight.classList.contains('disabled')) {
+                        e.preventDefault();
+                        cardRight.click();
+                    }
+                    // N键：生成新题目（在显示答案后）
+                    else if (e.code === 'KeyN' && !timerInterval && cardContent.textContent !== "——") {
+                        e.preventDefault();
+                        cardLeft.click();
+                    }
+                });
+            }
+
+            // 1. 位数切换功能（简单直接，点击即切换）
+            digitBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按钮激活状态
+                    digitBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentDigit = this.dataset.digit;
+                    // 重置显示状态但不清空历史记录
+                    resetDisplay();
+                    // 更新提示文字
+                    cardTitle.textContent = `已选择${this.textContent}，点击左侧区域生成内容`;
+                });
+            });
+
+            // 2. 数字→德语模式切换
+            btnGenNum.addEventListener('click', function() {
+                currentMode = "num";
+                updateButtonStates();
+                resetDisplay();
+                cardTitle.textContent = "数字 → 德语模式，请点击左侧区域生成内容";
+            });
+
+            // 3. 德语→数字模式切换
+            btnGenDe.addEventListener('click', function() {
+                currentMode = "de";
+                updateButtonStates();
+                resetDisplay();
+                cardTitle.textContent = "德语 → 数字模式，请点击左侧区域生成内容";
+            });
+            
+            // 清空历史记录按钮
+            if (clearHistoryBtn) {
+                clearHistoryBtn.addEventListener('click', clearHistory);
+            }
+
+            // 4. 点击卡片左侧生成内容（或下一题）
+            cardLeft.addEventListener('click', function() {
+                // 重置显示状态但保留历史记录
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                timer.textContent = "00:00.00";
+                timer.style.display = "none";
+                timer.style.color = "var(--terminal-red)";
+                answer.style.display = "none";
+                
+                // 生成新题目
+                if (currentMode === "num") {
+                    // 数字→德语模式
+                    const randomNum = getRandomNum(currentDigit);
+                    cardContent.textContent = randomNum;
+                    currentWord = randomNum;
+                    currentAnswer = numToGerman(randomNum);
+                    cardTitle.textContent = "数字 → 德语（点击右侧查看答案）";
+                } else {
+                    // 德语→数字模式
+                    const randomNum = getRandomNum(currentDigit);
+                    const germanWord = numToGerman(randomNum);
+                    cardContent.textContent = germanWord;
+                    currentWord = germanWord;
+                    currentAnswer = randomNum;
+                    cardTitle.textContent = "德语 → 数字（点击右侧查看答案）";
+                }
+                
+                // 启动计时器
+                startTimer();
+                // 启用右侧答案区域
+                cardRight.classList.remove('disabled');
+                answerText.textContent = "点击查看答案";
+                timeUsed.textContent = "";
+            });
+
+            // 5. 点击卡片右侧显示答案
+            cardRight.addEventListener('click', function() {
+                // 只有生成内容后才执行
+                if (cardContent.textContent !== "——" && timerInterval) {
+                    // 暂停计时器
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    timer.style.color = "var(--terminal-green)"; // 计时暂停后变绿色
+                    // 计算用时
+                    const usedTime = parseFloat(((Date.now() - startTime) / 1000).toFixed(2));
+                    // 显示答案
+                    answerText.textContent = currentAnswer;
+                    // 显示用时
+                    timeUsed.textContent = `用时：${usedTime} 秒`;
+                    // 显示答案区域
+                    answer.style.display = "block";
+                    
+                    // 添加到历史记录（显示答案时才添加，确保用时准确）
+                    addToHistory(currentWord, currentAnswer, usedTime);
+                }
+            });
+
+            // 辅助函数：生成对应位数的随机数字
+            function getRandomNum(digit) {
+                let min, max;
+                switch(digit) {
+                    case "1": min = 1; max = 9; break;
+                    case "2": min = 10; max = 99; break;
+                    case "3": min = 100; max = 999; break;
+                    default: min = 1; max = 9;
+                }
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            // 辅助函数：数字转德语（稳定无错）
+            function numToGerman(num) {
+                if (num <= 19) return units[num];
+                const h = Math.floor(num / 100);
+                const rest = num % 100;
+                const parts = [];
+                if (h > 0) parts.push(h === 1 ? hundred : `${units[h]}${hundred}`);
+                if (rest > 0) {
+                    if (rest <= 19) parts.push(units[rest]);
+                    else {
+                        const t = Math.floor(rest / 10) * 10;
+                        const u = rest % 10;
+                        parts.push(u === 0 ? tens[t] : `${units[u]}und${tens[t]}`);
+                    }
+                }
+                return parts.join("");
+            }
+
+            // 辅助函数：启动计时器
+            function startTimer() {
+                startTime = Date.now();
+                timer.style.display = "inline-block";
+                timer.style.color = "var(--terminal-red)"; // 计时中为红色
+                timerInterval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const min = Math.floor(elapsed / 60000).toString().padStart(2, '0');
+                    const sec = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                    const ms = Math.floor((elapsed % 1000) / 10).toString().padStart(2, '0');
+                    timer.textContent = `${min}:${sec}.${ms}`;
+                }, 10);
+            }
+
+            // 辅助函数：重置显示状态（不清空历史记录）
+            function resetDisplay() {
+                // 停止计时器
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                // 重置计时器显示
+                timer.textContent = "00:00.00";
+                timer.style.display = "none";
+                timer.style.color = "var(--terminal-red)";
+                // 重置卡片内容
+                cardContent.textContent = "——";
+                // 隐藏答案区域
+                answer.style.display = "none";
+                // 隐藏点击提示
+                clickHint.style.display = "none";
+                // 清空答案和当前单词
+                currentAnswer = "";
+                currentWord = "";
+                // 禁用右侧答案区域
+                cardRight.classList.add('disabled');
+            }
+        }
+    </script>
+    <style>
+        /* 页面特定样式覆盖（如需要） */
+    </style>
+
+    <div class="container">
+        <a href="german_index.html" class="nav-btn">← 返回主页</a>
+        <h1>数字-德语考核器（完美版）</h1>
+        <div class="subtitle">位数切换 | 反应计时 | 双向考核 | 即点即用</div>
+
+        <!-- 位数选择 -->
+        <div class="digit-group">
+            <span class="digit-label">选择考核位数：</span>
+            <div class="digit-buttons">
+                <button class="digit-btn active" data-digit="1">个位数（1-9）</button>
+                <button class="digit-btn" data-digit="2">两位数（10-99）</button>
+                <button class="digit-btn" data-digit="3">三位数（100-999）</button>
+            </div>
+        </div>
+
+        <!-- 功能按钮 -->
+        <div class="func-buttons">
+            <button class="func-btn btn-num" id="btn-gen-num">生成数字 → 查德语</button>
+            <button class="func-btn btn-de" id="btn-gen-de">生成德语 → 查数字</button>
+        </div>
+
+        <!-- 内容卡片 -->
+        <div class="card" id="card">
+            <div class="timer" id="timer">00:00.00</div>
+            <div class="card-left" id="card-left">
+                <div class="card-title" id="card-title">点击左侧区域生成内容</div>
+                <div class="card-content" id="card-content">——</div>
+                <div class="click-hint" id="click-hint">当前模式：数字 → 德语</div>
+            </div>
+            <div class="card-right disabled" id="card-right">
+                <div class="answer" id="answer">
+                    <span class="card-title">答案</span>
+                    <span id="answer-text">点击查看答案</span>
+                    <div class="time-used" id="time-used"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip">
+            操作流程：选择位数 → 点击左侧区域生成内容（或按 <kbd>空格</kbd>）→ 点击右侧区域查看答案（或按 <kbd>Enter</kbd>）→ 按 <kbd>N</kbd> 生成下一题
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="stats-container" id="stats-container">
+            <div class="stat-item">
+                <div class="stat-label">暂无数据</div>
+            </div>
+        </div>
+        
+        <!-- 已考核词汇框 -->
+        <div class="history-container">
+            <div class="history-header">
+                <div class="history-title">练习历史</div>
+                <button class="clear-history-btn" id="clear-history-btn">清空历史</button>
+            </div>
+            <div class="history-words" id="history-words">
+                <!-- 已考核的词汇将在这里动态显示 -->
+                <span class="history-word">暂无考核记录</span>
+            </div>
+        </div>
+        
+        <!-- 键盘快捷键提示 -->
+        <div class="keyboard-hint">
+            <kbd>空格</kbd> 生成题目 | <kbd>Enter</kbd> 查看答案 | <kbd>N</kbd> 下一题
+        </div>
+    </div>
