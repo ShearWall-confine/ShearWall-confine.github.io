@@ -823,6 +823,9 @@ verstehen,理解,irregular,verstehe,verstehst,versteht,verstehen,versteht,verste
             if (unfamiliarBtn) unfamiliarBtn.disabled = false;
             if (nextBtn) nextBtn.disabled = true;
             
+            // 自动朗读动词
+            speakText(verb.infinitive, 'de-DE');
+            
             // 开始计时
             startTimer();
         }
