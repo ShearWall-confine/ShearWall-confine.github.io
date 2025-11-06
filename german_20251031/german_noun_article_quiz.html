@@ -680,7 +680,7 @@
     <div class="container">
         <a href="german_index.html" class="nav-btn">← 返回主页</a>
         <h1>德语名词及冠词考核器</h1>
-        <div class="subtitle">名词学习 | 冠词练习 | 双向考核 | 反应计时</div>
+        <div class="subtitle">名词学习 | 冠词练习 | 复数形式 | 双向考核 | 反应计时</div>
 
         <!-- 模式选择 -->
         <div class="option-group">
@@ -688,6 +688,7 @@
             <div class="option-buttons">
                 <button class="option-btn active" data-mode="de-to-cn">德语 → 中文</button>
                 <button class="option-btn" data-mode="cn-to-de">中文 → 德语</button>
+                <button class="option-btn" data-mode="de-to-plural">名词 → 复数</button>
             </div>
         </div>
 
@@ -725,7 +726,8 @@
         </div>
 
         <div class="tip">
-            💡 提示：查看题目 → 思考答案 → 点击"熟悉"或"不熟悉"查看答案 → 点击"下一题"继续
+            💡 提示：查看题目 → 思考答案 → 点击"熟悉"或"不熟悉"查看答案 → 点击"下一题"继续<br>
+            支持三种模式：德语→中文、中文→德语（含冠词）、名词→复数形式
         </div>
 
         <!-- 状态指示器 -->
@@ -853,22 +855,278 @@
             initDOMElements();
             
             // 直接使用嵌入的CSV数据（避免CORS问题）
-            const csvData = `noun,article,meaning
-Stuhl,der,椅子
-Bleistift,der,铅笔
-Wörterbuch,das,词典
-Bügeleisen,das,熨斗
-Fernseher,der,电视
-Computer,der,电脑
-Drucker,der,打印机
-Handy,das,手机
-MP3-Player,der,MP3播放器
-Lampe,die,台灯
-Schere,die,剪刀
-Wasserkocher,der,电水壶
-Waschmaschine,die,洗衣机
-Kuli,der,圆珠笔
-Kaffeemaschine,die,咖啡机`;
+            const csvData = `noun,article,meaning,plural
+Familienname,der,姓,die Familiennamen
+Name,der,名字,die Namen
+Vorname,der,名,die Vornamen
+Person,die,人,die Personen
+Leute,die,人们,die Leute
+Automechaniker,der,汽车机械师,die Automechaniker
+Automechanikerin,die,女汽车机械师,die Automechanikerinnen
+Deutschlehrer,der,德语教师,die Deutschlehrer
+Deutschlehrerin,die,女德语教师,die Deutschlehrerinnen
+Sekretär,der,秘书,die Sekretäre
+Sekretärin,die,女秘书,die Sekretärinnen
+Student,der,大学生,die Studenten
+Studentin,die,女大学生,die Studentinnen
+Käufer,der,顾客,die Käufer
+Käuferin,die,女顾客,die Käuferinnen
+Verkäufer,der,售货员,die Verkäufer
+Verkäuferin,die,女售货员,die Verkäuferinnen
+Kunde,der,顾客,die Kunden
+Kundin,die,女顾客,die Kundinnen
+Chef,der,主管人员,die Chefs
+Chefin,die,女主管,die Chefinnen
+Informatiker,der,计算机工程师,die Informatiker
+Informatikerin,die,女计算机工程师,die Informatikerinnen
+Kursleiter,der,培训班教师,die Kursleiter
+Kursleiterin,die,女培训班教师,die Kursleiterinnen
+Nachbar,der,邻居,die Nachbarn
+Nachbarin,die,女邻居,die Nachbarinnen
+Eltern,die,父母,die Eltern
+Sohn,der,儿子,die Söhne
+Tochter,die,女儿,die Töchter
+Kind,das,孩子,die Kinder
+Erwachsene,der,成年人,die Erwachsenen
+Freundin,die,女朋友,die Freundinnen
+Lernziel,das,学习目标,die Lernziele
+Herkunft,die,出生地,die Herkünfte
+Sprache,die,语言,die Sprachen
+Polnisch,das,波兰语,das Polnisch
+Russisch,das,俄罗斯语,das Russisch
+Chinesisch,das,中文,das Chinesisch
+Englisch,das,英语,das Englisch
+Französisch,das,法语,das Französisch
+Koreanisch,das,韩语,das Koreanisch
+Persisch,das,波斯语,das Persisch
+Spanisch,das,西班牙语,das Spanisch
+Türkisch,das,土耳其语,das Türkisch
+Ukrainisch,das,乌克兰语,das Ukrainisch
+Slowakisch,das,斯洛伐克语,das Slowakisch
+Estnisch,das,爱沙尼亚语,das Estnisch
+Schwedisch,das,瑞典语,das Schwedisch
+Sprachenname,der,语言名称,die Sprachennamen
+Deutschkurs,der,德语培训班,die Deutschkurse
+Kurs,der,培训班,die Kurse
+Kursliste,die,学员名单,die Kurslisten
+Liste,die,列表,die Listen
+Wörterbuch,das,词典,die Wörterbücher
+Wortliste,die,词汇表,die Wortlisten
+Wort,das,词,die Wörter
+Satz,der,句子,die Sätze
+Aussagesatz,der,陈述句,die Aussagesätze
+W-Frage,die,特殊疑问句,die W-Fragen
+Beispiel,das,例子,die Beispiele
+Verb,das,动词,die Verben
+Nomen,das,名词,die Nomen
+Artikel,der,冠词,die Artikel
+Fragewort,das,疑问词,die Fragewörter
+Grammatik,die,语法,die Grammatiken
+Konjugation,die,动词变位,die Konjugationen
+Infinitiv,der,动词不定式,die Infinitive
+Singular,der,单数,die Singulare
+Plural,der,复数,die Plurale
+Endung,die,词尾,die Endungen
+Akzent,der,重音,die Akzente
+Aussprache,die,发音,die Aussprachen
+Melodie,die,曲调,die Melodien
+Rhythmus,der,节奏,die Rhythmen
+Vokal,der,元音,die Vokale
+Konsonant,der,辅音,die Konsonanten
+Wortakzent,der,词重音,die Wortakzente
+Betonung,die,重音,die Betonungen
+Dialog,der,对话,die Dialoge
+Dialognummer,die,对话编号,die Dialognummern
+Text,der,课文,die Texte
+Lernplakat,das,学习招贴画,die Lernplakate
+Kärtchen,das,小卡片,die Kärtchen
+Alphabet,das,字母表,die Alphabete
+Steckbrief,der,简要说明,die Steckbriefe
+Arbeitsanweisung,die,工作指导,die Arbeitsanweisungen
+Aufgabe,die,练习,die Aufgaben
+Übung,die,练习,die Übungen
+Rollenspiel,das,角色扮演,die Rollenspiele
+Projekt,das,项目,die Projekte
+Suchwort,das,搜索词,die Suchwörter
+Information,die,信息,die Informationen
+Rückfrage,die,反问,die Rückfragen
+Zeitangabe,die,时间说明,die Zeitangaben
+Wortteil,der,词的组成部分,die Wortteile
+Satzklammer,die,句子框型结构,die Satzklammern
+Vergangenheitsform,die,过去时态,die Vergangenheitsformen
+Vergangenheit,die,过去,die Vergangenheiten
+Land,das,国家,die Länder
+Stadt,die,城市,die Städte
+Wohnort,der,居住地,die Wohnorte
+Haus,das,房子,die Häuser
+Wohnung,die,公寓,die Wohnungen
+Ecke,die,角落,die Ecken
+Firma,die,公司,die Firmen
+Kantine,die,餐厅食堂,die Kantinen
+Büro,das,办公室,die Büros
+Kursraum,der,教室,die Kursräume
+Schule,die,学校,die Schulen
+Grundschule,die,小学,die Grundschulen
+Kinderkrippe,die,托儿所,die Kinderkrippen
+Supermarkt,der,超市,die Supermärkte
+Flohmarkt,der,跳蚤市场,die Flohmärkte
+Café,das,咖啡馆,die Cafés
+Cafeteria,die,咖啡馆,die Cafeterias
+Biergarten,der,露天啤酒馆,die Biergärten
+Park,der,公园,die Parks
+Fußgängerzone,die,步行区,die Fußgängerzonen
+Rathaus,das,市政厅,die Rathäuser
+Museum,das,博物馆,die Museen
+Schwimmbad,das,游泳场,die Schwimmbäder
+Theater,das,剧院,die Theater
+Kino,das,电影院,die Kinos
+Zirkus,der,马戏团,die Zirkusse
+Bäckerei,die,面包房,die Bäckereien
+Bibliothek,die,图书馆,die Bibliotheken
+Metzgerei,die,肉铺,die Metzgereien
+Region,die,地区,die Regionen
+Gleis,das,站台,die Gleise
+Treffpunkt,der,集合点,die Treffpunkte
+Bleistift,der,铅笔,die Bleistifte
+Kuli,der,圆珠笔,die Kulis
+Kugelschreiber,der,圆珠笔,die Kugelschreiber
+Computer,der,计算机,die Computer
+Drucker,der,打印机,die Drucker
+Fernseher,der,电视,die Fernseher
+Herd,der,炉灶,die Herde
+MP3-Player,der,MP3播放器,die MP3-Player
+Stuhl,der,椅子,die Stühle
+Tisch,der,桌子,die Tische
+Wasserkocher,der,电热水壶,die Wasserkocher
+DVD,die,DVD光盘,die DVDs
+Kaffeemaschine,die,咖啡机,die Kaffeemaschinen
+Lampe,die,灯,die Lampen
+Schere,die,剪刀,die Scheren
+Waschmaschine,die,洗衣机,die Waschmaschinen
+Bügeleisen,das,熨斗,die Bügeleisen
+Tasche,die,包,die Taschen
+Buch,das,书,die Bücher
+Brille,die,眼镜,die Brillen
+Fahrrad,das,自行车,die Fahrräder
+Kinderwagen,der,童车,die Kinderwagen
+Kühlschrank,der,冰箱,die Kühlschränke
+Staubsauger,der,吸尘器,die Staubsauger
+Monitor,der,显示器,die Monitore
+Digitalkamera,die,数码相机,die Digitalkameras
+Kamera,die,相机,die Kameras
+CD,die,光盘,die CDs
+Papierkorb,der,纸篓,die Papierkörbe
+Uhr,die,钟表,die Uhren
+Telefonnummer,die,电话号码,die Telefonnummern
+Handynummer,die,手机号码,die Handynummern
+Vorwahl,die,区号,die Vorwahlen
+Telefon,das,电话,die Telefone
+E-Mail,die,电子邮件,die E-Mails
+E-Mail-Adresse,die,电子邮件地址,die E-Mail-Adressen
+Postleitzahl,die,邮政编码,die Postleitzahlen
+Adresse,die,地址,die Adressen
+Handy,das,手机,die Handys
+Telefonbuch,das,电话簿,die Telefonbücher
+Mineralwasser,das,矿泉水,die Mineralwasser
+Wasser,das,水,das Wasser
+Kaffee,der,咖啡,die Kaffees
+Tee,der,茶,die Tees
+Zucker,der,糖,der Zucker
+Milch,die,牛奶,die Milch
+Orangensaft,der,橘子汁,die Orangensäfte
+Saft,der,果汁,die Säfte
+Joghurt,der,酸奶,die Joghurts
+Peperoni,die,辣椒,die Peperonis
+Salami,die,意大利香肠,die Salamis
+Tomate,die,西红柿,die Tomaten
+Cappuccino,der,卡布奇诺,die Cappuccinos
+Cola,die,可乐,die Colas
+Getränk,das,饮料,die Getränke
+Espresso,der,浓咖啡,die Espressos
+Brötchen,das,小面包,die Brötchen
+Kaffeekanne,die,咖啡壶,die Kaffeekannen
+Teekanne,die,茶壶,die Teekannen
+Thermoskanne,die,保温壶,die Thermoskannen
+Seite,die,书页,die Seiten
+Geldschein,der,纸币,die Geldscheine
+Euromünze,die,欧元硬币,die Euromünzen
+Eurozone,die,欧元区,die Eurozonen
+Cent,der,欧分,die Cents
+Euro,der,欧元,die Euros
+Tablett,das,托盘,die Tabletts
+Kasse,die,钱箱,die Kassen
+Bild,das,图画,die Bilder
+Foto,das,照片,die Fotos
+Zettel,der,纸条,die Zettel
+Karte,die,卡片,die Karten
+Tabelle,die,表格,die Tabellen
+Tag,der,日,die Tage
+Abend,der,晚上,die Abende
+Morgen,der,早上,die Morgen
+Mittag,der,中午,die Mittage
+Nachmittag,der,下午,die Nachmittage
+Vormittag,der,上午,die Vormittage
+Nacht,die,夜晚,die Nächte
+Woche,die,星期,die Wochen
+Wochentag,der,工作日,die Wochentage
+Wochenende,das,周末,die Wochenenden
+Arbeitswoche,die,工作周,die Arbeitswochen
+Arbeitstag,der,工作日,die Arbeitstage
+Jahr,das,年,die Jahre
+Minute,die,分钟,die Minuten
+Stunde,die,小时,die Stunden
+Uhrzeit,die,时间,die Uhrzeiten
+Tageszeit,die,白天时间,die Tageszeiten
+Tagesablauf,der,日常安排,die Tagesabläufe
+Alltag,der,日常生活,die Alltage
+Alltagssprache,die,日常用语,die Alltagssprachen
+Beruf,der,职业,die Berufe
+Praktikum,das,实习,die Praktika
+Aktivität,die,活动,die Aktivitäten
+Konzert,das,音乐会,die Konzerte
+Film,der,电影,die Filme
+Krimi,der,侦探片,die Krimis
+Fernsehprogramm,das,电视节目,die Fernsehprogramme
+Verabredung,die,约会,die Verabredungen
+Interview,das,采访,die Interviews
+Verkaufsgespräch,das,购物谈话,die Verkaufsgespräche
+Gespräch,das,谈话,die Gespräche
+Kleinanzeige,die,小广告,die Kleinanzeigen
+Anzeige,die,广告,die Anzeigen
+Ansage,die,主持节目,die Ansagen
+Stadtfest,das,城市节日,die Stadtfeste
+Sport,der,体育运动,die Sportarten
+Fitness,die,健康,die Fitness
+Musik,die,音乐,die Musik
+Kinderachen,die,童装,die Kinderachen
+Sache,die,事物,die Sachen
+Spülmaschine,die,洗碗机,die Spülmaschinen
+Gegenstand,der,东西,die Gegenstände
+Preis,der,价格,die Preise
+Qualität,die,质量,die Qualitäten
+Schnäppchen,das,廉价品,die Schnäppchen
+Ziffer,die,数字,die Ziffern
+Zahl,die,数字,die Zahlen
+Tipp,der,建议,die Tipps
+Angebot,das,提供,die Angebote
+Schrank,der,柜子,die Schränke
+Entschuldigung,die,抱歉,die Entschuldigungen
+Frau,die,女士,die Frauen
+Herr,der,先生,die Herren
+Personalpronomen,das,人称代词,die Personalpronomen
+Position,die,位置,die Positionen
+Verbposition,die,动词位置,die Verbpositionen
+Frage,die,问题,die Fragen
+Antwort,die,回答,die Antworten
+Pause,die,休息,die Pausen
+Krankheit,die,病,die Krankheiten
+Lust,die,兴趣,die Lust
+Tür,die,门,die Türen
+Polizei,die,警察,die Polizei
+Bus,der,公共汽车,die Busse
+ICE,der,城际快车,die ICEs
+Moment,der,片刻,die Momente
+Nummer,die,号码,die Nummern`;
             
             // 使用PapaParse解析CSV字符串
             Papa.parse(csvData, {
@@ -876,7 +1134,7 @@ Kaffeemaschine,die,咖啡机`;
                 skipEmptyLines: true,
                 complete: function(results) {
                     console.log('CSV解析成功，共', results.data.length, '条数据');
-                    nounsData = results.data.filter(row => row.noun && row.article && row.meaning);
+                    nounsData = results.data.filter(row => row.noun && row.article && row.meaning && row.plural);
                     totalQuestions = nounsData.length;
                     updateCounter();
                     // 初始化打乱的数据并生成第一个问题
@@ -997,8 +1255,8 @@ Kaffeemaschine,die,咖啡机`;
             // 添加德语单词双击朗读功能
             if (questionText) {
                 questionText.addEventListener('dblclick', function() {
-                // 只有在德语→中文模式下才朗读问题侧的德语单词
-                    if (currentMode === 'de-to-cn' && questionText.textContent !== '点击卡片开始学习') {
+                // 在德语→中文模式或复数模式下，朗读问题侧的德语单词
+                    if ((currentMode === 'de-to-cn' || currentMode === 'de-to-plural') && questionText.textContent !== '点击卡片开始学习') {
                         speakText(questionText.textContent.trim(), 'de-DE');
                     }
                 });
@@ -1009,8 +1267,8 @@ Kaffeemaschine,die,咖啡机`;
                 answerContent.addEventListener('dblclick', function() {
                     const text = answerContent.textContent.trim();
                     if (text) {
-                            // 如果是中文→德语模式或者包含德语冠词，使用德语朗读
-                            if (currentMode === 'cn-to-de' || text.match(/^(der|die|das) /)) {
+                            // 如果是中文→德语模式、复数模式或者包含德语冠词，使用德语朗读
+                            if (currentMode === 'cn-to-de' || currentMode === 'de-to-plural' || text.match(/^(der|die|das) /)) {
                                 speakText(text, 'de-DE');
                             } else {
                                 speakText(text, 'zh-CN');
@@ -1074,6 +1332,16 @@ Kaffeemaschine,die,咖啡机`;
                 currentAnswer = currentItem.meaning;
                 // 自动朗读德语单词
                 speakText(currentItem.noun, 'de-DE');
+                // 设置DWDS链接
+                updateDWDSLink(currentItem.noun);
+            } else if (currentMode === 'de-to-plural') {
+                // 名词 → 复数形式
+                if (questionText) {
+                    questionText.textContent = `${currentItem.article} ${currentItem.noun}`;
+                }
+                currentAnswer = currentItem.plural;
+                // 自动朗读德语单词（单数）
+                speakText(`${currentItem.article} ${currentItem.noun}`, 'de-DE');
                 // 设置DWDS链接
                 updateDWDSLink(currentItem.noun);
             } else {
@@ -1202,8 +1470,8 @@ Kaffeemaschine,die,咖啡机`;
                 answerArea.style.display = 'block';
             }
             
-            // 在中文→德语模式下，如果答案包含德语单词，进行朗读
-            if (currentMode === 'cn-to-de') {
+            // 在中文→德语模式或复数模式下，朗读德语答案
+            if (currentMode === 'cn-to-de' || currentMode === 'de-to-plural') {
                 speakText(currentAnswer, 'de-DE');
             }
         }
@@ -1219,7 +1487,14 @@ Kaffeemaschine,die,咖啡机`;
                 
                 // 获取当前要添加到历史记录的单词
                 const currentItem = shuffledData[currentQuestionIndex];
-                const historyWord = currentMode === 'de-to-cn' ? currentItem.noun : currentItem.meaning;
+                let historyWord;
+                if (currentMode === 'de-to-cn') {
+                    historyWord = currentItem.noun;
+                } else if (currentMode === 'de-to-plural') {
+                    historyWord = `${currentItem.article} ${currentItem.noun}`;
+                } else {
+                    historyWord = currentItem.meaning;
+                }
                 
             // 添加到历史记录（用于显示），包含时间信息
             addToHistory(historyWord, isUnfamiliar, elapsedTime);
@@ -1227,12 +1502,24 @@ Kaffeemaschine,die,咖啡机`;
             // 添加到当前轮次记录（用于统计），按答题顺序存储（从左到右）
             // 使用completedQuestions - 1作为索引，因为completedQuestions已经+1了
             const answerIndex = completedQuestions - 1;
+            let questionDisplay, answerDisplay;
+            if (currentMode === 'de-to-cn') {
+                questionDisplay = currentItem.noun;
+                answerDisplay = currentItem.meaning;
+            } else if (currentMode === 'de-to-plural') {
+                questionDisplay = `${currentItem.article} ${currentItem.noun}`;
+                answerDisplay = currentItem.plural;
+            } else {
+                questionDisplay = currentItem.meaning;
+                answerDisplay = `${currentItem.article} ${currentItem.noun}`;
+            }
+            
             currentRoundAnswers[answerIndex] = {
                 word: historyWord,
                 unfamiliar: isUnfamiliar,
                 time: elapsedTime,
-                question: currentItem.noun,
-                answer: currentItem.article,
+                question: questionDisplay,
+                answer: answerDisplay,
                 meaning: currentItem.meaning
             };
             
@@ -1364,7 +1651,7 @@ Kaffeemaschine,die,咖啡机`;
                         tooltip.innerHTML = `
                             <div class="tooltip-time">⏱️ ${answerItem.time}s</div>
                             <div class="tooltip-question">📝 ${answerItem.question}</div>
-                            <div class="tooltip-answer">✓ ${answerItem.answer} - ${answerItem.meaning}</div>
+                            <div class="tooltip-answer">✓ ${answerItem.answer}</div>
                         `;
                         document.body.appendChild(tooltip);
                         
@@ -1436,7 +1723,14 @@ Kaffeemaschine,die,咖啡机`;
         // 更新单词的不熟悉状态
         function updateUnfamiliarStatus() {
             const currentItem = shuffledData[currentQuestionIndex];
-            const historyWord = currentMode === 'de-to-cn' ? currentItem.noun : currentItem.meaning;
+            let historyWord;
+            if (currentMode === 'de-to-cn') {
+                historyWord = currentItem.noun;
+            } else if (currentMode === 'de-to-plural') {
+                historyWord = `${currentItem.article} ${currentItem.noun}`;
+            } else {
+                historyWord = currentItem.meaning;
+            }
             
             // 查找并更新历史记录
             const existingWord = historyWords.find(item => item.word === historyWord);
@@ -1591,7 +1885,7 @@ Kaffeemaschine,die,咖啡机`;
                 if (historyItem) {
                     // 已完成的题目 - 直接使用historyItem中的数据
                     const questionText = historyItem.question;
-                    const answerText = `${historyItem.answer} - ${historyItem.meaning}`;
+                    const answerText = historyItem.answer;
                     
                     // 确定颜色分类
                     if (historyItem.unfamiliar) {
