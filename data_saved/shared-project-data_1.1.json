@@ -910,6 +910,25 @@
       "type": "task-end"
     },
     {
+      "id": "subtask-completion-1760966693207-0",
+      "date": "2025-10-24",
+      "time": "21:25",
+      "title": "完成：开题ppt",
+      "description": "完成子任务：开题ppt",
+      "status": "completed",
+      "linkedTaskId": 1760966693207,
+      "linkedSubtaskIndex": 0,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周组会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周组会",
+      "isSubtask": true
+    },
+    {
       "id": "task-start-1761047847521",
       "date": "2025-10-21",
       "title": "开始：论文阅读",
@@ -1191,23 +1210,13 @@
       "type": "task-end"
     },
     {
-      "id": "subtask-completion-1760966693207-0",
-      "date": "2025-10-24",
-      "time": "21:25",
-      "title": "完成：开题ppt",
-      "description": "完成子任务：开题ppt",
-      "status": "completed",
-      "linkedTaskId": 1760966693207,
-      "linkedSubtaskIndex": 0,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周组会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周组会",
-      "isSubtask": true
+      "id": 1762519483584,
+      "title": "华能核电报告",
+      "description": "",
+      "date": "2025-11-15",
+      "status": "pending",
+      "tags": [],
+      "isSynced": false
     }
   ],
   "files": [
