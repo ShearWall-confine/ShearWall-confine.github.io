@@ -219,6 +219,13 @@
           "issues": []
         },
         {
+          "id": 1762614217414,
+          "title": "和鲁老师拍照",
+          "completed": false,
+          "notes": "",
+          "issues": []
+        },
+        {
           "id": 1760964282141,
           "title": "模态测试：CA_13_Top_R",
           "completed": true,
@@ -452,13 +459,6 @@
         {
           "id": 1760964282175,
           "title": "模态测试：TB_07+07_Mid+Top_AR",
-          "completed": false,
-          "notes": "",
-          "issues": []
-        },
-        {
-          "id": 1762614217414,
-          "title": "和鲁老师拍照",
           "completed": false,
           "notes": "",
           "issues": []
