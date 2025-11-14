@@ -12,7 +12,7 @@
       "priority": "medium",
       "startDate": "2023-09-20",
       "endDate": "2029-03-19",
-      "progress": 67,
+      "progress": 100,
       "subtasks": [
         {
           "id": 1760965508292,
@@ -35,7 +35,7 @@
         {
           "id": 1761655761250,
           "title": "汇报进度/地铁车站管道/考试卷子/",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": [],
           "completionTime": "2025-11-04T20:49",
@@ -888,25 +888,6 @@
       "isSubtask": true
     },
     {
-      "id": "subtask-completion-1760965498124-2",
-      "date": "2025-11-04",
-      "time": "20:49",
-      "title": "完成：汇报进度/地铁车站管道/考试卷子/",
-      "description": "完成子任务：汇报进度/地铁车站管道/考试卷子/",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "linkedSubtaskIndex": 2,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周例会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周例会",
-      "isSubtask": true
-    },
-    {
       "id": "task-start-1760966693207",
       "date": "2023-09-01",
       "title": "开始：每周组会",
@@ -1233,6 +1214,25 @@
       ],
       "isSynced": true,
       "type": "task-end"
+    },
+    {
+      "id": "subtask-completion-1760965498124-2",
+      "date": "2025-11-04",
+      "time": "20:49",
+      "title": "完成：汇报进度/地铁车站管道/考试卷子/",
+      "description": "完成子任务：汇报进度/地铁车站管道/考试卷子/",
+      "status": "completed",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 2,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
     }
   ],
   "files": [
