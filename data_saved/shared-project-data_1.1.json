@@ -602,7 +602,7 @@
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2025-11-30",
-      "progress": 20,
+      "progress": 40,
       "subtasks": [
         {
           "title": "开题报告",
@@ -624,7 +624,7 @@
         {
           "id": 1761026516469,
           "title": "琪姐ppt/报告",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
@@ -1245,7 +1245,7 @@
     },
     {
       "id": 1763115025273,
-      "title": "思考后续课题进展，报告鲁老师",
+      "title": "思考后续课题进展，报告鲁老师/整理dropbox文件夹",
       "description": "",
       "date": "2025-11-16",
       "status": "in-progress",
