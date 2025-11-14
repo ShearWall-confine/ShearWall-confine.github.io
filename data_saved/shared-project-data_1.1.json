@@ -43,7 +43,7 @@
         },
         {
           "id": 1763114973565,
-          "title": "新子任务",
+          "title": "思考后续进度/考试卷子",
           "completed": false,
           "notes": "",
           "issues": []
@@ -1243,7 +1243,7 @@
     },
     {
       "id": 1763115025273,
-      "title": "思考后续",
+      "title": "思考后续课题进展，报告鲁老师",
       "description": "",
       "date": "2025-11-16",
       "status": "in-progress",
