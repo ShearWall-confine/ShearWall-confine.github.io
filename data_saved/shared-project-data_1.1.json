@@ -12,7 +12,7 @@
       "priority": "medium",
       "startDate": "2023-09-20",
       "endDate": "2029-03-19",
-      "progress": 100,
+      "progress": 75,
       "subtasks": [
         {
           "id": 1760965508292,
@@ -40,6 +40,13 @@
           "issues": [],
           "completionTime": "2025-11-04T20:49",
           "timeDescription": ""
+        },
+        {
+          "id": 1763114973565,
+          "title": "新子任务",
+          "completed": false,
+          "notes": "",
+          "issues": []
         }
       ],
       "attachments": [],
@@ -1233,6 +1240,15 @@
       "type": "subtask-completion",
       "parentTask": "每周例会",
       "isSubtask": true
+    },
+    {
+      "id": 1763115025273,
+      "title": "思考后续",
+      "description": "",
+      "date": "2025-11-16",
+      "status": "in-progress",
+      "tags": [],
+      "isSynced": false
     }
   ],
   "files": [
