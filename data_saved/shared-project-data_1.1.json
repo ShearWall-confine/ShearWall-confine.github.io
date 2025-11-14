@@ -46,7 +46,9 @@
           "title": "思考后续进度/考试卷子",
           "completed": false,
           "notes": "",
-          "issues": []
+          "issues": [],
+          "completionTime": "2025-11-18T18:11",
+          "timeDescription": ""
         }
       ],
       "attachments": [],
@@ -90,19 +92,19 @@
       "priority": "medium",
       "startDate": "2025-10-21",
       "endDate": "2025-11-20",
-      "progress": 0,
+      "progress": 100,
       "subtasks": [
         {
           "id": 1761049287717,
           "title": "pvp2025论文收集/同济谢强pvp邮件询问",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         },
         {
           "id": 1761049305929,
           "title": "isliee论文集阅读",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": []
         }
@@ -1249,6 +1251,25 @@
       "status": "in-progress",
       "tags": [],
       "isSynced": false
+    },
+    {
+      "id": "subtask-completion-1760965498124-3",
+      "date": "2025-11-18",
+      "time": "18:11",
+      "title": "完成：思考后续进度/考试卷子",
+      "description": "完成子任务：思考后续进度/考试卷子",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 3,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
     }
   ],
   "files": [
