@@ -77,6 +77,8 @@
             color: #fff;
             z-index: 40;
             display: none;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
         }
 
         #settings-panel.visible {
@@ -381,6 +383,33 @@
 
         #restart-btn:hover {
             transform: translateY(-1px);
+        }
+
+        /* --- Landscape mobile: compact settings panel --- */
+        @media (max-height: 520px) and (max-width: 1024px) {
+            #settings-panel {
+                top: 60px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-height: calc(100vh - 100px);
+                padding: 12px 14px;
+            }
+
+            #settings-panel h3 {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            #settings-panel label {
+                font-size: 11px;
+                margin-top: 8px;
+            }
+
+            #apply-settings {
+                margin-top: 10px;
+                padding: 8px 0;
+            }
         }
 
         @keyframes popUp {
@@ -872,8 +901,9 @@ function init() {
 
 function isInPowerBarArea(pos) {
     const c = CONFIG.CUSHION_SIZE;
-    const barHeight = c;
-    return pos.y >= logicalHeight - barHeight && pos.y <= logicalHeight && pos.x >= c && pos.x <= logicalWidth - c;
+    const barWidth = c;
+    return pos.x >= logicalWidth - barWidth && pos.x <= logicalWidth &&
+           pos.y >= c && pos.y <= logicalHeight - c;
 }
 
 function setupInputs() {
@@ -930,6 +960,7 @@ function setupInputs() {
 
     window.addEventListener('mouseup', handlePowerEnd);
     window.addEventListener('mouseup', handlePlacementEnd);
+    window.addEventListener('touchend', handlePowerEnd);
     window.addEventListener('touchend', handlePlacementEnd);
 
     // Keyboard
@@ -1093,9 +1124,10 @@ function handlePowerMove(e) {
     if (!STATE.isCharging) return;
     const pos = getEventPos(e);
     const c = CONFIG.CUSHION_SIZE;
-    const left = c;
-    const right = logicalWidth - c;
-    let t = (pos.x - left) / (right - left);
+    const top = c;
+    const bottom = logicalHeight - c;
+    // vertical bar on right cushion: from bottom (0) to top (1)
+    let t = (bottom - pos.y) / (bottom - top);
     let percent = Math.max(0, Math.min(1, t));
     STATE.power = percent;
     updatePowerUI(percent);
@@ -1444,23 +1476,24 @@ function loop() {
     ctx.fillStyle = "#000";
     for(let p of pockets) { ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.POCKET_RADIUS, 0, Math.PI*2); ctx.fill(); }
 
-    // Bottom-frame power bar
+    // Right-cushion vertical power bar
     const barC = CONFIG.CUSHION_SIZE;
-    const barHeight = 6;
-    const barLeft = barC + 16;
-    const barRight = logicalWidth - barC - 16;
-    const barWidth = Math.max(0, barRight - barLeft);
-    const barY = logicalHeight - barC + (barC - barHeight) * 0.5;
+    const barWidth = 6;
+    const barTop = barC + 16;
+    const barBottom = logicalHeight - barC - 16;
+    const barHeight = Math.max(0, barBottom - barTop);
+    const barX = logicalWidth - barC + (barC - barWidth) * 0.5;
 
     ctx.save();
     ctx.fillStyle = "rgba(255,255,255,0.12)";
-    ctx.fillRect(barLeft, barY, barWidth, barHeight);
+    ctx.fillRect(barX, barTop, barWidth, barHeight);
 
     const pct = Math.max(0, Math.min(1, STATE.power || 0));
     if (pct > 0) {
         const color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+        const filled = barHeight * pct;
         ctx.fillStyle = color;
-        ctx.fillRect(barLeft, barY, barWidth * pct, barHeight);
+        ctx.fillRect(barX, barBottom - filled, barWidth, filled);
     }
     ctx.restore();
 
