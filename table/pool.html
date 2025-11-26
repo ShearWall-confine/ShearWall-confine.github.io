@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gemini Pool: Cross-Platform Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            touch-action: none;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* --- 返回主页按钮 --- */
+        #back-home-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 25;
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: rgba(20, 20, 30, 0.7);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.15);
+            text-decoration: none;
+            letter-spacing: 1px;
+            pointer-events: auto;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        #back-home-btn:hover {
+            background: rgba(80, 80, 110, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair; /* 桌面端鼠标样式 */
+        }
+
+        /* --- 顶部信息栏 --- */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 90px;
+            height: 60px;
+            pointer-events: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .player-card {
+            background: rgba(20, 20, 30, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 8px 16px;
+            display: flex;
+            flex-direction: column;
+            min-width: 90px;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .player-card.active {
+            opacity: 1;
+            transform: scale(1);
+            background: rgba(40, 40, 50, 0.6);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .target-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        
+        .p1-active .target-type { color: #4facfe; }
+        .p2-active .target-type { color: #f093fb; }
+
+        .score-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* --- 右侧力度条 (优化触控区) --- */
+        #power-control {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        #power-track {
+            position: relative;
+            width: 12px;
+            height: 60%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #power-fill {
+            position: absolute;
+            bottom: 0;
+            top: 0; /* 默认充满，高度由JS控制 */
+            width: 100%;
+            height: 0%; 
+            background: linear-gradient(to top, #4facfe, #00f2fe);
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .p2-turn #power-fill {
+            background: linear-gradient(to top, #f093fb, #f5576c);
+        }
+
+        #power-handle {
+            position: absolute;
+            width: 36px; /* 加大触控点 */
+            height: 36px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transform: translateY(0);
+            cursor: pointer;
+            left: 50%;
+            margin-left: -18px; /* 居中 */
+            top: 0; /* 初始位置 */
+        }
+
+        /* --- 移动端微调控制 (New) --- */
+        #mobile-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            display: none; /* 默认隐藏，JS检测Touch后显示 */
+            gap: 20px;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .fine-tune-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            touch-action: manipulation;
+            transition: all 0.1s;
+        }
+
+        .fine-tune-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        /* --- 桌面端键盘提示 (New) --- */
+        #desktop-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            pointer-events: none;
+            display: none; /* JS检测Mouse后显示 */
+            white-space: nowrap;
+        }
+        
+        .key-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 600;
+            margin: 0 4px;
+            font-size: 10px;
+        }
+
+        /* --- 提示与动画 --- */
+        #game-toast {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            padding: 15px 30px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 30;
+        }
+
+        .float-text {
+            position: absolute;
+            color: white;
+            font-weight: 800;
+            font-size: 20px;
+            pointer-events: none;
+            animation: popUp 0.8s ease-out forwards;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            z-index: 5;
+        }
+
+        @keyframes popUp {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<a id="back-home-btn" href="../index.html">← 返回主页</a>
+
+<div id="ui-layer">
+    <div id="p1-card" class="player-card active p1-active">
+        <div class="target-type" id="p1-type">ANY</div>
+        <div class="score-info"><span>PLAYER 1</span></div>
+    </div>
+    <div id="p2-card" class="player-card">
+        <div class="target-type" id="p2-type">ANY</div>
+        <div class="score-info"><span>PLAYER 2</span></div>
+    </div>
+</div>
+
+<!-- 右侧蓄力条 -->
+<div id="power-control">
+    <div id="power-track">
+        <div id="power-fill"></div>
+        <div id="power-handle"></div>
+    </div>
+</div>
+
+<!-- 移动端微调控制 -->
+<div id="mobile-controls">
+    <div class="fine-tune-btn" id="btn-left">↺</div>
+    <div class="fine-tune-btn" id="btn-right">↻</div>
+</div>
+
+<!-- 桌面端提示 -->
+<div id="desktop-hint">
+    Use <span class="key-badge">←</span> <span class="key-badge">→</span> to Aim &nbsp;|&nbsp; Hold <span class="key-badge">SPACE</span> to Shoot
+</div>
+
+<div id="game-toast"></div>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+// --- 配置 ---
+const CONFIG = {
+    BALL_RADIUS: 10,
+    POCKET_RADIUS: 22,
+    CUSHION_SIZE: 20,
+    FRICTION: 0.988,
+    WALL_BOUNCE: 0.75,
+    BALL_BOUNCE: 0.94,
+    MAX_POWER: 200,
+    POWER_SCALE: 0.14,
+    STOP_VELOCITY: 0.05,
+    TRAIL_FADE: 0.07,
+    AIM_SENSITIVITY_TOUCH: 0.005,
+    AIM_SENSITIVITY_KEY: 0.01
+};
+
+const TYPE = { CUE: 0, SOLID: 1, STRIPE: 2, BLACK: 3 };
+const PALETTE = {
+    BG: '#050505',
+    FELT: ['#001a33', '#000814'],
+    P1_COLOR: '#4facfe',
+    P2_COLOR: '#f093fb',
+    SOLIDS: ['#FFD700', '#FF6B6B', '#4ECDC4', '#1A535C', '#FF9F1C', '#2E86AB', '#8D99AE'],
+    STRIPES: ['#FFE66D', '#FF8C94', '#96CEB4', '#45B8AC', '#FFAD60', '#5DADE2', '#A3E4D7']
+};
+
+const STATE = {
+    turn: 1,
+    assigned: false,
+    p1Group: null,
+    aimAngle: Math.PI/2,
+    power: 0,
+    isCharging: false,
+    spaceCharging: false, // 键盘蓄力标志
+    spaceChargeDir: 1,    // 蓄力增加或减少
+    sunkThisTurn: [],
+    foul: false,
+    gameOver: false,
+    canShoot: true,
+    inputType: 'unknown' // 'mouse' or 'touch'
+};
+
+class Vector {
+    constructor(x, y) { this.x = x; this.y = y; }
+    add(v) { return new Vector(this.x + v.x, this.y + v.y); }
+    sub(v) { return new Vector(this.x - v.x, this.y - v.y); }
+    mult(n) { return new Vector(this.x * n, this.y * n); }
+    mag() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+    normalize() { let m = this.mag(); return m === 0 ? new Vector(0,0) : new Vector(this.x / m, this.y / m); }
+    dist(v) { return Math.sqrt((this.x - v.x) ** 2 + (this.y - v.y) ** 2); }
+    
+    // 修复：添加点积静态方法
+    static dot(v1, v2) { return v1.x * v2.x + v1.y * v2.y; }
+}
+
+class Ball {
+    constructor(x, y, type, color, id) {
+        this.pos = new Vector(x, y);
+        this.vel = new Vector(0, 0);
+        this.type = type;
+        this.color = color;
+        this.id = id;
+        this.active = true;
+    }
+
+    update() {
+        if (!this.active) return;
+        if (this.vel.mag() > 1) {
+            trailCtx.beginPath();
+            if (this.type === TYPE.SOLID || this.type === TYPE.BLACK || this.type === TYPE.CUE) {
+                trailCtx.arc(this.pos.x, this.pos.y, CONFIG.BALL_RADIUS * 0.8, 0, Math.PI * 2);
+                trailCtx.fillStyle = this.type === TYPE.CUE ? 'rgba(255,255,255,0.2)' : this.color;
+                trailCtx.fill();
+            } else {
+                trailCtx.arc(this.pos.x, this.pos.y, CONFIG.BALL_RADIUS * 0.6, 0, Math.PI * 2);
+                trailCtx.fillStyle = this.color;
+                trailCtx.globalAlpha = 0.4;
+                trailCtx.fill();
+                trailCtx.globalAlpha = 1.0;
+            }
+        }
+        this.pos = this.pos.add(this.vel);
+        this.vel = this.vel.mult(CONFIG.FRICTION);
+        if (this.vel.mag() < CONFIG.STOP_VELOCITY) this.vel = new Vector(0, 0);
+
+        const bound = CONFIG.CUSHION_SIZE + CONFIG.BALL_RADIUS;
+        if (this.pos.x < bound) { this.pos.x = bound; this.vel.x *= -CONFIG.WALL_BOUNCE; }
+        if (this.pos.x > logicalWidth - bound) { this.pos.x = logicalWidth - bound; this.vel.x *= -CONFIG.WALL_BOUNCE; }
+        if (this.pos.y < bound) { this.pos.y = bound; this.vel.y *= -CONFIG.WALL_BOUNCE; }
+        if (this.pos.y > logicalHeight - bound) { this.pos.y = logicalHeight - bound; this.vel.y *= -CONFIG.WALL_BOUNCE; }
+    }
+
+    draw(ctx) {
+        if (!this.active) return;
+        const x = this.pos.x;
+        const y = this.pos.y;
+        const r = CONFIG.BALL_RADIUS;
+
+        ctx.fillStyle = "rgba(0,0,0,0.4)";
+        ctx.beginPath(); ctx.arc(x + r*0.3, y + r*0.3, r, 0, Math.PI * 2); ctx.fill();
+
+        if (this.type === TYPE.CUE) {
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        } else if (this.type === TYPE.BLACK) {
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.font = "bold 10px Inter";
+            ctx.textAlign = "center"; ctx.textBaseline="middle"; ctx.fillText("8", x, y+0.5);
+        } else if (this.type === TYPE.SOLID) {
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, adjustBrightness(this.color, 60));
+            grad.addColorStop(0.3, this.color);
+            grad.addColorStop(1, adjustBrightness(this.color, -50));
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        } else if (this.type === TYPE.STRIPE) {
+            ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = this.color; ctx.lineWidth = r * 0.6;
+            ctx.beginPath(); ctx.arc(x, y, r*0.6, 0, Math.PI*2); ctx.stroke();
+            let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
+            glare.addColorStop(0, "rgba(255,255,255,0.4)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
+            ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        }
+    }
+}
+
+// --- Globals ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const trailCanvas = document.createElement('canvas');
+const trailCtx = trailCanvas.getContext('2d');
+
+const uiP1 = document.getElementById('p1-card');
+const uiP2 = document.getElementById('p2-card');
+const uiType1 = document.getElementById('p1-type');
+const uiType2 = document.getElementById('p2-type');
+const uiPowerControl = document.getElementById('power-control');
+const uiPowerFill = document.getElementById('power-fill');
+const uiPowerHandle = document.getElementById('power-handle');
+const uiToast = document.getElementById('game-toast');
+const uiMobileControls = document.getElementById('mobile-controls');
+const uiDesktopHint = document.getElementById('desktop-hint');
+
+let logicalWidth, logicalHeight;
+let balls = [];
+let pockets = [];
+let whiteBall;
+let aimTouchStart = null;
+let aimAngleStart = 0;
+
+// --- Init ---
+function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    logicalWidth = window.innerWidth;
+    logicalHeight = window.innerHeight;
+    canvas.width = logicalWidth * dpr; canvas.height = logicalHeight * dpr;
+    canvas.style.width = logicalWidth + "px"; canvas.style.height = logicalHeight + "px";
+    ctx.resetTransform(); ctx.scale(dpr, dpr);
+    trailCanvas.width = logicalWidth * dpr; trailCanvas.height = logicalHeight * dpr;
+    trailCtx.resetTransform(); trailCtx.scale(dpr, dpr);
+    const off = CONFIG.CUSHION_SIZE * 0.8;
+    pockets = [
+        new Vector(off, off), new Vector(logicalWidth/2, off-4), new Vector(logicalWidth-off, off),
+        new Vector(off, logicalHeight-off), new Vector(logicalWidth/2, logicalHeight-off+4), new Vector(logicalWidth-off, logicalHeight-off)
+    ];
+}
+
+function init() {
+    resize();
+    window.addEventListener('resize', resize);
+    resetGame();
+    setupInputs();
+    requestAnimationFrame(loop);
+}
+
+function setupInputs() {
+    // Canvas Touch Aim (Coarse)
+    canvas.addEventListener('touchstart', e => {
+        STATE.inputType = 'touch'; updateDeviceUI();
+        handleAimStart(e);
+    }, {passive: false});
+    window.addEventListener('touchmove', e => handleAimMove(e), {passive: false});
+    
+    // Mouse Aim (Coarse)
+    canvas.addEventListener('mousedown', e => {
+        STATE.inputType = 'mouse'; updateDeviceUI();
+        handleAimStart(e);
+    });
+    window.addEventListener('mousemove', e => {
+        STATE.inputType = 'mouse'; updateDeviceUI();
+        handleAimMove(e);
+    });
+
+    // Mobile Fine Tune Buttons
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const fineTune = (dir) => {
+        if(!STATE.canShoot) return;
+        STATE.aimAngle += dir * 0.05; // Small step
+        if(navigator.vibrate) navigator.vibrate(5);
+    };
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); fineTune(-1); });
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); fineTune(1); });
+    // Also support click for testing
+    btnLeft.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(-1); });
+    btnRight.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(1); });
+
+    // Power Slider
+    uiPowerControl.addEventListener('touchstart', handlePowerStart, {passive: false});
+    uiPowerControl.addEventListener('touchmove', handlePowerMove, {passive: false});
+    uiPowerControl.addEventListener('touchend', handlePowerEnd, {passive: false});
+    uiPowerControl.addEventListener('mousedown', handlePowerStart);
+    window.addEventListener('mouseup', handlePowerEnd);
+
+    // Keyboard
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('wheel', handleWheel); // Mouse wheel support
+}
+
+function updateDeviceUI() {
+    if (STATE.inputType === 'touch') {
+        uiMobileControls.style.display = 'flex';
+        uiDesktopHint.style.display = 'none';
+    } else {
+        uiMobileControls.style.display = 'none';
+        uiDesktopHint.style.display = 'block';
+    }
+}
+
+// --- Input Handlers ---
+function handleAimStart(e) {
+    if (!STATE.canShoot || STATE.spaceCharging) return;
+    if (e.target !== canvas) return;
+    e.preventDefault();
+    aimTouchStart = getEventPos(e);
+    aimAngleStart = STATE.aimAngle;
+}
+
+function handleAimMove(e) {
+    if (!STATE.canShoot || STATE.isCharging || STATE.spaceCharging) return;
+    const pos = getEventPos(e);
+
+    if (STATE.inputType === 'mouse') {
+        // 鼠标直接以白球到指针的连线作为瞄准方向
+        const angle = Math.atan2(pos.y - whiteBall.pos.y, pos.x - whiteBall.pos.x);
+        if (!isNaN(angle)) STATE.aimAngle = angle;
+        return;
+    }
+
+    if (!aimTouchStart) return;
+    let dy = pos.y - aimTouchStart.y;
+    let sensitivity = CONFIG.AIM_SENSITIVITY_TOUCH;
+    STATE.aimAngle = aimAngleStart + (dy * sensitivity); 
+}
+
+function handleKeyDown(e) {
+    if (!STATE.canShoot) return;
+    STATE.inputType = 'mouse'; updateDeviceUI();
+    
+    const step = e.shiftKey ? 0.05 : 0.005; // Shift for fast turn
+
+    if (e.code === 'ArrowLeft') STATE.aimAngle -= step;
+    if (e.code === 'ArrowRight') STATE.aimAngle += step;
+    
+    if (e.code === 'Space' && !STATE.spaceCharging && !e.repeat) {
+        STATE.spaceCharging = true;
+        STATE.power = 0;
+        STATE.spaceChargeDir = 1;
+    }
+}
+
+function handleKeyUp(e) {
+    if (e.code === 'Space' && STATE.spaceCharging) {
+        STATE.spaceCharging = false;
+        shoot();
+        STATE.power = 0;
+        updatePowerUI(0);
+    }
+}
+
+function handleWheel(e) {
+    if (!STATE.canShoot) return;
+    STATE.aimAngle += e.deltaY * 0.001;
+}
+
+// Power Slider Logic
+function handlePowerStart(e) {
+    if (!STATE.canShoot || STATE.spaceCharging) return;
+    e.preventDefault();
+    STATE.isCharging = true;
+    updatePowerUI(0);
+}
+
+function handlePowerMove(e) {
+    if (!STATE.isCharging) return;
+    const pos = getEventPos(e);
+    const rect = document.getElementById('power-track').getBoundingClientRect();
+    let relativeY = pos.y - rect.top;
+    let percent = Math.max(0, Math.min(1, relativeY / rect.height));
+    STATE.power = percent;
+    updatePowerUI(percent);
+}
+
+function handlePowerEnd(e) {
+    if (!STATE.isCharging) return;
+    STATE.isCharging = false;
+    if (STATE.power > 0.1) shoot();
+    STATE.power = 0;
+    updatePowerUI(0);
+}
+
+function getEventPos(e) {
+    if (e.touches && e.touches.length > 0) return new Vector(e.touches[0].clientX, e.touches[0].clientY);
+    return new Vector(e.clientX, e.clientY);
+}
+
+// --- Logic ---
+function updatePowerUI(percent) {
+    uiPowerFill.style.height = (percent * 100) + "%";
+    uiPowerFill.style.top = "0"; 
+    uiPowerHandle.style.top = (percent * 100) + "%";
+    
+    if (STATE.turn === 2) uiPowerControl.classList.add('p2-turn');
+    else uiPowerControl.classList.remove('p2-turn');
+}
+
+function shoot() {
+    STATE.canShoot = false;
+    let force = STATE.power * CONFIG.MAX_POWER;
+    let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
+    whiteBall.vel = dir.mult(force * CONFIG.POWER_SCALE);
+    STATE.sunkThisTurn = [];
+    STATE.foul = false;
+    if(navigator.vibrate) navigator.vibrate(20); // 震动反馈
+}
+
+function resetGame() {
+    balls = [];
+    STATE.turn = 1; STATE.assigned = false; STATE.p1Group = null;
+    STATE.foul = false; STATE.gameOver = false; STATE.sunkThisTurn = [];
+    trailCtx.clearRect(0,0,logicalWidth,logicalHeight);
+
+    whiteBall = new Ball(logicalWidth * 0.25, logicalHeight / 2, TYPE.CUE, '#fff', 0);
+    balls.push(whiteBall);
+
+    const startX = logicalWidth * 0.7;
+    const startY = logicalHeight / 2;
+    const r = CONFIG.BALL_RADIUS;
+    const rackPattern = [1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0]; 
+    let solids = [...PALETTE.SOLIDS], stripes = [...PALETTE.STRIPES];
+    let ballIdx = 0;
+
+    for (let col = 0; col < 5; col++) {
+        for (let row = 0; row <= col; row++) {
+            let x = startX + col * (r * 2 * 0.866 + 1);
+            let y = startY - col * (r + 0.5) + row * (r * 2 + 1);
+            let typeCode = rackPattern[ballIdx];
+            let type, color, id;
+            if (typeCode === 2) { type = TYPE.BLACK; color = '#000'; id = 8; }
+            else if (typeCode === 0) { type = TYPE.SOLID; color = solids.shift()||'#888'; id=ballIdx+1; }
+            else { type = TYPE.STRIPE; color = stripes.shift()||'#888'; id=ballIdx+9; }
+            balls.push(new Ball(x, y, type, color, id));
+            ballIdx++;
+        }
+    }
+    updateUI();
+    showToast("GAME START");
+}
+
+function checkTurn() {
+    const isMoving = balls.some(b => b.active && b.vel.mag() > CONFIG.STOP_VELOCITY);
+    if (!isMoving && !STATE.canShoot && !STATE.gameOver) {
+        resolveTurn();
+        STATE.canShoot = true;
+    }
+}
+
+function resolveTurn() {
+    let switchTurn = true;
+    let message = "";
+    if (STATE.foul) {
+        message = "FOUL! BALL IN HAND";
+        resetWhiteBall();
+        switchTurn = true;
+    } else if (STATE.sunkThisTurn.includes(TYPE.BLACK)) {
+        let myType = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
+        let myRemaining = countRemaining(myType);
+        if (myRemaining > 0 || !STATE.assigned) { message = `PLAYER ${STATE.turn} LOST`; STATE.gameOver = true; }
+        else { message = `PLAYER ${STATE.turn} WINS!`; STATE.gameOver = true; }
+        showToast(message); return;
+    } else if (STATE.sunkThisTurn.length > 0) {
+        let firstSunk = STATE.sunkThisTurn[0];
+        if (!STATE.assigned) {
+            if (firstSunk === TYPE.SOLID) { STATE.p1Group = TYPE.SOLID; STATE.assigned = true; message = "P1: SOLIDS"; switchTurn = false; }
+            else if (firstSunk === TYPE.STRIPE) { STATE.p1Group = TYPE.STRIPE; STATE.assigned = true; message = "P1: STRIPES"; switchTurn = false; }
+        } else {
+            let myGroup = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
+            if (STATE.sunkThisTurn.includes(myGroup)) { switchTurn = false; message = "GOOD SHOT"; }
+            else { switchTurn = true; message = "WRONG BALL"; }
+        }
+    } else { switchTurn = true; }
+
+    if (switchTurn) STATE.turn = STATE.turn === 1 ? 2 : 1;
+    if (message) showToast(message);
+    updateUI();
+}
+
+function countRemaining(type) { return type ? balls.filter(b => b.active && b.type === type).length : 0; }
+function resetWhiteBall() {
+    whiteBall.active = true; whiteBall.vel = new Vector(0,0);
+    whiteBall.pos = new Vector(logicalWidth * 0.25, logicalHeight / 2);
+}
+
+function resolveCollisions() {
+    for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+            let b1 = balls[i]; let b2 = balls[j];
+            if (!b1.active || !b2.active) continue;
+            let dist = b1.pos.dist(b2.pos);
+            if (dist < CONFIG.BALL_RADIUS * 2) {
+                let normal = b2.pos.sub(b1.pos).normalize();
+                let overlap = CONFIG.BALL_RADIUS * 2 - dist;
+                b1.pos = b1.pos.sub(normal.mult(overlap * 0.5));
+                b2.pos = b2.pos.add(normal.mult(overlap * 0.5));
+                let relVel = b1.vel.sub(b2.vel);
+                let sepVel = Vector.dot(relVel, normal);
+                let newSepVel = -sepVel * CONFIG.BALL_BOUNCE;
+                let sepVelVec = normal.mult(newSepVel - sepVel);
+                b1.vel = b1.vel.add(sepVelVec.mult(0.5));
+                b2.vel = b2.vel.sub(sepVelVec.mult(0.5));
+            }
+        }
+    }
+    for (let b of balls) {
+        if (!b.active) continue;
+        for (let p of pockets) {
+            if (b.pos.dist(p) < CONFIG.POCKET_RADIUS) {
+                if (b.type === TYPE.CUE) { STATE.foul = true; b.active = false; }
+                else { b.active = false; b.vel = new Vector(0,0); STATE.sunkThisTurn.push(b.type); spawnFloatText("+1", p.x, p.y); }
+            }
+        }
+    }
+}
+
+function spawnFloatText(text, x, y) {
+    const el = document.createElement('div');
+    el.className = 'float-text'; el.innerText = text;
+    el.style.left = Math.min(x, logicalWidth-50)+'px'; el.style.top = Math.min(y, logicalHeight-50)+'px';
+    document.body.appendChild(el); setTimeout(() => el.remove(), 800);
+}
+function showToast(msg) { uiToast.innerText = msg; uiToast.style.opacity = "1"; setTimeout(() => uiToast.style.opacity = "0", 2000); }
+function updateUI() {
+    if (STATE.turn === 1) { uiP1.classList.add('active', 'p1-active'); uiP2.classList.remove('active', 'p2-active'); }
+    else { uiP1.classList.remove('active', 'p1-active'); uiP2.classList.add('active', 'p2-active'); }
+    if (!STATE.assigned) { uiType1.innerText = "ANY"; uiType2.innerText = "ANY"; }
+    else {
+        uiType1.innerText = STATE.p1Group === TYPE.SOLID ? "SOLIDS ●" : "STRIPES ◎";
+        uiType2.innerText = STATE.p1Group === TYPE.SOLID ? "STRIPES ◎" : "SOLIDS ●";
+    }
+}
+function adjustBrightness(col, amt) {
+    let usePound = false; if (col[0] == "#") { col = col.slice(1); usePound = true; }
+    let num = parseInt(col,16); let r = (num >> 16) + amt; let b = ((num >> 8) & 0x00FF) + amt; let g = (num & 0x0000FF) + amt;
+    r = r > 255 ? 255 : (r < 0 ? 0 : r); b = b > 255 ? 255 : (b < 0 ? 0 : b); g = g > 255 ? 255 : (g < 0 ? 0 : g);
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16).padStart(6,0);
+}
+
+function loop() {
+    ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+    
+    // Space Charging Logic
+    if (STATE.spaceCharging) {
+        STATE.power += 0.02 * STATE.spaceChargeDir;
+        if (STATE.power >= 1) { STATE.power = 1; STATE.spaceChargeDir = -1; }
+        if (STATE.power <= 0) { STATE.power = 0; STATE.spaceChargeDir = 1; }
+        updatePowerUI(STATE.power);
+    }
+
+    trailCtx.globalCompositeOperation = 'destination-out';
+    trailCtx.fillStyle = `rgba(0, 0, 0, ${CONFIG.TRAIL_FADE})`;
+    trailCtx.fillRect(0, 0, logicalWidth, logicalHeight);
+    trailCtx.globalCompositeOperation = 'source-over';
+
+    let felt = ctx.createRadialGradient(logicalWidth/2, logicalHeight/2, logicalWidth*0.2, logicalWidth/2, logicalHeight/2, logicalWidth);
+    felt.addColorStop(0, PALETTE.FELT[0]); felt.addColorStop(1, PALETTE.FELT[1]);
+    ctx.fillStyle = felt; ctx.fillRect(0, 0, logicalWidth, logicalHeight);
+    ctx.drawImage(trailCanvas, 0, 0, logicalWidth, logicalHeight);
+    
+    const c = CONFIG.CUSHION_SIZE;
+    ctx.fillStyle = "#0a0a10";
+    ctx.fillRect(0,0,logicalWidth,c); ctx.fillRect(0,logicalHeight-c,logicalWidth,c);
+    ctx.fillRect(0,0,c,logicalHeight); ctx.fillRect(logicalWidth-c,0,c,logicalHeight);
+    ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth=1;
+    ctx.strokeRect(c,c,logicalWidth-c*2,logicalHeight-c*2);
+    
+    ctx.fillStyle = "#000";
+    for(let p of pockets) { ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.POCKET_RADIUS, 0, Math.PI*2); ctx.fill(); }
+
+    resolveCollisions();
+    checkTurn();
+
+    for(let b of balls) { b.update(); b.draw(ctx); }
+    
+    if (STATE.canShoot && !STATE.gameOver) {
+        let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
+        let start = whiteBall.pos;
+        let end = start.add(dir.mult(600));
+        let color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+        
+        ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.lineTo(end.x, end.y);
+        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([8, 8]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(start.x, start.y, CONFIG.BALL_RADIUS + 15, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth = 1; ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+}
+
+init();
+</script>
+</body>
+</html>
