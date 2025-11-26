@@ -39,6 +39,109 @@
             background: rgba(80, 80, 110, 0.8);
             transform: translateY(-1px);
         }
+
+        /* --- 设置按钮与面板 --- */
+        #settings-toggle {
+            position: absolute;
+            top: 20px;
+            right: 150px;
+            z-index: 25;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(20, 20, 30, 0.7);
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        #settings-toggle:hover {
+            background: rgba(80, 80, 110, 0.8);
+            transform: translateY(-1px);
+        }
+
+        #settings-panel {
+            position: absolute;
+            top: 80px;
+            right: 30px;
+            width: 260px;
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(15, 15, 25, 0.88);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            z-index: 40;
+            display: none;
+        }
+
+        #settings-panel.visible {
+            display: block;
+        }
+
+        #settings-panel h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #settings-panel label {
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        #settings-panel input,
+        #settings-panel select {
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        #settings-panel input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.25);
+            outline: none;
+        }
+
+        #settings-panel input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        #apply-settings {
+            margin-top: 14px;
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            cursor: pointer;
+        }
+
+        #close-settings {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            cursor: pointer;
+        }
         
         canvas {
             display: block;
@@ -258,6 +361,26 @@
 <body>
 
 <a id="back-home-btn" href="../index.html">← 返回主页</a>
+<button id="settings-toggle">⚙ 设置</button>
+
+<div id="settings-panel">
+    <h3>桌面设置 <button id="close-settings">×</button></h3>
+    <label>球半径 <span id="ball-size-display">10px</span></label>
+    <input type="range" min="6" max="18" step="1" id="ball-size-input" value="10">
+    
+    <label>球袋大小 <span id="pocket-size-display">22px</span></label>
+    <input type="range" min="18" max="32" step="1" id="pocket-size-input" value="22">
+    
+    <label>桌面配色</label>
+    <select id="felt-select">
+        <option value="midnight">午夜蓝</option>
+        <option value="classic">经典绿</option>
+        <option value="ember">琥珀夜</option>
+        <option value="aurora">极光霓虹</option>
+    </select>
+    
+    <button id="apply-settings">应用并重置</button>
+</div>
 
 <div id="ui-layer">
     <div id="p1-card" class="player-card active p1-active">
@@ -317,6 +440,19 @@ const PALETTE = {
     P2_COLOR: '#f093fb',
     SOLIDS: ['#FFD700', '#FF6B6B', '#4ECDC4', '#1A535C', '#FF9F1C', '#2E86AB', '#8D99AE'],
     STRIPES: ['#FFE66D', '#FF8C94', '#96CEB4', '#45B8AC', '#FFAD60', '#5DADE2', '#A3E4D7']
+};
+
+const SETTINGS = {
+    ballRadius: CONFIG.BALL_RADIUS,
+    pocketRadius: CONFIG.POCKET_RADIUS,
+    feltScheme: 'midnight'
+};
+
+const FELT_SCHEMES = {
+    midnight: ['#001a33', '#000814'],
+    classic: ['#0b4d0b', '#062b06'],
+    ember: ['#331111', '#120505'],
+    aurora: ['#002b36', '#00111b']
 };
 
 const STATE = {
@@ -437,6 +573,15 @@ const uiPowerHandle = document.getElementById('power-handle');
 const uiToast = document.getElementById('game-toast');
 const uiMobileControls = document.getElementById('mobile-controls');
 const uiDesktopHint = document.getElementById('desktop-hint');
+const uiSettingsToggle = document.getElementById('settings-toggle');
+const uiSettingsPanel = document.getElementById('settings-panel');
+const uiCloseSettings = document.getElementById('close-settings');
+const uiBallRange = document.getElementById('ball-size-input');
+const uiPocketRange = document.getElementById('pocket-size-input');
+const uiFeltSelect = document.getElementById('felt-select');
+const uiApplySettings = document.getElementById('apply-settings');
+const uiBallDisplay = document.getElementById('ball-size-display');
+const uiPocketDisplay = document.getElementById('pocket-size-display');
 
 let logicalWidth, logicalHeight;
 let balls = [];
@@ -467,6 +612,7 @@ function init() {
     window.addEventListener('resize', resize);
     resetGame();
     setupInputs();
+    setupSettingsPanel();
     requestAnimationFrame(loop);
 }
 
@@ -513,6 +659,47 @@ function setupInputs() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('wheel', handleWheel); // Mouse wheel support
+}
+
+function setupSettingsPanel() {
+    if (!uiSettingsToggle) return;
+    uiBallRange.value = CONFIG.BALL_RADIUS;
+    uiPocketRange.value = CONFIG.POCKET_RADIUS;
+    uiBallDisplay.innerText = `${CONFIG.BALL_RADIUS}px`;
+    uiPocketDisplay.innerText = `${CONFIG.POCKET_RADIUS}px`;
+    uiFeltSelect.value = SETTINGS.feltScheme;
+
+    const togglePanel = (show) => {
+        uiSettingsPanel.classList[show ? 'add' : 'remove']('visible');
+    };
+
+    uiSettingsToggle.addEventListener('click', () => togglePanel(!uiSettingsPanel.classList.contains('visible')));
+    uiCloseSettings.addEventListener('click', () => togglePanel(false));
+
+    uiBallRange.addEventListener('input', () => {
+        SETTINGS.ballRadius = Number(uiBallRange.value);
+        uiBallDisplay.innerText = `${SETTINGS.ballRadius}px`;
+    });
+    uiPocketRange.addEventListener('input', () => {
+        SETTINGS.pocketRadius = Number(uiPocketRange.value);
+        uiPocketDisplay.innerText = `${SETTINGS.pocketRadius}px`;
+    });
+    uiFeltSelect.addEventListener('change', () => {
+        SETTINGS.feltScheme = uiFeltSelect.value;
+    });
+
+    uiApplySettings.addEventListener('click', () => {
+        applyCustomSettings();
+        togglePanel(false);
+    });
+}
+
+function applyCustomSettings() {
+    CONFIG.BALL_RADIUS = SETTINGS.ballRadius;
+    CONFIG.POCKET_RADIUS = SETTINGS.pocketRadius;
+    PALETTE.FELT = FELT_SCHEMES[SETTINGS.feltScheme] || FELT_SCHEMES.midnight;
+    showToast("设置已应用，重新开局");
+    resetGame();
 }
 
 function updateDeviceUI() {
