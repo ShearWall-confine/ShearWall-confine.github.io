@@ -15,7 +15,7 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
-
+        
         /* --- Top control stack (embedded into top cushion) --- */
         #ui-shell {
             position: absolute;
@@ -65,26 +65,36 @@
             text-shadow: 0 0 6px rgba(255,255,255,0.5);
         }
 
+        /* --- Settings overlay & dialog --- */
         #settings-panel {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            width: 260px;
-            padding: 18px;
-            border-radius: 16px;
-            background: rgba(15, 15, 25, 0.88);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: #fff;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 40;
             display: none;
-            max-height: calc(100vh - 120px);
-            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
         }
 
         #settings-panel.visible {
-            display: block;
+            display: flex;
+        }
+
+        .settings-content {
+            width: 60vw;
+            max-width: 420px;
+            max-height: 60vh;
+            padding: 18px 20px;
+            border-radius: 16px;
+            background: rgba(15, 15, 25, 0.96);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-sizing: border-box;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
         }
 
         #settings-panel h3 {
@@ -130,7 +140,7 @@
         }
 
         #apply-settings {
-            margin-top: 14px;
+            margin: 8px 0 12px 0;
             width: 100%;
             padding: 8px 0;
             border-radius: 10px;
@@ -388,13 +398,11 @@
 
         /* --- Landscape mobile: compact settings panel --- */
         @media (max-height: 520px) and (max-width: 1024px) {
-            #settings-panel {
-                top: 60px;
-                left: 10px;
-                right: 10px;
-                width: auto;
-                max-height: calc(100vh - 100px);
-                padding: 12px 14px;
+            .settings-content {
+                width: 70vw;
+                max-width: 480px;
+                max-height: 70vh;
+                padding: 12px 16px;
             }
 
             #settings-panel h3 {
@@ -408,7 +416,7 @@
             }
 
             #apply-settings {
-                margin-top: 10px;
+                margin: 8px 0 10px 0;
                 padding: 8px 0;
             }
         }
@@ -447,51 +455,54 @@
 </div>
 
 <div id="settings-panel">
-    <h3>Table Settings <button id="close-settings">×</button></h3>
-    <label>Ball radius <span id="ball-size-display">10px</span></label>
-    <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
-    
-    <label>Pocket size <span id="pocket-size-display">22px</span></label>
-    <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
+    <div class="settings-content">
+        <h3>Table Settings <button id="close-settings">×</button></h3>
 
-    <label>Max shot power <span id="power-max-display">200</span></label>
-    <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
+        <button id="apply-settings">Apply &amp; Re-rack</button>
 
-    <label>Table friction <span id="friction-display">0.988</span></label>
-    <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
-    
-    <label>Felt palette</label>
-    <select id="felt-select">
-        <option value="midnight">Midnight Blue</option>
-        <option value="classic">Classic Green</option>
-        <option value="ember">Ember Night</option>
-        <option value="aurora">Aurora Neon</option>
-        <option value="metal_steel">Steel Metal</option>
-        <option value="metal_gold">Gold Metal</option>
-        <option value="metal_copper">Copper Metal</option>
-        <option value="diamond_cyan">Cyan Diamond</option>
-        <option value="diamond_violet">Violet Diamond</option>
-        <option value="plastic_blue">Blue Plastic</option>
-        <option value="plastic_red">Red Plastic</option>
-        <option value="stone_marble">Marble Stone</option>
-        <option value="stone_slate">Slate Stone</option>
-    </select>
+        <label>Ball radius <span id="ball-size-display">10px</span></label>
+        <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
+        
+        <label>Pocket size <span id="pocket-size-display">22px</span></label>
+        <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
 
-    <label>Ball material</label>
-    <select id="ball-material-select">
-        <option value="classic">Classic</option>
-        <option value="metal_steel">Steel Metal</option>
-        <option value="metal_gold">Gold Metal</option>
-        <option value="metal_copper">Copper Metal</option>
-        <option value="diamond_cyan">Cyan Diamond</option>
-        <option value="diamond_violet">Violet Diamond</option>
-        <option value="plastic_blue">Blue Plastic</option>
-        <option value="plastic_red">Red Plastic</option>
-        <option value="stone_marble">Marble Stone</option>
-        <option value="stone_slate">Slate Stone</option>
-    </select>
-    
-    <button id="apply-settings">Apply &amp; Re-rack</button>
+        <label>Max shot power <span id="power-max-display">200</span></label>
+        <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
+
+        <label>Table friction <span id="friction-display">0.988</span></label>
+        <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
+        
+        <label>Felt palette</label>
+        <select id="felt-select">
+            <option value="midnight">Midnight Blue</option>
+            <option value="classic">Classic Green</option>
+            <option value="ember">Ember Night</option>
+            <option value="aurora">Aurora Neon</option>
+            <option value="metal_steel">Steel Metal</option>
+            <option value="metal_gold">Gold Metal</option>
+            <option value="metal_copper">Copper Metal</option>
+            <option value="diamond_cyan">Cyan Diamond</option>
+            <option value="diamond_violet">Violet Diamond</option>
+            <option value="plastic_blue">Blue Plastic</option>
+            <option value="plastic_red">Red Plastic</option>
+            <option value="stone_marble">Marble Stone</option>
+            <option value="stone_slate">Slate Stone</option>
+        </select>
+
+        <label>Ball material</label>
+        <select id="ball-material-select">
+            <option value="classic">Classic</option>
+            <option value="metal_steel">Steel Metal</option>
+            <option value="metal_gold">Gold Metal</option>
+            <option value="metal_copper">Copper Metal</option>
+            <option value="diamond_cyan">Cyan Diamond</option>
+            <option value="diamond_violet">Violet Diamond</option>
+            <option value="plastic_blue">Blue Plastic</option>
+            <option value="plastic_red">Red Plastic</option>
+            <option value="stone_marble">Marble Stone</option>
+            <option value="stone_slate">Slate Stone</option>
+        </select>
+    </div>
 </div>
 
 <div id="ball-hand-banner">Ball in hand — drag the cue ball to place it.</div>
@@ -687,8 +698,8 @@ class Ball {
                 ctx.fillStyle = grad;
             } else {
                 // classic / plastic
-                let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
-                grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
                 ctx.fillStyle = grad;
             }
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
@@ -916,7 +927,7 @@ function setupInputs() {
         if (isInPowerBarArea(pos)) {
             handlePowerStart(e);
         } else {
-            handleAimStart(e);
+        handleAimStart(e);
         }
     }, {passive: false});
     window.addEventListener('touchmove', e => {
@@ -934,7 +945,7 @@ function setupInputs() {
         if (isInPowerBarArea(pos)) {
             handlePowerStart(e);
         } else {
-            handleAimStart(e);
+        handleAimStart(e);
         }
     });
     window.addEventListener('mousemove', e => {
@@ -942,7 +953,7 @@ function setupInputs() {
         if (STATE.isCharging) {
             handlePowerMove(e);
         } else {
-            handleAimMove(e);
+        handleAimMove(e);
         }
     });
 
@@ -1441,37 +1452,17 @@ function updateUI() {
     if (uiScore2) uiScore2.innerText = STATE.scores[2];
 }
 
-function getGroupIds(groupType) {
-    if (groupType === TYPE.SOLID) return [1,2,3,4,5,6,7];
-    if (groupType === TYPE.STRIPE) return [9,10,11,12,13,14,15];
-    return [];
-}
-
-function getRemainingIdSet(groupType) {
-    const set = new Set();
-    for (let b of balls) {
-        if (b.active && b.type === groupType && typeof b.id === 'number') {
-            set.add(b.id);
-        }
-    }
-    return set;
-}
-
-function getBallColorById(id, fallbackColor) {
-    for (let b of balls) {
-        if (b.id === id && b.color) return b.color;
-    }
-    return fallbackColor;
-}
-
 function buildTargetsForPlayer(isP1) {
     if (!STATE.assigned) return [];
     const myGroup = isP1 ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
     if (myGroup !== TYPE.SOLID && myGroup !== TYPE.STRIPE) return [];
 
-    const allIds = getGroupIds(myGroup);
-    const remainingSet = getRemainingIdSet(myGroup);
-    const remainingCount = remainingSet.size;
+    // All balls that originally belong to this group (by type), excluding black/cue
+    const groupBalls = balls
+        .filter(b => b.type === myGroup && typeof b.id === 'number' && b.id !== 8)
+        .sort((a, b) => (a.id || 0) - (b.id || 0));
+
+    const remainingCount = groupBalls.filter(b => b.active).length;
 
     // 如果己方目标球都清空，且黑球仍在台面，则目标只剩黑球
     const blackRemaining = countRemaining(TYPE.BLACK) > 0;
@@ -1479,18 +1470,12 @@ function buildTargetsForPlayer(isP1) {
         return [{ id: 8, isRemaining: true, isBlack: true, color: '#000' }];
     }
 
-    const targets = [];
-    for (let id of allIds) {
-        const isRemaining = remainingSet.has(id);
-        const baseColor = getBallColorById(id, isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR);
-        targets.push({
-            id,
-            isRemaining,
-            isBlack: false,
-            color: baseColor
-        });
-    }
-    return targets;
+    return groupBalls.map(b => ({
+        id: b.id,
+        isRemaining: b.active,
+        isBlack: false,
+        color: b.color
+    }));
 }
 
 function drawScoreboard(ctx) {
@@ -1553,11 +1538,11 @@ function drawScoreboard(ctx) {
 
                 ctx.beginPath();
                 if (t.isBlack || t.id === 8) {
-                    ctx.fillStyle = isRem ? "#000" : "rgba(80,80,80,0.8)";
+                    ctx.fillStyle = isRem ? "#000" : "rgba(50,50,50,0.9)";
                 } else if (isRem) {
                     ctx.fillStyle = t.color || (isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR);
                 } else {
-                    ctx.fillStyle = "rgba(120,120,130,0.4)";
+                    ctx.fillStyle = "rgba(80,80,90,0.9)"; // fully gray for potted balls
                 }
                 ctx.arc(cx, cy, dotRadius, 0, Math.PI*2);
                 ctx.fill();
@@ -1567,7 +1552,7 @@ function drawScoreboard(ctx) {
                 ctx.stroke();
 
                 // text label
-                const textColor = isRem ? "#ffffff" : "rgba(220,220,230,0.7)";
+                const textColor = isRem ? "#ffffff" : "rgba(180,180,190,0.9)";
                 ctx.fillStyle = textColor;
                 ctx.fillText(String(t.id), cx, cy+0.5);
 
