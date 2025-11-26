@@ -1158,7 +1158,13 @@ function setupInputs() {
     if (uiConfirmShotBtn) {
         uiConfirmShotBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation(); // Prevent event from bubbling to canvas
             confirmShot();
+        });
+        // Also handle touchstart to prevent it from triggering canvas events
+        uiConfirmShotBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
         });
     }
 }
@@ -1294,6 +1300,12 @@ function confirmShot() {
 // --- Input Handlers ---
 function handleAimStart(e) {
     if (STATE.gameOver) return;
+    
+    // Don't update aim if clicking on the confirm shot button
+    if (e.target === uiConfirmShotBtn || (e.target && e.target.closest && e.target.closest('#confirm-shot-btn'))) {
+        return;
+    }
+    
     if (STATE.ballInHand && STATE.canShoot) {
         e.preventDefault();
         placingBall = true;
