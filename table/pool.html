@@ -744,7 +744,8 @@ const STATE = {
     ballInHand: false,
     ballMaterial: 'classic',
     aimMode: 'basic', // runtime aiming helper mode
-    pendingShot: false // for offline mode: shot ready but waiting for confirmation
+    pendingShot: false, // for offline mode: shot ready but waiting for confirmation
+    savedPower: 0 // saved power value when pendingShot is set
 };
 
 class Vector {
@@ -1289,9 +1290,31 @@ function updateConfirmButton() {
 }
 
 function confirmShot() {
-    if (!STATE.pendingShot || !STATE.canShoot || STATE.gameOver) return;
+    // Check if button is visible and not disabled (button visibility means conditions were met)
+    const buttonVisible = uiConfirmShotBtn && uiConfirmShotBtn.style.display !== 'none' && !uiConfirmShotBtn.disabled;
+    
+    // If button is visible, allow shot even if pendingShot was somehow cleared
+    if (!buttonVisible && !STATE.pendingShot) {
+        return;
+    }
+    
+    // Final safety checks
+    if (!STATE.canShoot || STATE.gameOver || STATE.ballInHand) {
+        return;
+    }
+    
     STATE.pendingShot = false;
+    
+    // Use saved power value (saved when pendingShot was set) or current power, with minimum
+    const shotPower = Math.max(0.1, STATE.savedPower || STATE.power || 0.1);
+    
+    // Temporarily set power for shoot()
+    STATE.power = shotPower;
+    
     shoot();
+    
+    // Clear saved power and reset state
+    STATE.savedPower = 0;
     STATE.power = 0;
     updatePowerUI(0);
     updateConfirmButton();
@@ -1389,8 +1412,10 @@ function handleKeyUp(e) {
         if (STATE.aimMode === 'offline') {
             if (STATE.power > 0.1) {
                 STATE.pendingShot = true;
+                STATE.savedPower = STATE.power; // Save power value for later use
             } else {
                 STATE.power = 0;
+                STATE.savedPower = 0;
                 updatePowerUI(0);
             }
         } else {
@@ -1441,9 +1466,11 @@ function handlePowerEnd(e) {
     if (STATE.aimMode === 'offline') {
         if (STATE.power > 0.1) {
             STATE.pendingShot = true;
+            STATE.savedPower = STATE.power; // Save power value for later use
             updateConfirmButton();
         } else {
             STATE.power = 0;
+            STATE.savedPower = 0;
             updatePowerUI(0);
         }
     } else {
@@ -1541,6 +1568,7 @@ function resetGame() {
     STATE.spaceChargeDir = 1;
     STATE.inputType = 'unknown';
     STATE.pendingShot = false;
+    STATE.savedPower = 0;
     updateBallInHandBanner();
     trailCtx.clearRect(0,0,logicalWidth,logicalHeight);
 
@@ -1949,7 +1977,7 @@ function loop() {
     // Space Charging Logic
     if (STATE.spaceCharging) {
         // In offline mode, use slower charging speed (1/10 of normal)
-        const chargeSpeed = STATE.aimMode === 'offline' ? 0.002 : 0.02;
+        const chargeSpeed = STATE.aimMode === 'offline' ? 0.008 : 0.02;
         STATE.power += chargeSpeed * STATE.spaceChargeDir;
         if (STATE.power >= 1) { STATE.power = 1; STATE.spaceChargeDir = -1; }
         if (STATE.power <= 0) { STATE.power = 0; STATE.spaceChargeDir = 1; }
