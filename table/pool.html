@@ -1136,7 +1136,7 @@ function setupInputs() {
     const btnRight = document.getElementById('btn-right');
     const fineTune = (dir) => {
         if(!STATE.canShoot) return;
-        STATE.aimAngle += dir * 0.05; // Small step
+        STATE.aimAngle += dir * 0.005; // Small step (reduced to 1/10 of original 0.05)
         if(navigator.vibrate) navigator.vibrate(5);
     };
     btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); fineTune(-1); });
