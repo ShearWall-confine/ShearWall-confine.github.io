@@ -139,17 +139,27 @@
             cursor: pointer;
         }
 
-        .toggle-row {
+        .select-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-top: 10px;
             font-size: 12px;
+            gap: 8px;
         }
 
-        .toggle-row input[type="checkbox"] {
-            width: 34px;
-            height: 18px;
+        .select-row label {
+            flex: 1;
+        }
+
+        .select-row select {
+            flex: 1.2;
+            background: rgba(10,10,20,0.85);
+            color: #fff;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 4px 6px;
+            font-size: 11px;
         }
 
         .spin-row {
@@ -533,9 +543,13 @@
             <button class="spin-btn" data-target="friction-input" data-step="0.01" data-min="0" data-max="1">+</button>
         </div>
 
-        <div class="toggle-row">
-            <span>Advanced aiming (experimental)</span>
-            <input type="checkbox" id="advanced-aim-toggle">
+        <div class="select-row">
+            <label for="aim-mode-select">Aiming helper</label>
+            <select id="aim-mode-select">
+                <option value="cue">Cue direction only</option>
+                <option value="basic" selected>Basic guide</option>
+                <option value="advanced">Advanced guide</option>
+            </select>
         </div>
         
         <label>Felt palette</label>
@@ -644,7 +658,7 @@ const SETTINGS = {
     maxPower: CONFIG.MAX_POWER,
     friction: CONFIG.FRICTION,
     ballMaterial: 'classic',
-    advancedAim: false
+    aimMode: 'basic' // 'cue' | 'basic' | 'advanced'
 };
 
 const FELT_SCHEMES = {
@@ -681,7 +695,7 @@ const STATE = {
     scores: {1: 0, 2: 0},
     ballInHand: false,
     ballMaterial: 'classic',
-    advancedAim: false
+    aimMode: 'basic' // runtime aiming helper mode
 };
 
 class Vector {
@@ -874,9 +888,9 @@ class Ball {
             } else if (material.startsWith('stone_')) {
                 drawStone();
             } else {
-                let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
-                grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
-                ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             }
             // 8 label
             ctx.fillStyle = "#fff"; ctx.font = "bold 10px Inter";
@@ -906,9 +920,9 @@ class Ball {
                 ctx.fillStyle = bandGrad;
                 ctx.beginPath(); ctx.arc(x, y, r*0.96, 0, Math.PI*2); ctx.fill();
                 ctx.restore();
-                let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
+            let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
                 glare.addColorStop(0, "rgba(255,255,255,0.55)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
-                ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             } else if (material.startsWith('diamond_')) {
                 // dark crystal base with luminous band
                 ctx.fillStyle = "rgba(8,8,18,0.98)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
@@ -977,7 +991,7 @@ const uiEndScreen = document.getElementById('end-screen');
 const uiEndMessage = document.getElementById('end-message');
 const uiRestartBtn = document.getElementById('restart-btn');
 const uiBallMaterialSelect = document.getElementById('ball-material-select');
-const uiAdvancedAimToggle = document.getElementById('advanced-aim-toggle');
+const uiAimModeSelect = document.getElementById('aim-mode-select');
 
 if (uiRestartBtn) {
     uiRestartBtn.addEventListener('click', () => {
@@ -1103,7 +1117,7 @@ function setupSettingsPanel() {
     uiPowerMaxDisplay.innerText = `${CONFIG.MAX_POWER}`;
     uiFrictionRange.value = CONFIG.FRICTION.toFixed(3);
     uiFrictionDisplay.innerText = CONFIG.FRICTION.toFixed(3);
-    if (uiAdvancedAimToggle) uiAdvancedAimToggle.checked = SETTINGS.advancedAim;
+    if (uiAimModeSelect) uiAimModeSelect.value = SETTINGS.aimMode || 'basic';
 
     const togglePanel = (show) => {
         uiSettingsPanel.classList[show ? 'add' : 'remove']('visible');
@@ -1137,9 +1151,9 @@ function setupSettingsPanel() {
         uiFrictionDisplay.innerText = SETTINGS.friction.toFixed(3);
     });
 
-    if (uiAdvancedAimToggle) {
-        uiAdvancedAimToggle.addEventListener('change', () => {
-            SETTINGS.advancedAim = !!uiAdvancedAimToggle.checked;
+    if (uiAimModeSelect) {
+        uiAimModeSelect.addEventListener('change', () => {
+            SETTINGS.aimMode = uiAimModeSelect.value;
         });
     }
 
@@ -1181,7 +1195,7 @@ function applyCustomSettings() {
     CONFIG.MAX_POWER = SETTINGS.maxPower;
     CONFIG.FRICTION = SETTINGS.friction;
     STATE.ballMaterial = SETTINGS.ballMaterial || 'classic';
-     STATE.advancedAim = !!SETTINGS.advancedAim;
+    STATE.aimMode = SETTINGS.aimMode || 'basic';
     showToast("Settings applied — new rack ready");
     resetGame();
 }
@@ -1802,40 +1816,46 @@ function loop() {
         const color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
         const maxDist = Math.max(logicalWidth, logicalHeight);
 
-        // Find first collision with any active object ball (not cue)
-        // using precise circle–ray intersection for equal-radius balls:
-        // cue center moves along 'dir', object ball is a circle of radius 2R
         let hitBall = null;
-        let hitDist = maxDist;
-        const R = CONFIG.BALL_RADIUS * 2; // center-to-center distance at first contact
-        for (let b of balls) {
-            if (!b.active || b === whiteBall) continue;
+        let baseEnd = start.add(dir.mult(maxDist * 0.9));
 
-            // Ray-sphere intersection: |(start + dir*t) - b.pos| = R
-            const f = start.sub(b.pos);              // from ball center to cue center
-            const a = 1;                             // dir is normalized
-            const bCoef = 2 * Vector.dot(dir, f);
-            const cTerm = f.mag() * f.mag() - R*R;
-            const disc = bCoef*bCoef - 4*a*cTerm;
-            if (disc < 0) continue;                  // no intersection
+        if (STATE.aimMode !== 'cue') {
+            // Find first collision with any active object ball (not cue)
+            // using precise circle–ray intersection for equal-radius balls:
+            // cue center moves along 'dir', object ball is a circle of radius 2R
+            let hitDist = maxDist;
+            const R = CONFIG.BALL_RADIUS * 2; // center-to-center distance at first contact
+            for (let b of balls) {
+                if (!b.active || b === whiteBall) continue;
 
-            const sqrtD = Math.sqrt(disc);
-            let t1 = (-bCoef - sqrtD) / (2*a);
-            let t2 = (-bCoef + sqrtD) / (2*a);
+                // Ray-sphere intersection: |(start + dir*t) - b.pos| = R
+                const f = start.sub(b.pos);              // from ball center to cue center
+                const a = 1;                             // dir is normalized
+                const bCoef = 2 * Vector.dot(dir, f);
+                const cTerm = f.mag() * f.mag() - R*R;
+                const disc = bCoef*bCoef - 4*a*cTerm;
+                if (disc < 0) continue;                  // no intersection
 
-            // pick smallest positive t as first contact
-            let tHit = Number.POSITIVE_INFINITY;
-            if (t1 > 0 && t1 < tHit) tHit = t1;
-            if (t2 > 0 && t2 < tHit) tHit = t2;
-            if (!isFinite(tHit) || tHit <= 0 || tHit > maxDist) continue;
+                const sqrtD = Math.sqrt(disc);
+                let t1 = (-bCoef - sqrtD) / (2*a);
+                let t2 = (-bCoef + sqrtD) / (2*a);
 
-            if (tHit < hitDist) {
-                hitDist = tHit;
-                hitBall = b;
+                // pick smallest positive t as first contact
+                let tHit = Number.POSITIVE_INFINITY;
+                if (t1 > 0 && t1 < tHit) tHit = t1;
+                if (t2 > 0 && t2 < tHit) tHit = t2;
+                if (!isFinite(tHit) || tHit <= 0 || tHit > maxDist) continue;
+
+                if (tHit < hitDist) {
+                    hitDist = tHit;
+                    hitBall = b;
+                }
+            }
+
+            if (hitBall) {
+                baseEnd = start.add(dir.mult(hitDist));
             }
         }
-
-        const baseEnd = start.add(dir.mult(hitBall ? hitDist : maxDist * 0.9));
 
         // Soft outer halo around cue ball
         ctx.beginPath();
@@ -1855,7 +1875,7 @@ function loop() {
         ctx.stroke();
         ctx.restore();
 
-        if (hitBall) {
+        if (hitBall && STATE.aimMode !== 'cue') {
             // Solid segment up to first impact
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
@@ -1872,7 +1892,7 @@ function loop() {
             ctx.fillStyle = color;
             ctx.fill();
 
-            if (STATE.advancedAim) {
+            if (STATE.aimMode === 'advanced') {
                 // Predict post-collision paths (simple equal-mass elastic model)
                 // impact normal from cue impact point to object center
                 const impactPoint = baseEnd;
