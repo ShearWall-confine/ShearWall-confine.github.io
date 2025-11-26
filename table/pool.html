@@ -212,63 +212,9 @@
             color: #fff;
         }
 
-        /* --- Power column --- */
+        /* --- (Legacy) DOM power column: hidden, logic moved into bottom cushion --- */
         #power-control {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 90px;
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            pointer-events: auto;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(10, 10, 20, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 16px 0;
-        }
-
-        #power-track {
-            position: relative;
-            width: 14px;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-        }
-
-        #power-fill {
-            position: absolute;
-            bottom: 0;
-            top: 0; /* fully extends, height controlled by JS */
-            width: 100%;
-            height: 0%; 
-            background: linear-gradient(to top, #4facfe, #00f2fe);
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-        
-        .p2-turn #power-fill {
-            background: linear-gradient(to top, #f093fb, #f5576c);
-        }
-
-        #power-handle {
-            position: absolute;
-            width: 36px; /* larger touch target */
-            height: 36px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            transform: translateY(0);
-            cursor: pointer;
-            left: 50%;
-            margin-left: -18px; /* center horizontally */
-            top: 0; /* initial position */
+            display: none;
         }
 
         /* --- Mobile fine-tune controls --- */
@@ -489,6 +435,29 @@
         <option value="classic">Classic Green</option>
         <option value="ember">Ember Night</option>
         <option value="aurora">Aurora Neon</option>
+        <option value="metal_steel">Steel Metal</option>
+        <option value="metal_gold">Gold Metal</option>
+        <option value="metal_copper">Copper Metal</option>
+        <option value="diamond_cyan">Cyan Diamond</option>
+        <option value="diamond_violet">Violet Diamond</option>
+        <option value="plastic_blue">Blue Plastic</option>
+        <option value="plastic_red">Red Plastic</option>
+        <option value="stone_marble">Marble Stone</option>
+        <option value="stone_slate">Slate Stone</option>
+    </select>
+
+    <label>Ball material</label>
+    <select id="ball-material-select">
+        <option value="classic">Classic</option>
+        <option value="metal_steel">Steel Metal</option>
+        <option value="metal_gold">Gold Metal</option>
+        <option value="metal_copper">Copper Metal</option>
+        <option value="diamond_cyan">Cyan Diamond</option>
+        <option value="diamond_violet">Violet Diamond</option>
+        <option value="plastic_blue">Blue Plastic</option>
+        <option value="plastic_red">Red Plastic</option>
+        <option value="stone_marble">Marble Stone</option>
+        <option value="stone_slate">Slate Stone</option>
     </select>
     
     <button id="apply-settings">Apply &amp; Re-rack</button>
@@ -545,7 +514,7 @@ const CONFIG = {
 const TYPE = { CUE: 0, SOLID: 1, STRIPE: 2, BLACK: 3 };
 const PALETTE = {
     BG: '#050505',
-    FELT: ['#001a33', '#000814'],
+    FELT: ['#0b4d0b', '#062b06'], // default: classic green
     P1_COLOR: '#4facfe',
     P2_COLOR: '#f093fb',
     SOLIDS: ['#FFD700', '#FF6B6B', '#4ECDC4', '#1A535C', '#FF9F1C', '#2E86AB', '#8D99AE'],
@@ -563,16 +532,26 @@ const BASE_CONFIG = {
 const SETTINGS = {
     ballRadius: CONFIG.BALL_RADIUS,
     pocketRadius: CONFIG.POCKET_RADIUS,
-    feltScheme: 'midnight',
+    feltScheme: 'classic',
     maxPower: CONFIG.MAX_POWER,
-    friction: CONFIG.FRICTION
+    friction: CONFIG.FRICTION,
+    ballMaterial: 'classic'
 };
 
 const FELT_SCHEMES = {
     midnight: ['#001a33', '#000814'],
     classic: ['#0b4d0b', '#062b06'],
     ember: ['#331111', '#120505'],
-    aurora: ['#002b36', '#00111b']
+    aurora: ['#002b36', '#00111b'],
+    metal_steel: ['#3a3f4a', '#16181e'],
+    metal_gold: ['#b88a1a', '#3c2604'],
+    metal_copper: ['#b45b33', '#34150d'],
+    diamond_cyan: ['#0c3b52', '#010b16'],
+    diamond_violet: ['#34154f', '#05020d'],
+    plastic_blue: ['#004b8d', '#02111f'],
+    plastic_red: ['#7b1616', '#250202'],
+    stone_marble: ['#e5e5e5', '#9e9e9e'],
+    stone_slate: ['#3b3e46', '#14161a']
 };
 
 const STATE = {
@@ -589,8 +568,10 @@ const STATE = {
     gameOver: false,
     canShoot: true,
     inputType: 'unknown', // 'mouse' or 'touch'
+    shotCount: 0,         // total shots taken this rack
     scores: {1: 0, 2: 0},
-    ballInHand: false
+    ballInHand: false,
+    ballMaterial: 'classic'
 };
 
 class Vector {
@@ -648,33 +629,164 @@ class Ball {
         const x = this.pos.x;
         const y = this.pos.y;
         const r = CONFIG.BALL_RADIUS;
+        const material = STATE.ballMaterial || 'classic';
 
         ctx.fillStyle = "rgba(0,0,0,0.4)";
         ctx.beginPath(); ctx.arc(x + r*0.3, y + r*0.3, r, 0, Math.PI * 2); ctx.fill();
 
+        // Cue ball rendering
         if (this.type === TYPE.CUE) {
-            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
-            grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-        } else if (this.type === TYPE.BLACK) {
-            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
-            grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "#fff"; ctx.font = "bold 10px Inter";
-            ctx.textAlign = "center"; ctx.textBaseline="middle"; ctx.fillText("8", x, y+0.5);
-        } else if (this.type === TYPE.SOLID) {
+            if (material.startsWith('metal_')) {
+                // metallic cue
+                let grad = ctx.createRadialGradient(x-r*0.4, y-r*0.4, r*0.2, x, y, r);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.4, '#d0d0d0');
+                grad.addColorStop(1, '#7f7f7f');
+                ctx.fillStyle = grad;
+            } else if (material.startsWith('diamond_')) {
+                let grad = ctx.createRadialGradient(x-r*0.5, y-r*0.5, r*0.1, x, y, r);
+                grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+                grad.addColorStop(0.4, 'rgba(230,230,255,0.7)');
+                grad.addColorStop(1, 'rgba(180,190,255,0.2)');
+                ctx.fillStyle = grad;
+            } else if (material.startsWith('stone_')) {
+                let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+                grad.addColorStop(0, '#e0e0e0');
+                grad.addColorStop(1, '#8b8b8b');
+                ctx.fillStyle = grad;
+            } else {
+                // classic / plastic
+                let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+                grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
+                ctx.fillStyle = grad;
+            }
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            return;
+        }
+
+        // Generic helpers for materials
+        const drawSolidClassic = () => {
             let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
             grad.addColorStop(0, adjustBrightness(this.color, 60));
             grad.addColorStop(0.3, this.color);
             grad.addColorStop(1, adjustBrightness(this.color, -50));
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-        } else if (this.type === TYPE.STRIPE) {
+        };
+        const drawStripeClassic = () => {
             ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             ctx.strokeStyle = this.color; ctx.lineWidth = r * 0.6;
             ctx.beginPath(); ctx.arc(x, y, r*0.6, 0, Math.PI*2); ctx.stroke();
             let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
             glare.addColorStop(0, "rgba(255,255,255,0.4)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
             ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        };
+
+        const drawMetal = () => {
+            let base = this.type === TYPE.BLACK ? '#222' : this.color;
+            let grad = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
+            grad.addColorStop(0, adjustBrightness(base, 60));
+            grad.addColorStop(0.25, base);
+            grad.addColorStop(0.5, adjustBrightness(base, -20));
+            grad.addColorStop(0.75, adjustBrightness(base, 40));
+            grad.addColorStop(1, adjustBrightness(base, -40));
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            // specular streak
+            ctx.strokeStyle = "rgba(255,255,255,0.6)";
+            ctx.lineWidth = r * 0.18;
+            ctx.beginPath();
+            ctx.arc(x, y, r*0.65, -0.6, 0.4);
+            ctx.stroke();
+        };
+
+        const drawDiamond = () => {
+            let grad = ctx.createRadialGradient(x-r*0.4, y-r*0.4, r*0.1, x, y, r);
+            grad.addColorStop(0, "rgba(255,255,255,0.95)");
+            grad.addColorStop(0.3, adjustBrightness(this.color, 40));
+            grad.addColorStop(0.7, this.color);
+            grad.addColorStop(1, "rgba(10,10,20,0.9)");
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            // simple facet lines
+            ctx.strokeStyle = "rgba(255,255,255,0.4)";
+            ctx.lineWidth = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(x-r*0.3, y);
+            ctx.lineTo(x, y-r*0.4);
+            ctx.lineTo(x+r*0.3, y);
+            ctx.lineTo(x, y+r*0.4);
+            ctx.closePath();
+            ctx.stroke();
+        };
+
+        const drawStone = () => {
+            let base = this.type === TYPE.BLACK ? '#1a1a1a' : this.color;
+            let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+            grad.addColorStop(0, adjustBrightness(base, 30));
+            grad.addColorStop(1, adjustBrightness(base, -30));
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            // speckle effect
+            ctx.fillStyle = "rgba(255,255,255,0.15)";
+            for (let i = 0; i < 6; i++) {
+                let angle = Math.random() * Math.PI * 2;
+                let rr = Math.random() * r*0.7;
+                ctx.beginPath();
+                ctx.arc(x + Math.cos(angle)*rr, y + Math.sin(angle)*rr, r*0.1, 0, Math.PI*2);
+                ctx.fill();
+            }
+        };
+
+        if (this.type === TYPE.BLACK) {
+            if (material.startsWith('metal_')) {
+                drawMetal();
+            } else if (material.startsWith('diamond_')) {
+                // black diamond uses dark tinted gradient
+                let grad = ctx.createRadialGradient(x-r*0.4, y-r*0.4, r*0.1, x, y, r);
+                grad.addColorStop(0, "rgba(255,255,255,0.8)");
+                grad.addColorStop(0.3, "#444");
+                grad.addColorStop(1, "#000");
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            } else if (material.startsWith('stone_')) {
+                drawStone();
+            } else {
+                let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
+                grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
+                ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            }
+            // 8 label
+            ctx.fillStyle = "#fff"; ctx.font = "bold 10px Inter";
+            ctx.textAlign = "center"; ctx.textBaseline="middle"; ctx.fillText("8", x, y+0.5);
+        } else if (this.type === TYPE.SOLID) {
+            if (material.startsWith('metal_')) {
+                drawMetal();
+            } else if (material.startsWith('diamond_')) {
+                drawDiamond();
+            } else if (material.startsWith('stone_')) {
+                drawStone();
+            } else {
+                drawSolidClassic();
+            }
+        } else if (this.type === TYPE.STRIPE) {
+            if (material.startsWith('metal_')) {
+                // metal base with a reflective stripe
+                ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = this.color; ctx.lineWidth = r * 0.7;
+                ctx.beginPath(); ctx.arc(x, y, r*0.55, 0, Math.PI*2); ctx.stroke();
+                let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
+                glare.addColorStop(0, "rgba(255,255,255,0.5)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
+                ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            } else if (material.startsWith('diamond_')) {
+                // translucent stripe
+                ctx.fillStyle = "rgba(10,10,20,0.95)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = r * 0.6;
+                ctx.beginPath(); ctx.arc(x, y, r*0.6, 0, Math.PI*2); ctx.stroke();
+            } else if (material.startsWith('stone_')) {
+                drawStone();
+            } else {
+                drawStripeClassic();
+            }
         }
     }
 }
@@ -714,6 +826,7 @@ const uiBallHandBanner = document.getElementById('ball-hand-banner');
 const uiEndScreen = document.getElementById('end-screen');
 const uiEndMessage = document.getElementById('end-message');
 const uiRestartBtn = document.getElementById('restart-btn');
+const uiBallMaterialSelect = document.getElementById('ball-material-select');
 
 if (uiRestartBtn) {
     uiRestartBtn.addEventListener('click', () => {
@@ -757,22 +870,48 @@ function init() {
     requestAnimationFrame(loop);
 }
 
+function isInPowerBarArea(pos) {
+    const c = CONFIG.CUSHION_SIZE;
+    const barHeight = c;
+    return pos.y >= logicalHeight - barHeight && pos.y <= logicalHeight && pos.x >= c && pos.x <= logicalWidth - c;
+}
+
 function setupInputs() {
-    // Canvas Touch Aim (Coarse)
+    // Canvas Touch / Mouse: decide between aim vs power by position
     canvas.addEventListener('touchstart', e => {
         STATE.inputType = 'touch'; updateDeviceUI();
-        handleAimStart(e);
+        const pos = getEventPos(e);
+        if (isInPowerBarArea(pos)) {
+            handlePowerStart(e);
+        } else {
+            handleAimStart(e);
+        }
     }, {passive: false});
-    window.addEventListener('touchmove', e => handleAimMove(e), {passive: false});
+    window.addEventListener('touchmove', e => {
+        if (STATE.isCharging) {
+            handlePowerMove(e);
+        } else {
+            handleAimMove(e);
+        }
+    }, {passive: false});
     
-    // Mouse Aim (Coarse)
+    // Mouse Aim / Power
     canvas.addEventListener('mousedown', e => {
         STATE.inputType = 'mouse'; updateDeviceUI();
-        handleAimStart(e);
+        const pos = getEventPos(e);
+        if (isInPowerBarArea(pos)) {
+            handlePowerStart(e);
+        } else {
+            handleAimStart(e);
+        }
     });
     window.addEventListener('mousemove', e => {
         STATE.inputType = 'mouse'; updateDeviceUI();
-        handleAimMove(e);
+        if (STATE.isCharging) {
+            handlePowerMove(e);
+        } else {
+            handleAimMove(e);
+        }
     });
 
     // Mobile Fine Tune Buttons
@@ -789,11 +928,6 @@ function setupInputs() {
     btnLeft.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(-1); });
     btnRight.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(1); });
 
-    // Power Slider
-    uiPowerControl.addEventListener('touchstart', handlePowerStart, {passive: false});
-    uiPowerControl.addEventListener('touchmove', handlePowerMove, {passive: false});
-    uiPowerControl.addEventListener('touchend', handlePowerEnd, {passive: false});
-    uiPowerControl.addEventListener('mousedown', handlePowerStart);
     window.addEventListener('mouseup', handlePowerEnd);
     window.addEventListener('mouseup', handlePlacementEnd);
     window.addEventListener('touchend', handlePlacementEnd);
@@ -811,6 +945,7 @@ function setupSettingsPanel() {
     uiBallDisplay.innerText = `${CONFIG.BALL_RADIUS}px`;
     uiPocketDisplay.innerText = `${CONFIG.POCKET_RADIUS}px`;
     uiFeltSelect.value = SETTINGS.feltScheme;
+    if (uiBallMaterialSelect) uiBallMaterialSelect.value = SETTINGS.ballMaterial;
     uiPowerMaxRange.value = CONFIG.MAX_POWER;
     uiPowerMaxDisplay.innerText = `${CONFIG.MAX_POWER}`;
     uiFrictionRange.value = CONFIG.FRICTION.toFixed(3);
@@ -834,6 +969,11 @@ function setupSettingsPanel() {
     uiFeltSelect.addEventListener('change', () => {
         SETTINGS.feltScheme = uiFeltSelect.value;
     });
+    if (uiBallMaterialSelect) {
+        uiBallMaterialSelect.addEventListener('change', () => {
+            SETTINGS.ballMaterial = uiBallMaterialSelect.value;
+        });
+    }
     uiPowerMaxRange.addEventListener('input', () => {
         SETTINGS.maxPower = Number(uiPowerMaxRange.value);
         uiPowerMaxDisplay.innerText = `${SETTINGS.maxPower}`;
@@ -856,6 +996,7 @@ function applyCustomSettings() {
     CONFIG.POWER_SCALE = BASE_CONFIG.POWER_SCALE * (BASE_CONFIG.BALL_RADIUS / CONFIG.BALL_RADIUS);
     CONFIG.MAX_POWER = SETTINGS.maxPower;
     CONFIG.FRICTION = SETTINGS.friction;
+    STATE.ballMaterial = SETTINGS.ballMaterial || 'classic';
     showToast("Settings applied — new rack ready");
     resetGame();
 }
@@ -951,9 +1092,11 @@ function handlePowerStart(e) {
 function handlePowerMove(e) {
     if (!STATE.isCharging) return;
     const pos = getEventPos(e);
-    const rect = document.getElementById('power-track').getBoundingClientRect();
-    let relativeY = pos.y - rect.top;
-    let percent = Math.max(0, Math.min(1, relativeY / rect.height));
+    const c = CONFIG.CUSHION_SIZE;
+    const left = c;
+    const right = logicalWidth - c;
+    let t = (pos.x - left) / (right - left);
+    let percent = Math.max(0, Math.min(1, t));
     STATE.power = percent;
     updatePowerUI(percent);
 }
@@ -1016,16 +1159,13 @@ function handlePlacementEnd() {
 
 // --- Logic ---
 function updatePowerUI(percent) {
-    uiPowerFill.style.height = (percent * 100) + "%";
-    uiPowerFill.style.top = "0"; 
-    uiPowerHandle.style.top = (percent * 100) + "%";
-    
-    if (STATE.turn === 2) uiPowerControl.classList.add('p2-turn');
-    else uiPowerControl.classList.remove('p2-turn');
+    // Legacy DOM slider is hidden; logic now rendered into bottom cushion via canvas
 }
 
 function shoot() {
     if (STATE.ballInHand || STATE.gameOver) return;
+    hideToast();
+    STATE.shotCount += 1;
     STATE.canShoot = false;
     let force = STATE.power * CONFIG.MAX_POWER;
     let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
@@ -1037,11 +1177,19 @@ function shoot() {
 
 function resetGame() {
     hideEndScreen();
+    hideToast();
     balls = [];
     STATE.turn = 1; STATE.assigned = false; STATE.p1Group = null;
     STATE.foul = false; STATE.gameOver = false; STATE.sunkThisTurn = [];
+    STATE.canShoot = true;
     STATE.ballInHand = false; placingBall = false; lastPlacementValid = false;
     STATE.scores = {1: 0, 2: 0};
+    STATE.shotCount = 0;
+    STATE.power = 0;
+    STATE.isCharging = false;
+    STATE.spaceCharging = false;
+    STATE.spaceChargeDir = 1;
+    STATE.inputType = 'unknown';
     updateBallInHandBanner();
     trailCtx.clearRect(0,0,logicalWidth,logicalHeight);
 
@@ -1069,6 +1217,7 @@ function resetGame() {
         }
     }
     updateUI();
+    updatePowerUI(0);
     showToast("GAME START");
 }
 
@@ -1083,30 +1232,78 @@ function checkTurn() {
 function resolveTurn() {
     let switchTurn = true;
     let message = "";
-    if (STATE.foul) {
-        message = "FOUL! BALL IN HAND";
-        resetWhiteBall(true);
-        switchTurn = true;
-    } else if (STATE.sunkThisTurn.includes(TYPE.BLACK)) {
-        let myType = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
-        let myRemaining = countRemaining(myType);
-        if (myRemaining > 0 || !STATE.assigned) { message = `PLAYER ${STATE.turn} LOST`; STATE.gameOver = true; }
-        else { message = `PLAYER ${STATE.turn} WINS!`; STATE.gameOver = true; }
+
+    const sunkBlack = STATE.sunkThisTurn.includes(TYPE.BLACK);
+    const cueScratch = STATE.foul;
+
+    // Black ball logic takes highest priority
+    if (sunkBlack) {
+        const isBreakShot = (STATE.shotCount === 1 && !STATE.assigned);
+        if (isBreakShot && !cueScratch) {
+            // Clean break pot on black: immediate win for breaker
+            message = `PLAYER ${STATE.turn} WINS! (break pot)`;
+        } else {
+            let myType = (STATE.turn === 1)
+                ? STATE.p1Group
+                : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
+            let myRemaining = countRemaining(myType);
+            // If player still has group balls left OR groups not assigned OR cue scratched with black → loss
+            if (myRemaining > 0 || !STATE.assigned || cueScratch) {
+                message = `PLAYER ${STATE.turn} LOST`;
+            } else {
+                message = `PLAYER ${STATE.turn} WINS!`;
+            }
+        }
+        STATE.gameOver = true;
         STATE.canShoot = false;
         showToast(message);
         showEndScreen(message);
         return;
+    }
+
+    if (STATE.foul) {
+        message = "FOUL! BALL IN HAND";
+        resetWhiteBall(true);
+        switchTurn = true;
     } else if (STATE.sunkThisTurn.length > 0) {
         let firstSunk = STATE.sunkThisTurn[0];
         if (!STATE.assigned) {
-            if (firstSunk === TYPE.SOLID) { STATE.p1Group = TYPE.SOLID; STATE.assigned = true; message = "P1: SOLIDS"; switchTurn = false; }
-            else if (firstSunk === TYPE.STRIPE) { STATE.p1Group = TYPE.STRIPE; STATE.assigned = true; message = "P1: STRIPES"; switchTurn = false; }
+            // First legal object ball of the game: lock in groups based on shooter
+            if (firstSunk === TYPE.SOLID || firstSunk === TYPE.STRIPE) {
+                if (STATE.turn === 1) {
+                    // Shooter is P1: P1 gets what they potted
+                    STATE.p1Group = firstSunk;
+                } else {
+                    // Shooter is P2: P1 gets the opposite group
+                    STATE.p1Group = (firstSunk === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
+                }
+                STATE.assigned = true;
+                const p1IsSolids = STATE.p1Group === TYPE.SOLID;
+                message = p1IsSolids
+                    ? "Groups set: P1 solids / P2 stripes"
+                    : "Groups set: P1 stripes / P2 solids";
+                // Shooter continues after a good opening pot
+                switchTurn = false;
+            }
         } else {
             let myGroup = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
             if (STATE.sunkThisTurn.includes(myGroup)) { switchTurn = false; message = "GOOD SHOT"; }
             else { switchTurn = true; message = "WRONG BALL"; }
         }
     } else { switchTurn = true; }
+
+    // Fallback: if somehow all object balls are gone, treat as rack finished (draw)
+    const remainingSolids = countRemaining(TYPE.SOLID);
+    const remainingStripes = countRemaining(TYPE.STRIPE);
+    const remainingBlack = countRemaining(TYPE.BLACK);
+    if (!STATE.gameOver && remainingSolids === 0 && remainingStripes === 0 && remainingBlack === 0) {
+        const drawMsg = "Rack cleared — no balls remaining";
+        STATE.gameOver = true;
+        STATE.canShoot = false;
+        showToast(drawMsg);
+        showEndScreen(drawMsg);
+        return;
+    }
 
     if (switchTurn) STATE.turn = STATE.turn === 1 ? 2 : 1;
     if (message) showToast(message);
@@ -1167,7 +1364,20 @@ function spawnFloatText(text, x, y) {
     el.style.left = Math.min(x, logicalWidth-50)+'px'; el.style.top = Math.min(y, logicalHeight-50)+'px';
     document.body.appendChild(el); setTimeout(() => el.remove(), 800);
 }
-function showToast(msg) { uiToast.innerText = msg; uiToast.style.opacity = "1"; setTimeout(() => uiToast.style.opacity = "0", 2000); }
+function showToast(msg) {
+    if (!uiToast) return;
+    uiToast.innerText = msg;
+    uiToast.style.opacity = "1";
+    setTimeout(() => {
+        // 防止在新消息刚显示时被旧定时器误关掉
+        if (uiToast.innerText === msg) {
+            uiToast.style.opacity = "0";
+        }
+    }, 2000);
+}
+function hideToast() {
+    if (uiToast) uiToast.style.opacity = "0";
+}
 function updateBallInHandBanner() {
     if (!uiBallHandBanner) return;
     if (STATE.ballInHand && !STATE.gameOver) {
@@ -1234,21 +1444,137 @@ function loop() {
     ctx.fillStyle = "#000";
     for(let p of pockets) { ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.POCKET_RADIUS, 0, Math.PI*2); ctx.fill(); }
 
+    // Bottom-frame power bar
+    const barC = CONFIG.CUSHION_SIZE;
+    const barHeight = 6;
+    const barLeft = barC + 16;
+    const barRight = logicalWidth - barC - 16;
+    const barWidth = Math.max(0, barRight - barLeft);
+    const barY = logicalHeight - barC + (barC - barHeight) * 0.5;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    ctx.fillRect(barLeft, barY, barWidth, barHeight);
+
+    const pct = Math.max(0, Math.min(1, STATE.power || 0));
+    if (pct > 0) {
+        const color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+        ctx.fillStyle = color;
+        ctx.fillRect(barLeft, barY, barWidth * pct, barHeight);
+    }
+    ctx.restore();
+
     resolveCollisions();
     checkTurn();
 
     for(let b of balls) { b.update(); b.draw(ctx); }
     
     if (STATE.canShoot && !STATE.gameOver && !STATE.ballInHand) {
-        let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
-        let start = whiteBall.pos;
-        let end = start.add(dir.mult(600));
-        let color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
-        
-        ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.lineTo(end.x, end.y);
-        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([8, 8]); ctx.stroke(); ctx.setLineDash([]);
-        ctx.beginPath(); ctx.arc(start.x, start.y, CONFIG.BALL_RADIUS + 15, 0, Math.PI*2);
-        ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth = 1; ctx.stroke();
+        const start = whiteBall.pos;
+        const dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle)).normalize();
+        const color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+        const maxDist = Math.max(logicalWidth, logicalHeight);
+
+        // Find first collision with any active object ball (not cue)
+        let hitBall = null;
+        let hitDist = maxDist;
+        for (let b of balls) {
+            if (!b.active || b === whiteBall) continue;
+            const toBall = b.pos.sub(start);
+            const t = Vector.dot(toBall, dir);
+            if (t <= 0 || t > maxDist) continue;
+            const closestPoint = start.add(dir.mult(t));
+            const distPerp = b.pos.dist(closestPoint);
+            const R = CONFIG.BALL_RADIUS * 2; // approximate cue/object spacing
+            if (distPerp <= R) {
+                const offset = Math.sqrt(Math.max(R*R - distPerp*distPerp, 0));
+                const collisionDist = t - offset;
+                if (collisionDist > 0 && collisionDist < hitDist) {
+                    hitDist = collisionDist;
+                    hitBall = b;
+                }
+            }
+        }
+
+        const baseEnd = start.add(dir.mult(hitBall ? hitDist : maxDist * 0.9));
+
+        // Soft outer halo around cue ball
+        ctx.beginPath();
+        ctx.arc(start.x, start.y, CONFIG.BALL_RADIUS + 16, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Main aiming ray (long, faint dashed)
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(start.x + dir.x * maxDist, start.y + dir.y * maxDist);
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 10]);
+        ctx.stroke();
+        ctx.restore();
+
+        if (hitBall) {
+            // Solid segment up to first impact
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(baseEnd.x, baseEnd.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.4;
+            ctx.setLineDash([10, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Mark expected contact point
+            ctx.beginPath();
+            ctx.arc(baseEnd.x, baseEnd.y, 4, 0, Math.PI*2);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // Predict post-collision paths (simple equal-mass elastic model)
+            // impact normal from cue impact point to object center
+            const impactPoint = baseEnd;
+            const n = hitBall.pos.sub(impactPoint).normalize();
+            const v = dir; // cue ball incoming direction
+            const vDotN = Vector.dot(v, n);
+
+            // Object ball leaves roughly along impact normal
+            const objDir = n;
+            const objStart = hitBall.pos;
+            const objEnd = objStart.add(objDir.mult(CONFIG.BALL_RADIUS * 10));
+
+            ctx.beginPath();
+            ctx.moveTo(objStart.x, objStart.y);
+            ctx.lineTo(objEnd.x, objEnd.y);
+            ctx.strokeStyle = "rgba(255,255,255,0.45)";
+            ctx.lineWidth = 1.6;
+            ctx.setLineDash([3, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Cue ball loses its normal component, keeps tangential component
+            let cueDir = v.sub(n.mult(vDotN));
+            if (cueDir.mag() > 0.0001) {
+                cueDir = cueDir.normalize();
+            } else {
+                // fallback: slight reflection if nearly head-on
+                cueDir = v.sub(n.mult(2 * vDotN)).normalize();
+            }
+
+            const cueStart = impactPoint.add(cueDir.mult(CONFIG.BALL_RADIUS * 1.2));
+            const cueEnd = cueStart.add(cueDir.mult(CONFIG.BALL_RADIUS * 10));
+
+            ctx.beginPath();
+            ctx.moveTo(cueStart.x, cueStart.y);
+            ctx.lineTo(cueEnd.x, cueEnd.y);
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = 1.4;
+            ctx.setLineDash([2, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
     }
     requestAnimationFrame(loop);
 }
