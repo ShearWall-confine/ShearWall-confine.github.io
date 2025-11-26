@@ -16,17 +16,18 @@
             user-select: none;
         }
 
-        /* --- Top control stack --- */
+        /* --- Top control stack (embedded into top cushion) --- */
         #ui-shell {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 6px 24px;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            z-index: 25;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
             pointer-events: none;
         }
 
@@ -38,12 +39,12 @@
 
         #back-home-btn,
         #settings-toggle {
-            padding: 10px 18px;
+            padding: 6px 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(20, 20, 30, 0.7);
-            color: #fff;
-            font-size: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(240,240,255,0.9);
+            font-size: 12px;
             font-weight: 600;
             letter-spacing: 1px;
             text-decoration: none;
@@ -59,8 +60,9 @@
 
         #back-home-btn:hover,
         #settings-toggle:hover {
-            background: rgba(80, 80, 110, 0.8);
+            background: none;
             transform: translateY(-1px);
+            text-shadow: 0 0 6px rgba(255,255,255,0.5);
         }
 
         #settings-panel {
@@ -147,32 +149,31 @@
         }
         
         canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             display: block;
             width: 100%;
             height: 100%;
             cursor: crosshair; /* desktop crosshair cursor */
+            z-index: 1; /* table & balls under UI overlays */
         }
 
-        /* --- Scoreboard strip --- */
+        /* --- Scoreboard strip (embedded on felt) --- */
         #ui-layer {
-            position: relative;
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
+            display: none; /* visual scoreboard now drawn directly on canvas */
         }
 
         .player-card {
-            background: rgba(20, 20, 30, 0.4);
+            background: rgba(20, 20, 30, 0.55);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 8px 16px;
+            padding: 4px 12px;
             display: flex;
             flex-direction: column;
-            min-width: 90px;
+            min-width: 80px;
             transition: all 0.3s ease;
             opacity: 0.5;
             transform: scale(0.95);
@@ -187,7 +188,7 @@
         }
 
         .target-type {
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 4px;
@@ -201,15 +202,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 8px;
             color: white;
             font-weight: 700;
-            font-size: 14px;
-            min-width: 120px;
+            font-size: 12px;
+            min-width: 90px;
         }
 
         .score-value {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 800;
             color: #fff;
         }
@@ -281,15 +282,15 @@
         /* --- Toasts & overlays --- */
         #game-toast {
             position: absolute;
-            top: 40%;
+            top: 60px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(8px);
-            padding: 15px 30px;
+            padding: 10px 20px;
             border-radius: 12px;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             text-align: center;
             pointer-events: none;
@@ -312,14 +313,14 @@
 
         #ball-hand-banner {
             position: absolute;
-            top: 50%;
+            top: 60px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 16px 26px;
+            transform: translateX(-50%);
+            padding: 10px 22px;
             border-radius: 999px;
             background: rgba(10, 10, 20, 0.8);
             color: #fff;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.5px;
             border: 1px solid rgba(255,255,255,0.2);
@@ -426,20 +427,21 @@
         <a id="back-home-btn" href="../index.html">← Back to Hub</a>
         <button id="settings-toggle">⚙ Settings</button>
     </div>
-    <div id="ui-layer">
-        <div id="p1-card" class="player-card active p1-active">
-            <div class="target-type" id="p1-type">ANY</div>
-            <div class="score-info">
-                <span>PLAYER 1</span>
-                <span class="score-value" id="p1-score">0</span>
-            </div>
+</div>
+
+<div id="ui-layer">
+    <div id="p1-card" class="player-card active p1-active">
+        <div class="target-type" id="p1-type">ANY</div>
+        <div class="score-info">
+            <span>PLAYER 1</span>
+            <span class="score-value" id="p1-score">0</span>
         </div>
-        <div id="p2-card" class="player-card">
-            <div class="target-type" id="p2-type">ANY</div>
-            <div class="score-info">
-                <span>PLAYER 2</span>
-                <span class="score-value" id="p2-score">0</span>
-            </div>
+    </div>
+    <div id="p2-card" class="player-card">
+        <div class="target-type" id="p2-type">ANY</div>
+        <div class="score-info">
+            <span>PLAYER 2</span>
+            <span class="score-value" id="p2-score">0</span>
         </div>
     </div>
 </div>
@@ -1438,6 +1440,67 @@ function updateUI() {
     if (uiScore1) uiScore1.innerText = STATE.scores[1];
     if (uiScore2) uiScore2.innerText = STATE.scores[2];
 }
+
+function drawScoreboard(ctx) {
+    const c = CONFIG.CUSHION_SIZE;
+    const y = c + 24;
+    const cardWidth = 130;
+    const cardHeight = 40;
+    const gap = 18;
+    const centerX = logicalWidth / 2;
+    const p1x = centerX - cardWidth - gap/2;
+    const p2x = centerX + gap/2;
+
+    const drawCard = (x, label, score, isActive, isP1) => {
+        ctx.save();
+        const radius = 12;
+
+        // background
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + cardWidth - radius, y);
+        ctx.quadraticCurveTo(x + cardWidth, y, x + cardWidth, y + radius);
+        ctx.lineTo(x + cardWidth, y + cardHeight - radius);
+        ctx.quadraticCurveTo(x + cardWidth, y + cardHeight, x + cardWidth - radius, y + cardHeight);
+        ctx.lineTo(x + radius, y + cardHeight);
+        ctx.quadraticCurveTo(x, y + cardHeight, x, y + cardHeight - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+
+        const base = "rgba(15,15,25,0.86)";
+        ctx.fillStyle = base;
+        ctx.fill();
+        ctx.strokeStyle = isActive ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.15)";
+        ctx.lineWidth = isActive ? 2 : 1;
+        ctx.stroke();
+
+        // group text
+        ctx.font = "10px Inter";
+        ctx.textBaseline = "top";
+        ctx.textAlign = "left";
+        ctx.fillStyle = isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+        ctx.fillText(label, x + 10, y + 6);
+
+        // score
+        ctx.font = "bold 16px Inter";
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(String(score), x + cardWidth - 10, y + 6);
+
+        ctx.restore();
+    };
+
+    let p1Label = "ANY";
+    let p2Label = "ANY";
+    if (STATE.assigned) {
+        const p1Solids = STATE.p1Group === TYPE.SOLID;
+        p1Label = p1Solids ? "SOLIDS ●" : "STRIPES ◎";
+        p2Label = p1Solids ? "STRIPES ◎" : "SOLIDS ●";
+    }
+
+    drawCard(p1x, p1Label, STATE.scores[1], STATE.turn === 1, true);
+    drawCard(p2x, p2Label, STATE.scores[2], STATE.turn === 2, false);
+}
 function adjustBrightness(col, amt) {
     let usePound = false; if (col[0] == "#") { col = col.slice(1); usePound = true; }
     let num = parseInt(col,16); let r = (num >> 16) + amt; let b = ((num >> 8) & 0x00FF) + amt; let g = (num & 0x0000FF) + amt;
@@ -1476,26 +1539,39 @@ function loop() {
     ctx.fillStyle = "#000";
     for(let p of pockets) { ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.POCKET_RADIUS, 0, Math.PI*2); ctx.fill(); }
 
-    // Right-cushion vertical power bar
+    // Right-cushion vertical power bar (bright base)
     const barC = CONFIG.CUSHION_SIZE;
-    const barWidth = 6;
+    const barWidth = 8;
     const barTop = barC + 16;
     const barBottom = logicalHeight - barC - 16;
     const barHeight = Math.max(0, barBottom - barTop);
     const barX = logicalWidth - barC + (barC - barWidth) * 0.5;
 
     ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    // bright translucent base
+    const baseGrad = ctx.createLinearGradient(barX, barTop, barX, barBottom);
+    baseGrad.addColorStop(0, "rgba(255,255,255,0.65)");
+    baseGrad.addColorStop(1, "rgba(230,230,230,0.65)");
+    ctx.fillStyle = baseGrad;
     ctx.fillRect(barX, barTop, barWidth, barHeight);
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(barX+0.5, barTop+0.5, barWidth-1, barHeight-1);
 
     const pct = Math.max(0, Math.min(1, STATE.power || 0));
     if (pct > 0) {
         const color = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
         const filled = barHeight * pct;
-        ctx.fillStyle = color;
+        const fillGrad = ctx.createLinearGradient(barX, barBottom, barX, barTop);
+        fillGrad.addColorStop(0, adjustBrightness(color, -10));
+        fillGrad.addColorStop(1, adjustBrightness(color, 40));
+        ctx.fillStyle = fillGrad;
         ctx.fillRect(barX, barBottom - filled, barWidth, filled);
     }
     ctx.restore();
+
+    // Draw embedded scoreboard on felt, below balls
+    drawScoreboard(ctx);
 
     resolveCollisions();
     checkTurn();
