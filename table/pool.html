@@ -1157,15 +1157,30 @@ function setupInputs() {
 
     // Confirm shot button (mobile, offline mode only)
     if (uiConfirmShotBtn) {
+        let touchStartedOnButton = false;
+        
+        // Handle touchstart to prevent it from triggering canvas events
+        uiConfirmShotBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            touchStartedOnButton = true;
+        }, {passive: false});
+        
+        // Handle touchend to trigger shot on mobile
+        uiConfirmShotBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (touchStartedOnButton) {
+                touchStartedOnButton = false;
+                confirmShot();
+            }
+        }, {passive: false});
+        
+        // Handle click for desktop/fallback
         uiConfirmShotBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation(); // Prevent event from bubbling to canvas
             confirmShot();
-        });
-        // Also handle touchstart to prevent it from triggering canvas events
-        uiConfirmShotBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
         });
     }
 }
@@ -1290,28 +1305,61 @@ function updateConfirmButton() {
 }
 
 function confirmShot() {
+    console.log('confirmShot called', {
+        pendingShot: STATE.pendingShot,
+        canShoot: STATE.canShoot,
+        gameOver: STATE.gameOver,
+        ballInHand: STATE.ballInHand,
+        savedPower: STATE.savedPower,
+        currentPower: STATE.power
+    });
+    
     // Check if button is visible and not disabled (button visibility means conditions were met)
     const buttonVisible = uiConfirmShotBtn && uiConfirmShotBtn.style.display !== 'none' && !uiConfirmShotBtn.disabled;
     
     // If button is visible, allow shot even if pendingShot was somehow cleared
     if (!buttonVisible && !STATE.pendingShot) {
+        console.log('confirmShot: Button not visible or pendingShot false');
         return;
     }
     
     // Final safety checks
-    if (!STATE.canShoot || STATE.gameOver || STATE.ballInHand) {
+    if (!STATE.canShoot) {
+        console.log('confirmShot: canShoot is false');
+        return;
+    }
+    if (STATE.gameOver) {
+        console.log('confirmShot: gameOver is true');
+        return;
+    }
+    if (STATE.ballInHand) {
+        console.log('confirmShot: ballInHand is true');
         return;
     }
     
+    // Clear pending shot state immediately
     STATE.pendingShot = false;
     
     // Use saved power value (saved when pendingShot was set) or current power, with minimum
     const shotPower = Math.max(0.1, STATE.savedPower || STATE.power || 0.1);
+    console.log('confirmShot: Shooting with power', shotPower);
     
     // Temporarily set power for shoot()
+    const originalPower = STATE.power;
     STATE.power = shotPower;
     
+    // Hide button immediately to prevent multiple clicks and clear active state
+    if (uiConfirmShotBtn) {
+        uiConfirmShotBtn.style.display = 'none';
+        uiConfirmShotBtn.disabled = true;
+        // Force remove active state by blurring
+        uiConfirmShotBtn.blur();
+    }
+    
+    // Execute shot
+    console.log('confirmShot: Calling shoot() with power', STATE.power, 'aimAngle', STATE.aimAngle);
     shoot();
+    console.log('confirmShot: shoot() completed, whiteBall.vel', whiteBall.vel);
     
     // Clear saved power and reset state
     STATE.savedPower = 0;
