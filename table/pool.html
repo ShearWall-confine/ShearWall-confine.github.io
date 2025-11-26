@@ -162,6 +162,11 @@
             font-size: 11px;
         }
 
+        /* offline simulation preview lines */
+        .offline-preview {
+            pointer-events: none;
+        }
+
         .spin-row {
             display: flex;
             align-items: center;
@@ -315,6 +320,38 @@
         .fine-tune-btn:active {
             background: rgba(255, 255, 255, 0.3);
             transform: scale(0.95);
+        }
+
+        /* --- Mobile confirm shot button (offline mode only) --- */
+        #confirm-shot-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 100px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            z-index: 25;
+            display: none; /* hidden by default, shown only in offline mode on mobile */
+            touch-action: manipulation;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #confirm-shot-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #confirm-shot-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         /* --- Desktop keyboard hint --- */
@@ -549,6 +586,7 @@
                 <option value="cue">Cue direction only</option>
                 <option value="basic" selected>Basic guide</option>
                 <option value="advanced">Advanced guide</option>
+                <option value="offline">Offline simulation guide</option>
             </select>
         </div>
         
@@ -608,6 +646,9 @@
     <div class="fine-tune-btn" id="btn-right">↻</div>
 </div>
 
+<!-- Mobile confirm shot button (only visible in offline mode) -->
+<button id="confirm-shot-btn" style="display: none;">SHOOT</button>
+
 <!-- Desktop hint -->
 <div id="desktop-hint">
     Use <span class="key-badge">←</span> <span class="key-badge">→</span> to Aim &nbsp;|&nbsp; Hold <span class="key-badge">SPACE</span> to Shoot
@@ -658,7 +699,7 @@ const SETTINGS = {
     maxPower: CONFIG.MAX_POWER,
     friction: CONFIG.FRICTION,
     ballMaterial: 'classic',
-    aimMode: 'basic' // 'cue' | 'basic' | 'advanced'
+    aimMode: 'basic' // 'cue' | 'basic' | 'advanced' | 'offline'
 };
 
 const FELT_SCHEMES = {
@@ -695,7 +736,8 @@ const STATE = {
     scores: {1: 0, 2: 0},
     ballInHand: false,
     ballMaterial: 'classic',
-    aimMode: 'basic' // runtime aiming helper mode
+    aimMode: 'basic', // runtime aiming helper mode
+    pendingShot: false // for offline mode: shot ready but waiting for confirmation
 };
 
 class Vector {
@@ -721,9 +763,9 @@ class Ball {
         this.active = true;
     }
 
-    update() {
+    update(skipTrail = false) {
         if (!this.active) return;
-        if (this.vel.mag() > 1) {
+        if (!skipTrail && this.vel.mag() > 1) {
             trailCtx.beginPath();
             if (this.type === TYPE.SOLID || this.type === TYPE.BLACK || this.type === TYPE.CUE) {
                 trailCtx.arc(this.pos.x, this.pos.y, CONFIG.BALL_RADIUS * 0.8, 0, Math.PI * 2);
@@ -992,6 +1034,7 @@ const uiEndMessage = document.getElementById('end-message');
 const uiRestartBtn = document.getElementById('restart-btn');
 const uiBallMaterialSelect = document.getElementById('ball-material-select');
 const uiAimModeSelect = document.getElementById('aim-mode-select');
+const uiConfirmShotBtn = document.getElementById('confirm-shot-btn');
 
 if (uiRestartBtn) {
     uiRestartBtn.addEventListener('click', () => {
@@ -1103,6 +1146,14 @@ function setupInputs() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     window.addEventListener('wheel', handleWheel); // Mouse wheel support
+
+    // Confirm shot button (mobile, offline mode only)
+    if (uiConfirmShotBtn) {
+        uiConfirmShotBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            confirmShot();
+        });
+    }
 }
 
 function setupSettingsPanel() {
@@ -1196,6 +1247,8 @@ function applyCustomSettings() {
     CONFIG.FRICTION = SETTINGS.friction;
     STATE.ballMaterial = SETTINGS.ballMaterial || 'classic';
     STATE.aimMode = SETTINGS.aimMode || 'basic';
+    STATE.pendingShot = false;
+    updateConfirmButton();
     showToast("Settings applied — new rack ready");
     resetGame();
 }
@@ -1208,6 +1261,27 @@ function updateDeviceUI() {
         uiMobileControls.style.display = 'none';
         uiDesktopHint.style.display = 'block';
     }
+    updateConfirmButton();
+}
+
+function updateConfirmButton() {
+    if (!uiConfirmShotBtn) return;
+    const showBtn = STATE.aimMode === 'offline' && 
+                    STATE.inputType === 'touch' && 
+                    STATE.pendingShot && 
+                    STATE.canShoot && 
+                    !STATE.gameOver;
+    uiConfirmShotBtn.style.display = showBtn ? 'block' : 'none';
+    uiConfirmShotBtn.disabled = !STATE.pendingShot;
+}
+
+function confirmShot() {
+    if (!STATE.pendingShot || !STATE.canShoot || STATE.gameOver) return;
+    STATE.pendingShot = false;
+    shoot();
+    STATE.power = 0;
+    updatePowerUI(0);
+    updateConfirmButton();
 }
 
 // --- Input Handlers ---
@@ -1219,6 +1293,14 @@ function handleAimStart(e) {
         attemptPlaceCueBall(getEventPos(e));
         return;
     }
+    
+    // In offline mode on desktop: if pending shot and mouse click, confirm shot
+    if (STATE.aimMode === 'offline' && STATE.inputType === 'mouse' && STATE.pendingShot && e.button === 0) {
+        e.preventDefault();
+        confirmShot();
+        return;
+    }
+    
     if (!STATE.canShoot || STATE.spaceCharging) return;
     if (e.target !== canvas) return;
     e.preventDefault();
@@ -1233,7 +1315,12 @@ function handleAimMove(e) {
         attemptPlaceCueBall(getEventPos(e));
         return;
     }
-    if (!STATE.canShoot || STATE.isCharging || STATE.spaceCharging) return;
+    // In offline mode, allow aim adjustment even when pending shot (desktop only)
+    if (STATE.aimMode === 'offline' && STATE.pendingShot && STATE.inputType === 'mouse') {
+        // Allow mouse to adjust aim even with pending shot
+    } else if (!STATE.canShoot || STATE.isCharging || STATE.spaceCharging) {
+        return;
+    }
     const pos = getEventPos(e);
 
     if (STATE.inputType === 'mouse') {
@@ -1259,6 +1346,11 @@ function handleKeyDown(e) {
     if (e.code === 'ArrowRight') STATE.aimAngle += step;
     
     if (e.code === 'Space' && !STATE.spaceCharging && !e.repeat) {
+        // In offline mode, clear pending shot if exists
+        if (STATE.aimMode === 'offline' && STATE.pendingShot) {
+            STATE.pendingShot = false;
+            updateConfirmButton();
+        }
         STATE.spaceCharging = true;
         STATE.power = 0;
         STATE.spaceChargeDir = 1;
@@ -1269,9 +1361,21 @@ function handleKeyUp(e) {
     if (STATE.gameOver) return;
     if (e.code === 'Space' && STATE.spaceCharging) {
         STATE.spaceCharging = false;
+        
+        // In offline mode: don't shoot on space release, wait for mouse click
+        if (STATE.aimMode === 'offline') {
+            if (STATE.power > 0.1) {
+                STATE.pendingShot = true;
+            } else {
+                STATE.power = 0;
+                updatePowerUI(0);
+            }
+        } else {
+            // Other modes: shoot immediately as before
         shoot();
         STATE.power = 0;
         updatePowerUI(0);
+        }
     }
 }
 
@@ -1284,6 +1388,11 @@ function handleWheel(e) {
 function handlePowerStart(e) {
     if (!STATE.canShoot || STATE.spaceCharging || STATE.ballInHand || STATE.gameOver) return;
     e.preventDefault();
+    // In offline mode, clear pending shot if exists
+    if (STATE.aimMode === 'offline' && STATE.pendingShot) {
+        STATE.pendingShot = false;
+        updateConfirmButton();
+    }
     STATE.isCharging = true;
     updatePowerUI(0);
 }
@@ -1304,9 +1413,22 @@ function handlePowerMove(e) {
 function handlePowerEnd(e) {
     if (!STATE.isCharging) return;
     STATE.isCharging = false;
+    
+    // In offline mode: don't shoot immediately, wait for confirmation
+    if (STATE.aimMode === 'offline') {
+        if (STATE.power > 0.1) {
+            STATE.pendingShot = true;
+            updateConfirmButton();
+        } else {
+            STATE.power = 0;
+            updatePowerUI(0);
+        }
+    } else {
+        // Other modes: shoot immediately as before
     if (STATE.power > 0.1) shoot();
     STATE.power = 0;
     updatePowerUI(0);
+    }
 }
 
 function getEventPos(e) {
@@ -1362,14 +1484,19 @@ function updatePowerUI(percent) {
     // Legacy DOM slider is hidden; logic now rendered into bottom cushion via canvas
 }
 
+function computeShotVelocity(dir, power) {
+    const clamped = Math.max(0, Math.min(1, power || 0));
+    const force = clamped * CONFIG.MAX_POWER;
+    return dir.mult(force * CONFIG.POWER_SCALE);
+}
+
 function shoot() {
     if (STATE.ballInHand || STATE.gameOver) return;
     hideToast();
     STATE.shotCount += 1;
     STATE.canShoot = false;
-    let force = STATE.power * CONFIG.MAX_POWER;
-    let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
-    whiteBall.vel = dir.mult(force * CONFIG.POWER_SCALE);
+    const dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
+    whiteBall.vel = computeShotVelocity(dir, STATE.power);
     STATE.sunkThisTurn = [];
     STATE.foul = false;
     if(navigator.vibrate) navigator.vibrate(20); // haptic feedback
@@ -1390,6 +1517,7 @@ function resetGame() {
     STATE.spaceCharging = false;
     STATE.spaceChargeDir = 1;
     STATE.inputType = 'unknown';
+    STATE.pendingShot = false;
     updateBallInHandBanner();
     trailCtx.clearRect(0,0,logicalWidth,logicalHeight);
 
@@ -1556,6 +1684,58 @@ function resolveCollisions() {
             }
         }
     }
+}
+
+// Lightweight physics step for offline aiming simulation (no UI / scores / fouls)
+function simulateStep(simBalls) {
+    // pairwise collisions
+    for (let i = 0; i < simBalls.length; i++) {
+        for (let j = i + 1; j < simBalls.length; j++) {
+            let b1 = simBalls[i]; let b2 = simBalls[j];
+            if (!b1.active || !b2.active) continue;
+            let dist = b1.pos.dist(b2.pos);
+            if (dist < CONFIG.BALL_RADIUS * 2) {
+                let normal = b2.pos.sub(b1.pos).normalize();
+                let overlap = CONFIG.BALL_RADIUS * 2 - dist;
+                b1.pos = b1.pos.sub(normal.mult(overlap * 0.5));
+                b2.pos = b2.pos.add(normal.mult(overlap * 0.5));
+                let relVel = b1.vel.sub(b2.vel);
+                let sepVel = Vector.dot(relVel, normal);
+                let newSepVel = -sepVel * CONFIG.BALL_BOUNCE;
+                let sepVelVec = normal.mult(newSepVel - sepVel);
+                b1.vel = b1.vel.add(sepVelVec.mult(0.5));
+                b2.vel = b2.vel.sub(sepVelVec.mult(0.5));
+            }
+        }
+    }
+    // integrate + cushions
+    for (let b of simBalls) {
+        if (!b.active) continue;
+        b.update(true); // skip trail drawing
+    }
+
+    // simple pocket removal so preview stops在袋口
+    for (let b of simBalls) {
+        if (!b.active) continue;
+        for (let p of pockets) {
+            if (b.pos.dist(p) < CONFIG.POCKET_RADIUS) {
+                b.active = false;
+                b.vel = new Vector(0, 0);
+                break;
+            }
+        }
+    }
+}
+
+function cloneBallsForSim() {
+    const sim = [];
+    for (let b of balls) {
+        const nb = new Ball(b.pos.x, b.pos.y, b.type, b.color, b.id);
+        nb.active = b.active;
+        nb.vel = new Vector(b.vel.x, b.vel.y);
+        sim.push(nb);
+    }
+    return sim;
 }
 
 function spawnFloatText(text, x, y) {
@@ -1819,7 +1999,10 @@ function loop() {
         let hitBall = null;
         let baseEnd = start.add(dir.mult(maxDist * 0.9));
 
-        if (STATE.aimMode !== 'cue') {
+        // --- aiming helpers by mode ---
+        const mode = STATE.aimMode || 'basic';
+
+        if (mode === 'basic' || mode === 'advanced') {
             // Find first collision with any active object ball (not cue)
             // using precise circle–ray intersection for equal-radius balls:
             // cue center moves along 'dir', object ball is a circle of radius 2R
@@ -1854,6 +2037,75 @@ function loop() {
 
             if (hitBall) {
                 baseEnd = start.add(dir.mult(hitDist));
+            }
+        } else if (mode === 'offline') {
+            // Use a short offline simulation with same shot model as real shoot()
+            const simBalls = cloneBallsForSim();
+            const simWhite = simBalls.find(b => b.type === TYPE.CUE);
+            if (simWhite) {
+                const rawP = (STATE.power == null ? 0 : STATE.power);
+                const previewPower = rawP > 0 ? rawP : 0.6; // 未蓄力时给一个中等预览力度
+                simWhite.vel = computeShotVelocity(dir, previewPower);
+            }
+            const cuePath = [];
+            const objPaths = {}; // id -> points[]
+            let firstHitId = null;
+
+            // up to 1000 preview steps (or until balls are pocketed/inactive)
+            const maxSteps = 120;
+            for (let step = 0; step < maxSteps; step++) {
+                simulateStep(simBalls);
+
+                // record cue and object paths AFTER physics step
+                if (simWhite && simWhite.active) {
+                    cuePath.push({x: simWhite.pos.x, y: simWhite.pos.y});
+                }
+                for (let sb of simBalls) {
+                    if (!sb.active || sb.type === TYPE.CUE) continue;
+                    if (!objPaths[sb.id]) objPaths[sb.id] = [];
+                    objPaths[sb.id].push({x: sb.pos.x, y: sb.pos.y});
+                }
+
+                // detect first ball actually hit by cue in this offline run
+                if (simWhite && simWhite.active && firstHitId === null) {
+                    for (let sb of simBalls) {
+                        if (!sb.active || sb.type === TYPE.CUE) continue;
+                        if (simWhite.pos.dist(sb.pos) <= CONFIG.BALL_RADIUS * 2 + 0.5) {
+                            firstHitId = sb.id;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // draw cue path (use player color tint)
+            if (cuePath.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(cuePath[0].x, cuePath[0].y);
+                for (let i = 1; i < cuePath.length; i++) {
+                    ctx.lineTo(cuePath[i].x, cuePath[i].y);
+                }
+                const cueColor = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+                ctx.strokeStyle = adjustBrightness(cueColor, 30) + "AA"; // slightly bright, semi-transparent
+                ctx.lineWidth = 1.8;
+                ctx.setLineDash([3,4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // draw only the FIRST ball hit by cue ball (pure white)
+            if (firstHitId != null && objPaths[firstHitId] && objPaths[firstHitId].length > 1) {
+                const pts = objPaths[firstHitId];
+                ctx.beginPath();
+                ctx.moveTo(pts[0].x, pts[0].y);
+                for (let i = 1; i < pts.length; i++) {
+                    ctx.lineTo(pts[i].x, pts[i].y);
+                }
+                ctx.strokeStyle = "rgba(255,255,255,0.9)";
+                ctx.lineWidth = 1.6;
+                ctx.setLineDash([6,6]);
+                ctx.stroke();
+                ctx.setLineDash([]);
             }
         }
 
