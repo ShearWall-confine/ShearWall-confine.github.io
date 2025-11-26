@@ -139,6 +139,19 @@
             cursor: pointer;
         }
 
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .toggle-row input[type="checkbox"] {
+            width: 34px;
+            height: 18px;
+        }
+
         .spin-row {
             display: flex;
             align-items: center;
@@ -519,6 +532,11 @@
             <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
             <button class="spin-btn" data-target="friction-input" data-step="0.01" data-min="0" data-max="1">+</button>
         </div>
+
+        <div class="toggle-row">
+            <span>Advanced aiming (experimental)</span>
+            <input type="checkbox" id="advanced-aim-toggle">
+        </div>
         
         <label>Felt palette</label>
         <select id="felt-select">
@@ -625,7 +643,8 @@ const SETTINGS = {
     feltScheme: 'classic',
     maxPower: CONFIG.MAX_POWER,
     friction: CONFIG.FRICTION,
-    ballMaterial: 'classic'
+    ballMaterial: 'classic',
+    advancedAim: false
 };
 
 const FELT_SCHEMES = {
@@ -661,7 +680,8 @@ const STATE = {
     shotCount: 0,         // total shots taken this rack
     scores: {1: 0, 2: 0},
     ballInHand: false,
-    ballMaterial: 'classic'
+    ballMaterial: 'classic',
+    advancedAim: false
 };
 
 class Vector {
@@ -763,9 +783,22 @@ class Ball {
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
         };
         const drawStripeClassic = () => {
-            ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = this.color; ctx.lineWidth = r * 0.6;
-            ctx.beginPath(); ctx.arc(x, y, r*0.6, 0, Math.PI*2); ctx.stroke();
+            // dark base
+            ctx.fillStyle = "#111";
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            // central horizontal band
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x - r, y - r*0.45, r*2, r*0.9);
+            ctx.clip();
+            let bandGrad = ctx.createLinearGradient(x - r, y, x + r, y);
+            bandGrad.addColorStop(0, adjustBrightness(this.color, 40));
+            bandGrad.addColorStop(0.5, this.color);
+            bandGrad.addColorStop(1, adjustBrightness(this.color, -20));
+            ctx.fillStyle = bandGrad;
+            ctx.beginPath(); ctx.arc(x, y, r*0.95, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+            // subtle glare
             let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
             glare.addColorStop(0, "rgba(255,255,255,0.4)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
             ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
@@ -860,20 +893,47 @@ class Ball {
             }
         } else if (this.type === TYPE.STRIPE) {
             if (material.startsWith('metal_')) {
-                // metal base with a reflective stripe
-                ctx.fillStyle = "#111"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = this.color; ctx.lineWidth = r * 0.7;
-                ctx.beginPath(); ctx.arc(x, y, r*0.55, 0, Math.PI*2); ctx.stroke();
+                // metallic base with clear colored band
+                ctx.fillStyle = "#050509"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x - r, y - r*0.45, r*2, r*0.9);
+                ctx.clip();
+                let bandGrad = ctx.createLinearGradient(x - r, y, x + r, y);
+                bandGrad.addColorStop(0, adjustBrightness(this.color, 50));
+                bandGrad.addColorStop(0.5, this.color);
+                bandGrad.addColorStop(1, adjustBrightness(this.color, -10));
+                ctx.fillStyle = bandGrad;
+                ctx.beginPath(); ctx.arc(x, y, r*0.96, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
                 let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
-                glare.addColorStop(0, "rgba(255,255,255,0.5)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
+                glare.addColorStop(0, "rgba(255,255,255,0.55)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
                 ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             } else if (material.startsWith('diamond_')) {
-                // translucent stripe
-                ctx.fillStyle = "rgba(10,10,20,0.95)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = r * 0.6;
-                ctx.beginPath(); ctx.arc(x, y, r*0.6, 0, Math.PI*2); ctx.stroke();
+                // dark crystal base with luminous band
+                ctx.fillStyle = "rgba(8,8,18,0.98)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x - r, y - r*0.45, r*2, r*0.9);
+                ctx.clip();
+                let bandGrad = ctx.createLinearGradient(x - r, y, x + r, y);
+                bandGrad.addColorStop(0, "rgba(255,255,255,0.9)");
+                bandGrad.addColorStop(0.4, adjustBrightness(this.color, 40));
+                bandGrad.addColorStop(1, this.color);
+                ctx.fillStyle = bandGrad;
+                ctx.beginPath(); ctx.arc(x, y, r*0.95, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
             } else if (material.startsWith('stone_')) {
+                // stone ball with carved band
                 drawStone();
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x - r, y - r*0.4, r*2, r*0.8);
+                ctx.clip();
+                ctx.fillStyle = adjustBrightness(this.color, 20);
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath(); ctx.arc(x, y, r*0.9, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
             } else {
                 drawStripeClassic();
             }
@@ -917,6 +977,7 @@ const uiEndScreen = document.getElementById('end-screen');
 const uiEndMessage = document.getElementById('end-message');
 const uiRestartBtn = document.getElementById('restart-btn');
 const uiBallMaterialSelect = document.getElementById('ball-material-select');
+const uiAdvancedAimToggle = document.getElementById('advanced-aim-toggle');
 
 if (uiRestartBtn) {
     uiRestartBtn.addEventListener('click', () => {
@@ -1042,6 +1103,7 @@ function setupSettingsPanel() {
     uiPowerMaxDisplay.innerText = `${CONFIG.MAX_POWER}`;
     uiFrictionRange.value = CONFIG.FRICTION.toFixed(3);
     uiFrictionDisplay.innerText = CONFIG.FRICTION.toFixed(3);
+    if (uiAdvancedAimToggle) uiAdvancedAimToggle.checked = SETTINGS.advancedAim;
 
     const togglePanel = (show) => {
         uiSettingsPanel.classList[show ? 'add' : 'remove']('visible');
@@ -1074,6 +1136,12 @@ function setupSettingsPanel() {
         SETTINGS.friction = Number(uiFrictionRange.value);
         uiFrictionDisplay.innerText = SETTINGS.friction.toFixed(3);
     });
+
+    if (uiAdvancedAimToggle) {
+        uiAdvancedAimToggle.addEventListener('change', () => {
+            SETTINGS.advancedAim = !!uiAdvancedAimToggle.checked;
+        });
+    }
 
     // +/- buttons for easier tap control
     const spinButtons = document.querySelectorAll('.spin-btn');
@@ -1113,6 +1181,7 @@ function applyCustomSettings() {
     CONFIG.MAX_POWER = SETTINGS.maxPower;
     CONFIG.FRICTION = SETTINGS.friction;
     STATE.ballMaterial = SETTINGS.ballMaterial || 'classic';
+     STATE.advancedAim = !!SETTINGS.advancedAim;
     showToast("Settings applied — new rack ready");
     resetGame();
 }
@@ -1734,10 +1803,11 @@ function loop() {
         const maxDist = Math.max(logicalWidth, logicalHeight);
 
         // Find first collision with any active object ball (not cue)
-        // using precise circle–ray intersection from current cue center
+        // using precise circle–ray intersection for equal-radius balls:
+        // cue center moves along 'dir', object ball is a circle of radius 2R
         let hitBall = null;
         let hitDist = maxDist;
-        const R = CONFIG.BALL_RADIUS; // radius of object ball (cue treated as point for aiming)
+        const R = CONFIG.BALL_RADIUS * 2; // center-to-center distance at first contact
         for (let b of balls) {
             if (!b.active || b === whiteBall) continue;
 
@@ -1802,53 +1872,55 @@ function loop() {
             ctx.fillStyle = color;
             ctx.fill();
 
-            // Predict post-collision paths (simple equal-mass elastic model)
-            // impact normal from cue impact point to object center
-            const impactPoint = baseEnd;
-            const n = hitBall.pos.sub(impactPoint).normalize();
-            const v = dir; // cue ball incoming direction
-            const vDotN = Vector.dot(v, n);
+            if (STATE.advancedAim) {
+                // Predict post-collision paths (simple equal-mass elastic model)
+                // impact normal from cue impact point to object center
+                const impactPoint = baseEnd;
+                const n = hitBall.pos.sub(impactPoint).normalize();
+                const v = dir; // cue ball incoming direction
+                const vDotN = Vector.dot(v, n);
 
-            // For very thin, "extreme" cuts the simple model is unreliable:
-            // only show contact preview and skip post-collision guides.
-            const approach = Math.abs(vDotN);
+                // For very thin, "extreme" cuts the simple model is unreliable:
+                // only show contact preview and skip post-collision guides.
+                const approach = Math.abs(vDotN);
 
-            // Object ball leaves roughly along impact normal
-            const objDir = n;
-            const objStart = hitBall.pos;
-            const travelLen = CONFIG.BALL_RADIUS * 8;
-            const objEnd = objStart.add(objDir.mult(travelLen));
-
-            ctx.beginPath();
-            ctx.moveTo(objStart.x, objStart.y);
-            ctx.lineTo(objEnd.x, objEnd.y);
-            ctx.strokeStyle = "rgba(255,255,255,0.45)";
-            ctx.lineWidth = 1.6;
-            ctx.setLineDash([3, 6]);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Cue ball loses its normal component, keeps tangential component
-            if (approach >= 0.18) {
-                let cueDir = v.sub(n.mult(vDotN));
-                if (cueDir.mag() > 0.0001) {
-                    cueDir = cueDir.normalize();
-                } else {
-                    // fallback: slight reflection if nearly head-on
-                    cueDir = v.sub(n.mult(2 * vDotN)).normalize();
-                }
-
-                const cueStart = impactPoint.add(cueDir.mult(CONFIG.BALL_RADIUS * 1.2));
-                const cueEnd = cueStart.add(cueDir.mult(travelLen));
+                // Object ball leaves roughly along impact normal
+                const objDir = n;
+                const objStart = hitBall.pos;
+                const travelLen = CONFIG.BALL_RADIUS * 8;
+                const objEnd = objStart.add(objDir.mult(travelLen));
 
                 ctx.beginPath();
-                ctx.moveTo(cueStart.x, cueStart.y);
-                ctx.lineTo(cueEnd.x, cueEnd.y);
-                ctx.strokeStyle = "rgba(255,255,255,0.35)";
-                ctx.lineWidth = 1.4;
-                ctx.setLineDash([2, 6]);
+                ctx.moveTo(objStart.x, objStart.y);
+                ctx.lineTo(objEnd.x, objEnd.y);
+                ctx.strokeStyle = "rgba(255,255,255,0.45)";
+                ctx.lineWidth = 1.6;
+                ctx.setLineDash([3, 6]);
                 ctx.stroke();
                 ctx.setLineDash([]);
+
+                // Cue ball loses its normal component, keeps tangential component
+                if (approach >= 0.18) {
+                    let cueDir = v.sub(n.mult(vDotN));
+                    if (cueDir.mag() > 0.0001) {
+                        cueDir = cueDir.normalize();
+                    } else {
+                        // fallback: slight reflection if nearly head-on
+                        cueDir = v.sub(n.mult(2 * vDotN)).normalize();
+                    }
+
+                    const cueStart = impactPoint.add(cueDir.mult(CONFIG.BALL_RADIUS * 1.2));
+                    const cueEnd = cueStart.add(cueDir.mult(travelLen));
+
+                    ctx.beginPath();
+                    ctx.moveTo(cueStart.x, cueStart.y);
+                    ctx.lineTo(cueEnd.x, cueEnd.y);
+                    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+                    ctx.lineWidth = 1.4;
+                    ctx.setLineDash([2, 6]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
             }
         }
     }
