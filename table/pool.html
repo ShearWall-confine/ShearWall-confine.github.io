@@ -1441,31 +1441,83 @@ function updateUI() {
     if (uiScore2) uiScore2.innerText = STATE.scores[2];
 }
 
+function getGroupIds(groupType) {
+    if (groupType === TYPE.SOLID) return [1,2,3,4,5,6,7];
+    if (groupType === TYPE.STRIPE) return [9,10,11,12,13,14,15];
+    return [];
+}
+
+function getRemainingIdSet(groupType) {
+    const set = new Set();
+    for (let b of balls) {
+        if (b.active && b.type === groupType && typeof b.id === 'number') {
+            set.add(b.id);
+        }
+    }
+    return set;
+}
+
+function getBallColorById(id, fallbackColor) {
+    for (let b of balls) {
+        if (b.id === id && b.color) return b.color;
+    }
+    return fallbackColor;
+}
+
+function buildTargetsForPlayer(isP1) {
+    if (!STATE.assigned) return [];
+    const myGroup = isP1 ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
+    if (myGroup !== TYPE.SOLID && myGroup !== TYPE.STRIPE) return [];
+
+    const allIds = getGroupIds(myGroup);
+    const remainingSet = getRemainingIdSet(myGroup);
+    const remainingCount = remainingSet.size;
+
+    // 如果己方目标球都清空，且黑球仍在台面，则目标只剩黑球
+    const blackRemaining = countRemaining(TYPE.BLACK) > 0;
+    if (remainingCount === 0 && blackRemaining) {
+        return [{ id: 8, isRemaining: true, isBlack: true, color: '#000' }];
+    }
+
+    const targets = [];
+    for (let id of allIds) {
+        const isRemaining = remainingSet.has(id);
+        const baseColor = getBallColorById(id, isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR);
+        targets.push({
+            id,
+            isRemaining,
+            isBlack: false,
+            color: baseColor
+        });
+    }
+    return targets;
+}
+
 function drawScoreboard(ctx) {
     const c = CONFIG.CUSHION_SIZE;
     const y = c + 24;
-    const cardWidth = 130;
-    const cardHeight = 40;
+    const cardWidth = 150;
+    const cardHeight = 44;
     const gap = 18;
     const centerX = logicalWidth / 2;
     const p1x = centerX - cardWidth - gap/2;
     const p2x = centerX + gap/2;
 
-    const drawCard = (x, label, score, isActive, isP1) => {
+    const drawCard = (x, label, targets, isActive, isP1) => {
         ctx.save();
-        const radius = 12;
+        const cardRadius = 12;
 
         // background
         ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + cardWidth - radius, y);
-        ctx.quadraticCurveTo(x + cardWidth, y, x + cardWidth, y + radius);
-        ctx.lineTo(x + cardWidth, y + cardHeight - radius);
-        ctx.quadraticCurveTo(x + cardWidth, y + cardHeight, x + cardWidth - radius, y + cardHeight);
-        ctx.lineTo(x + radius, y + cardHeight);
-        ctx.quadraticCurveTo(x, y + cardHeight, x, y + cardHeight - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.moveTo(x + cardRadius, y);
+        ctx.lineTo(x + cardWidth - cardRadius, y);
+        ctx.quadraticCurveTo(x + cardWidth, y, x + cardWidth, y + cardRadius);
+        ctx.lineTo(x + cardWidth, y + cardHeight - cardRadius);
+        ctx.quadraticCurveTo(x + cardWidth, y + cardHeight, x + cardWidth - cardRadius, y + cardHeight);
+        ctx.lineTo(x + cardRadius, y + cardHeight);
+        ctx.quadraticCurveTo(x, y + cardHeight, x, y + cardHeight - cardRadius);
+        ctx.lineTo(x, y + cardRadius);
+        ctx.quadraticCurveTo(x, y, x + cardRadius, y);
 
         const base = "rgba(15,15,25,0.86)";
         ctx.fillStyle = base;
@@ -1481,25 +1533,65 @@ function drawScoreboard(ctx) {
         ctx.fillStyle = isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
         ctx.fillText(label, x + 10, y + 6);
 
-        // score
-        ctx.font = "bold 16px Inter";
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(String(score), x + cardWidth - 10, y + 6);
+        // target balls row
+        const rowY = y + 20;
+        const maxPerRow = 8;
+        const dotRadius = 7;
+        const spacing = 4 + dotRadius*2;
+        const startX = x + 12;
+
+        if (targets && targets.length) {
+            ctx.font = "9px Inter";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            let idx = 0;
+            for (let t of targets) {
+                if (idx >= maxPerRow) break;
+                const cx = startX + idx * spacing;
+                const cy = rowY;
+                const isRem = t.isRemaining;
+
+                ctx.beginPath();
+                if (t.isBlack || t.id === 8) {
+                    ctx.fillStyle = isRem ? "#000" : "rgba(80,80,80,0.8)";
+                } else if (isRem) {
+                    ctx.fillStyle = t.color || (isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR);
+                } else {
+                    ctx.fillStyle = "rgba(120,120,130,0.4)";
+                }
+                ctx.arc(cx, cy, dotRadius, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.strokeStyle = "rgba(0,0,0,0.4)";
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+
+                // text label
+                const textColor = isRem ? "#ffffff" : "rgba(220,220,230,0.7)";
+                ctx.fillStyle = textColor;
+                ctx.fillText(String(t.id), cx, cy+0.5);
+
+                idx++;
+            }
+        }
 
         ctx.restore();
     };
 
     let p1Label = "ANY";
     let p2Label = "ANY";
+    let p1Targets = [];
+    let p2Targets = [];
     if (STATE.assigned) {
         const p1Solids = STATE.p1Group === TYPE.SOLID;
         p1Label = p1Solids ? "SOLIDS ●" : "STRIPES ◎";
         p2Label = p1Solids ? "STRIPES ◎" : "SOLIDS ●";
+        p1Targets = buildTargetsForPlayer(true);
+        p2Targets = buildTargetsForPlayer(false);
     }
 
-    drawCard(p1x, p1Label, STATE.scores[1], STATE.turn === 1, true);
-    drawCard(p2x, p2Label, STATE.scores[2], STATE.turn === 2, false);
+    drawCard(p1x, p1Label, p1Targets, STATE.turn === 1, true);
+    drawCard(p2x, p2Label, p2Targets, STATE.turn === 2, false);
 }
 function adjustBrightness(col, amt) {
     let usePound = false; if (col[0] == "#") { col = col.slice(1); usePound = true; }
@@ -1585,23 +1677,34 @@ function loop() {
         const maxDist = Math.max(logicalWidth, logicalHeight);
 
         // Find first collision with any active object ball (not cue)
+        // using precise circle–ray intersection from current cue center
         let hitBall = null;
         let hitDist = maxDist;
+        const R = CONFIG.BALL_RADIUS; // radius of object ball (cue treated as point for aiming)
         for (let b of balls) {
             if (!b.active || b === whiteBall) continue;
-            const toBall = b.pos.sub(start);
-            const t = Vector.dot(toBall, dir);
-            if (t <= 0 || t > maxDist) continue;
-            const closestPoint = start.add(dir.mult(t));
-            const distPerp = b.pos.dist(closestPoint);
-            const R = CONFIG.BALL_RADIUS * 2; // approximate cue/object spacing
-            if (distPerp <= R) {
-                const offset = Math.sqrt(Math.max(R*R - distPerp*distPerp, 0));
-                const collisionDist = t - offset;
-                if (collisionDist > 0 && collisionDist < hitDist) {
-                    hitDist = collisionDist;
-                    hitBall = b;
-                }
+
+            // Ray-sphere intersection: |(start + dir*t) - b.pos| = R
+            const f = start.sub(b.pos);              // from ball center to cue center
+            const a = 1;                             // dir is normalized
+            const bCoef = 2 * Vector.dot(dir, f);
+            const cTerm = f.mag() * f.mag() - R*R;
+            const disc = bCoef*bCoef - 4*a*cTerm;
+            if (disc < 0) continue;                  // no intersection
+
+            const sqrtD = Math.sqrt(disc);
+            let t1 = (-bCoef - sqrtD) / (2*a);
+            let t2 = (-bCoef + sqrtD) / (2*a);
+
+            // pick smallest positive t as first contact
+            let tHit = Number.POSITIVE_INFINITY;
+            if (t1 > 0 && t1 < tHit) tHit = t1;
+            if (t2 > 0 && t2 < tHit) tHit = t2;
+            if (!isFinite(tHit) || tHit <= 0 || tHit > maxDist) continue;
+
+            if (tHit < hitDist) {
+                hitDist = tHit;
+                hitBall = b;
             }
         }
 
@@ -1649,10 +1752,15 @@ function loop() {
             const v = dir; // cue ball incoming direction
             const vDotN = Vector.dot(v, n);
 
+            // For very thin, "extreme" cuts the simple model is unreliable:
+            // only show contact preview and skip post-collision guides.
+            const approach = Math.abs(vDotN);
+
             // Object ball leaves roughly along impact normal
             const objDir = n;
             const objStart = hitBall.pos;
-            const objEnd = objStart.add(objDir.mult(CONFIG.BALL_RADIUS * 10));
+            const travelLen = CONFIG.BALL_RADIUS * 8;
+            const objEnd = objStart.add(objDir.mult(travelLen));
 
             ctx.beginPath();
             ctx.moveTo(objStart.x, objStart.y);
@@ -1664,25 +1772,27 @@ function loop() {
             ctx.setLineDash([]);
 
             // Cue ball loses its normal component, keeps tangential component
-            let cueDir = v.sub(n.mult(vDotN));
-            if (cueDir.mag() > 0.0001) {
-                cueDir = cueDir.normalize();
-            } else {
-                // fallback: slight reflection if nearly head-on
-                cueDir = v.sub(n.mult(2 * vDotN)).normalize();
+            if (approach >= 0.18) {
+                let cueDir = v.sub(n.mult(vDotN));
+                if (cueDir.mag() > 0.0001) {
+                    cueDir = cueDir.normalize();
+                } else {
+                    // fallback: slight reflection if nearly head-on
+                    cueDir = v.sub(n.mult(2 * vDotN)).normalize();
+                }
+
+                const cueStart = impactPoint.add(cueDir.mult(CONFIG.BALL_RADIUS * 1.2));
+                const cueEnd = cueStart.add(cueDir.mult(travelLen));
+
+                ctx.beginPath();
+                ctx.moveTo(cueStart.x, cueStart.y);
+                ctx.lineTo(cueEnd.x, cueEnd.y);
+                ctx.strokeStyle = "rgba(255,255,255,0.35)";
+                ctx.lineWidth = 1.4;
+                ctx.setLineDash([2, 6]);
+                ctx.stroke();
+                ctx.setLineDash([]);
             }
-
-            const cueStart = impactPoint.add(cueDir.mult(CONFIG.BALL_RADIUS * 1.2));
-            const cueEnd = cueStart.add(cueDir.mult(CONFIG.BALL_RADIUS * 10));
-
-            ctx.beginPath();
-            ctx.moveTo(cueStart.x, cueStart.y);
-            ctx.lineTo(cueEnd.x, cueEnd.y);
-            ctx.strokeStyle = "rgba(255,255,255,0.35)";
-            ctx.lineWidth = 1.4;
-            ctx.setLineDash([2, 6]);
-            ctx.stroke();
-            ctx.setLineDash([]);
         }
     }
     requestAnimationFrame(loop);
