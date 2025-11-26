@@ -139,6 +139,38 @@
             cursor: pointer;
         }
 
+        .spin-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .spin-row input[type="range"] {
+            flex: 1;
+        }
+
+        .spin-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(15,15,25,0.9);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .spin-btn:active {
+            background: rgba(60,60,80,0.9);
+            transform: scale(0.96);
+        }
+
         #apply-settings {
             margin: 8px 0 12px 0;
             width: 100%;
@@ -461,16 +493,32 @@
         <button id="apply-settings">Apply &amp; Re-rack</button>
 
         <label>Ball radius <span id="ball-size-display">10px</span></label>
-        <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
+        <div class="spin-row">
+            <button class="spin-btn" data-target="ball-size-input" data-step="1" data-min="6" data-max="100">−</button>
+            <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
+            <button class="spin-btn" data-target="ball-size-input" data-step="1" data-min="6" data-max="100">+</button>
+        </div>
         
         <label>Pocket size <span id="pocket-size-display">22px</span></label>
-        <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
+        <div class="spin-row">
+            <button class="spin-btn" data-target="pocket-size-input" data-step="2" data-min="10" data-max="200">−</button>
+            <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
+            <button class="spin-btn" data-target="pocket-size-input" data-step="2" data-min="10" data-max="200">+</button>
+        </div>
 
         <label>Max shot power <span id="power-max-display">200</span></label>
-        <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
+        <div class="spin-row">
+            <button class="spin-btn" data-target="power-max-input" data-step="20" data-min="80" data-max="10000">−</button>
+            <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
+            <button class="spin-btn" data-target="power-max-input" data-step="20" data-min="80" data-max="10000">+</button>
+        </div>
 
         <label>Table friction <span id="friction-display">0.988</span></label>
-        <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
+        <div class="spin-row">
+            <button class="spin-btn" data-target="friction-input" data-step="0.01" data-min="0" data-max="1">−</button>
+            <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
+            <button class="spin-btn" data-target="friction-input" data-step="0.01" data-min="0" data-max="1">+</button>
+        </div>
         
         <label>Felt palette</label>
         <select id="felt-select">
@@ -1025,6 +1073,30 @@ function setupSettingsPanel() {
     uiFrictionRange.addEventListener('input', () => {
         SETTINGS.friction = Number(uiFrictionRange.value);
         uiFrictionDisplay.innerText = SETTINGS.friction.toFixed(3);
+    });
+
+    // +/- buttons for easier tap control
+    const spinButtons = document.querySelectorAll('.spin-btn');
+    spinButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = btn.getAttribute('data-target');
+            const step = Number(btn.getAttribute('data-step') || '1');
+            const min = Number(btn.getAttribute('data-min') || '-999999');
+            const max = Number(btn.getAttribute('data-max') || '999999');
+            const dir = btn.textContent.trim() === '+' ? 1 : -1;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            let current = Number(input.value || input.getAttribute('value') || 0);
+            if (isNaN(current)) current = 0;
+            let next = current + dir * step;
+            if (next < min) next = min;
+            if (next > max) next = max;
+            input.value = String(next);
+            // trigger original input handlers so UI text & SETTINGS are updated
+            const ev = new Event('input', { bubbles: true });
+            input.dispatchEvent(ev);
+        });
     });
 
     uiApplySettings.addEventListener('click', () => {
