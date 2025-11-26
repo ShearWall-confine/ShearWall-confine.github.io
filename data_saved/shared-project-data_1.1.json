@@ -602,20 +602,20 @@
       "priority": "medium",
       "startDate": "2025-09-01",
       "endDate": "2025-11-30",
-      "progress": 40,
+      "progress": 100,
       "subtasks": [
         {
           "title": "开题报告：修改/参考文献调整",
-          "completed": false
+          "completed": true
         },
         {
           "title": "开题报告PPT",
-          "completed": false
+          "completed": true
         },
         {
           "id": 1760965450485,
           "title": "开题汇报",
-          "completed": false,
+          "completed": true,
           "notes": "",
           "issues": [],
           "completionTime": "2025-11-26T21:04",
@@ -831,6 +831,15 @@
       "isSynced": false
     },
     {
+      "id": 1763115025273,
+      "title": "思考后续课题进展，报告鲁老师/整理dropbox文件夹",
+      "description": "",
+      "date": "2025-11-16",
+      "status": "in-progress",
+      "tags": [],
+      "isSynced": false
+    },
+    {
       "id": "task-start-1760965498124",
       "date": "2023-09-20",
       "title": "开始：每周例会",
@@ -886,6 +895,44 @@
       "status": "completed",
       "linkedTaskId": 1760965498124,
       "linkedSubtaskIndex": 1,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760965498124-2",
+      "date": "2025-11-04",
+      "time": "20:49",
+      "title": "完成：汇报进度/地铁车站管道/考试卷子/",
+      "description": "完成子任务：汇报进度/地铁车站管道/考试卷子/",
+      "status": "completed",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 2,
+      "tags": [
+        "子任务",
+        "完成",
+        "每周例会"
+      ],
+      "isSynced": true,
+      "type": "subtask-completion",
+      "parentTask": "每周例会",
+      "isSubtask": true
+    },
+    {
+      "id": "subtask-completion-1760965498124-3",
+      "date": "2025-11-18",
+      "time": "18:11",
+      "title": "完成：思考后续进度/考试卷子",
+      "description": "完成子任务：思考后续进度/考试卷子",
+      "status": "pending",
+      "linkedTaskId": 1760965498124,
+      "linkedSubtaskIndex": 3,
       "tags": [
         "子任务",
         "完成",
@@ -1056,25 +1103,6 @@
       "type": "task-end"
     },
     {
-      "id": "subtask-completion-1760787494825-2",
-      "date": "2025-11-26",
-      "time": "21:04",
-      "title": "完成：开题汇报",
-      "description": "完成子任务：开题汇报",
-      "status": "pending",
-      "linkedTaskId": 1760787494825,
-      "linkedSubtaskIndex": 2,
-      "tags": [
-        "子任务",
-        "完成",
-        "开题"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "开题",
-      "isSubtask": true
-    },
-    {
       "id": "task-start-1760950677382",
       "date": "2025-09-01",
       "title": "开始：2025本科毕业论文/管道易损性指标",
@@ -1225,50 +1253,22 @@
       "type": "task-end"
     },
     {
-      "id": "subtask-completion-1760965498124-2",
-      "date": "2025-11-04",
-      "time": "20:49",
-      "title": "完成：汇报进度/地铁车站管道/考试卷子/",
-      "description": "完成子任务：汇报进度/地铁车站管道/考试卷子/",
+      "id": "subtask-completion-1760787494825-2",
+      "date": "2025-11-26",
+      "time": "21:04",
+      "title": "完成：开题汇报",
+      "description": "完成子任务：开题汇报",
       "status": "completed",
-      "linkedTaskId": 1760965498124,
+      "linkedTaskId": 1760787494825,
       "linkedSubtaskIndex": 2,
       "tags": [
         "子任务",
         "完成",
-        "每周例会"
+        "开题"
       ],
       "isSynced": true,
       "type": "subtask-completion",
-      "parentTask": "每周例会",
-      "isSubtask": true
-    },
-    {
-      "id": 1763115025273,
-      "title": "思考后续课题进展，报告鲁老师/整理dropbox文件夹",
-      "description": "",
-      "date": "2025-11-16",
-      "status": "in-progress",
-      "tags": [],
-      "isSynced": false
-    },
-    {
-      "id": "subtask-completion-1760965498124-3",
-      "date": "2025-11-18",
-      "time": "18:11",
-      "title": "完成：思考后续进度/考试卷子",
-      "description": "完成子任务：思考后续进度/考试卷子",
-      "status": "pending",
-      "linkedTaskId": 1760965498124,
-      "linkedSubtaskIndex": 3,
-      "tags": [
-        "子任务",
-        "完成",
-        "每周例会"
-      ],
-      "isSynced": true,
-      "type": "subtask-completion",
-      "parentTask": "每周例会",
+      "parentTask": "开题",
       "isSubtask": true
     }
   ],
