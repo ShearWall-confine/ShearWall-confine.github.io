@@ -16,47 +16,48 @@
             user-select: none;
         }
 
-        /* --- 返回主页按钮 --- */
-        #back-home-btn {
+        /* --- Top control stack --- */
+        #ui-shell {
             position: absolute;
             top: 20px;
+            left: 20px;
             right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
             z-index: 25;
+            pointer-events: none;
+        }
+
+        #action-stack {
+            display: flex;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        #back-home-btn,
+        #settings-toggle {
             padding: 10px 18px;
             border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.15);
             background: rgba(20, 20, 30, 0.7);
             color: #fff;
             font-size: 14px;
             font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 1px;
             text-decoration: none;
-            letter-spacing: 1px;
-            pointer-events: auto;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        #back-home-btn:hover {
-            background: rgba(80, 80, 110, 0.8);
-            transform: translateY(-1px);
-        }
-
-        /* --- 设置按钮与面板 --- */
-        #settings-toggle {
-            position: absolute;
-            top: 20px;
-            right: 150px;
-            z-index: 25;
-            padding: 10px 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(20, 20, 30, 0.7);
-            color: #fff;
-            font-weight: 600;
-            letter-spacing: 1px;
             cursor: pointer;
             transition: background 0.2s ease, transform 0.2s ease;
         }
 
+        #settings-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #back-home-btn:hover,
         #settings-toggle:hover {
             background: rgba(80, 80, 110, 0.8);
             transform: translateY(-1px);
@@ -65,7 +66,7 @@
         #settings-panel {
             position: absolute;
             top: 80px;
-            right: 30px;
+            left: 20px;
             width: 260px;
             padding: 18px;
             border-radius: 16px;
@@ -147,21 +148,17 @@
             display: block;
             width: 100%;
             height: 100%;
-            cursor: crosshair; /* 桌面端鼠标样式 */
+            cursor: crosshair; /* desktop crosshair cursor */
         }
 
-        /* --- 顶部信息栏 --- */
+        /* --- Scoreboard strip --- */
         #ui-layer {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 90px;
-            height: 60px;
+            position: relative;
             pointer-events: none;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            z-index: 10;
+            gap: 20px;
         }
 
         .player-card {
@@ -201,32 +198,46 @@
         .score-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            gap: 12px;
             color: white;
             font-weight: 700;
             font-size: 14px;
+            min-width: 120px;
         }
 
-        /* --- 右侧力度条 (优化触控区) --- */
+        .score-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* --- Power column --- */
         #power-control {
             position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 80px;
+            bottom: 30px;
+            right: 30px;
+            width: 90px;
+            height: 250px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 20;
             pointer-events: auto;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 16px 0;
         }
 
         #power-track {
             position: relative;
-            width: 12px;
-            height: 60%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
+            width: 14px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
             display: flex;
             justify-content: center;
         }
@@ -234,7 +245,7 @@
         #power-fill {
             position: absolute;
             bottom: 0;
-            top: 0; /* 默认充满，高度由JS控制 */
+            top: 0; /* fully extends, height controlled by JS */
             width: 100%;
             height: 0%; 
             background: linear-gradient(to top, #4facfe, #00f2fe);
@@ -248,7 +259,7 @@
 
         #power-handle {
             position: absolute;
-            width: 36px; /* 加大触控点 */
+            width: 36px; /* larger touch target */
             height: 36px;
             background: white;
             border-radius: 50%;
@@ -256,16 +267,16 @@
             transform: translateY(0);
             cursor: pointer;
             left: 50%;
-            margin-left: -18px; /* 居中 */
-            top: 0; /* 初始位置 */
+            margin-left: -18px; /* center horizontally */
+            top: 0; /* initial position */
         }
 
-        /* --- 移动端微调控制 (New) --- */
+        /* --- Mobile fine-tune controls --- */
         #mobile-controls {
             position: absolute;
             bottom: 30px;
             left: 30px;
-            display: none; /* 默认隐藏，JS检测Touch后显示 */
+            display: none; /* hidden until touch detected */
             gap: 20px;
             z-index: 20;
             pointer-events: auto;
@@ -292,7 +303,7 @@
             transform: scale(0.95);
         }
 
-        /* --- 桌面端键盘提示 (New) --- */
+        /* --- Desktop keyboard hint --- */
         #desktop-hint {
             position: absolute;
             bottom: 20px;
@@ -304,7 +315,7 @@
             padding: 8px 16px;
             border-radius: 20px;
             pointer-events: none;
-            display: none; /* JS检测Mouse后显示 */
+            display: none; /* revealed when mouse input detected */
             white-space: nowrap;
         }
         
@@ -319,7 +330,7 @@
             font-size: 10px;
         }
 
-        /* --- 提示与动画 --- */
+        /* --- Toasts & overlays --- */
         #game-toast {
             position: absolute;
             top: 40%;
@@ -351,6 +362,81 @@
             z-index: 5;
         }
 
+        #ball-hand-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 16px 26px;
+            border-radius: 999px;
+            background: rgba(10, 10, 20, 0.8);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 35;
+        }
+
+        #ball-hand-banner.visible {
+            opacity: 1;
+        }
+
+        #end-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 50;
+        }
+
+        #end-screen.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .end-content {
+            background: rgba(20,20,30,0.9);
+            border-radius: 20px;
+            padding: 30px 40px;
+            text-align: center;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 260px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .end-content h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        #restart-btn {
+            padding: 10px 26px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+        }
+
+        #restart-btn:hover {
+            transform: translateY(-1px);
+        }
+
         @keyframes popUp {
             0% { opacity: 0; transform: translateY(0) scale(0.5); }
             50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
@@ -360,40 +446,64 @@
 </head>
 <body>
 
-<a id="back-home-btn" href="../index.html">← 返回主页</a>
-<button id="settings-toggle">⚙ 设置</button>
+<div id="ui-shell">
+    <div id="action-stack">
+        <a id="back-home-btn" href="../index.html">← Back to Hub</a>
+        <button id="settings-toggle">⚙ Settings</button>
+    </div>
+    <div id="ui-layer">
+        <div id="p1-card" class="player-card active p1-active">
+            <div class="target-type" id="p1-type">ANY</div>
+            <div class="score-info">
+                <span>PLAYER 1</span>
+                <span class="score-value" id="p1-score">0</span>
+            </div>
+        </div>
+        <div id="p2-card" class="player-card">
+            <div class="target-type" id="p2-type">ANY</div>
+            <div class="score-info">
+                <span>PLAYER 2</span>
+                <span class="score-value" id="p2-score">0</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="settings-panel">
-    <h3>桌面设置 <button id="close-settings">×</button></h3>
-    <label>球半径 <span id="ball-size-display">10px</span></label>
-    <input type="range" min="6" max="18" step="1" id="ball-size-input" value="10">
+    <h3>Table Settings <button id="close-settings">×</button></h3>
+    <label>Ball radius <span id="ball-size-display">10px</span></label>
+    <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
     
-    <label>球袋大小 <span id="pocket-size-display">22px</span></label>
-    <input type="range" min="18" max="32" step="1" id="pocket-size-input" value="22">
+    <label>Pocket size <span id="pocket-size-display">22px</span></label>
+    <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
+
+    <label>Max shot power <span id="power-max-display">200</span></label>
+    <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
+
+    <label>Table friction <span id="friction-display">0.988</span></label>
+    <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
     
-    <label>桌面配色</label>
+    <label>Felt palette</label>
     <select id="felt-select">
-        <option value="midnight">午夜蓝</option>
-        <option value="classic">经典绿</option>
-        <option value="ember">琥珀夜</option>
-        <option value="aurora">极光霓虹</option>
+        <option value="midnight">Midnight Blue</option>
+        <option value="classic">Classic Green</option>
+        <option value="ember">Ember Night</option>
+        <option value="aurora">Aurora Neon</option>
     </select>
     
-    <button id="apply-settings">应用并重置</button>
+    <button id="apply-settings">Apply &amp; Re-rack</button>
 </div>
 
-<div id="ui-layer">
-    <div id="p1-card" class="player-card active p1-active">
-        <div class="target-type" id="p1-type">ANY</div>
-        <div class="score-info"><span>PLAYER 1</span></div>
-    </div>
-    <div id="p2-card" class="player-card">
-        <div class="target-type" id="p2-type">ANY</div>
-        <div class="score-info"><span>PLAYER 2</span></div>
+<div id="ball-hand-banner">Ball in hand — drag the cue ball to place it.</div>
+
+<div id="end-screen">
+    <div class="end-content">
+        <h2 id="end-message">Rack complete</h2>
+        <button id="restart-btn">Start New Rack</button>
     </div>
 </div>
 
-<!-- 右侧蓄力条 -->
+<!-- Power column -->
 <div id="power-control">
     <div id="power-track">
         <div id="power-fill"></div>
@@ -401,13 +511,13 @@
     </div>
 </div>
 
-<!-- 移动端微调控制 -->
+<!-- Mobile fine tune controls -->
 <div id="mobile-controls">
     <div class="fine-tune-btn" id="btn-left">↺</div>
     <div class="fine-tune-btn" id="btn-right">↻</div>
 </div>
 
-<!-- 桌面端提示 -->
+<!-- Desktop hint -->
 <div id="desktop-hint">
     Use <span class="key-badge">←</span> <span class="key-badge">→</span> to Aim &nbsp;|&nbsp; Hold <span class="key-badge">SPACE</span> to Shoot
 </div>
@@ -416,7 +526,7 @@
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// --- 配置 ---
+// --- Config ---
 const CONFIG = {
     BALL_RADIUS: 10,
     POCKET_RADIUS: 22,
@@ -442,10 +552,20 @@ const PALETTE = {
     STRIPES: ['#FFE66D', '#FF8C94', '#96CEB4', '#45B8AC', '#FFAD60', '#5DADE2', '#A3E4D7']
 };
 
+const BASE_CONFIG = {
+    BALL_RADIUS: CONFIG.BALL_RADIUS,
+    POCKET_RADIUS: CONFIG.POCKET_RADIUS,
+    POWER_SCALE: CONFIG.POWER_SCALE,
+    MAX_POWER: CONFIG.MAX_POWER,
+    FRICTION: CONFIG.FRICTION
+};
+
 const SETTINGS = {
     ballRadius: CONFIG.BALL_RADIUS,
     pocketRadius: CONFIG.POCKET_RADIUS,
-    feltScheme: 'midnight'
+    feltScheme: 'midnight',
+    maxPower: CONFIG.MAX_POWER,
+    friction: CONFIG.FRICTION
 };
 
 const FELT_SCHEMES = {
@@ -462,13 +582,15 @@ const STATE = {
     aimAngle: Math.PI/2,
     power: 0,
     isCharging: false,
-    spaceCharging: false, // 键盘蓄力标志
-    spaceChargeDir: 1,    // 蓄力增加或减少
+    spaceCharging: false, // keyboard charging flag
+    spaceChargeDir: 1,    // toggles charge direction
     sunkThisTurn: [],
     foul: false,
     gameOver: false,
     canShoot: true,
-    inputType: 'unknown' // 'mouse' or 'touch'
+    inputType: 'unknown', // 'mouse' or 'touch'
+    scores: {1: 0, 2: 0},
+    ballInHand: false
 };
 
 class Vector {
@@ -480,7 +602,7 @@ class Vector {
     normalize() { let m = this.mag(); return m === 0 ? new Vector(0,0) : new Vector(this.x / m, this.y / m); }
     dist(v) { return Math.sqrt((this.x - v.x) ** 2 + (this.y - v.y) ** 2); }
     
-    // 修复：添加点积静态方法
+    // Added missing dot-product helper
     static dot(v1, v2) { return v1.x * v2.x + v1.y * v2.y; }
 }
 
@@ -582,6 +704,23 @@ const uiFeltSelect = document.getElementById('felt-select');
 const uiApplySettings = document.getElementById('apply-settings');
 const uiBallDisplay = document.getElementById('ball-size-display');
 const uiPocketDisplay = document.getElementById('pocket-size-display');
+const uiPowerMaxRange = document.getElementById('power-max-input');
+const uiPowerMaxDisplay = document.getElementById('power-max-display');
+const uiFrictionRange = document.getElementById('friction-input');
+const uiFrictionDisplay = document.getElementById('friction-display');
+const uiScore1 = document.getElementById('p1-score');
+const uiScore2 = document.getElementById('p2-score');
+const uiBallHandBanner = document.getElementById('ball-hand-banner');
+const uiEndScreen = document.getElementById('end-screen');
+const uiEndMessage = document.getElementById('end-message');
+const uiRestartBtn = document.getElementById('restart-btn');
+
+if (uiRestartBtn) {
+    uiRestartBtn.addEventListener('click', () => {
+        hideEndScreen();
+        resetGame();
+    });
+}
 
 let logicalWidth, logicalHeight;
 let balls = [];
@@ -589,6 +728,8 @@ let pockets = [];
 let whiteBall;
 let aimTouchStart = null;
 let aimAngleStart = 0;
+let placingBall = false;
+let lastPlacementValid = false;
 
 // --- Init ---
 function resize() {
@@ -654,6 +795,8 @@ function setupInputs() {
     uiPowerControl.addEventListener('touchend', handlePowerEnd, {passive: false});
     uiPowerControl.addEventListener('mousedown', handlePowerStart);
     window.addEventListener('mouseup', handlePowerEnd);
+    window.addEventListener('mouseup', handlePlacementEnd);
+    window.addEventListener('touchend', handlePlacementEnd);
 
     // Keyboard
     window.addEventListener('keydown', handleKeyDown);
@@ -668,6 +811,10 @@ function setupSettingsPanel() {
     uiBallDisplay.innerText = `${CONFIG.BALL_RADIUS}px`;
     uiPocketDisplay.innerText = `${CONFIG.POCKET_RADIUS}px`;
     uiFeltSelect.value = SETTINGS.feltScheme;
+    uiPowerMaxRange.value = CONFIG.MAX_POWER;
+    uiPowerMaxDisplay.innerText = `${CONFIG.MAX_POWER}`;
+    uiFrictionRange.value = CONFIG.FRICTION.toFixed(3);
+    uiFrictionDisplay.innerText = CONFIG.FRICTION.toFixed(3);
 
     const togglePanel = (show) => {
         uiSettingsPanel.classList[show ? 'add' : 'remove']('visible');
@@ -687,6 +834,14 @@ function setupSettingsPanel() {
     uiFeltSelect.addEventListener('change', () => {
         SETTINGS.feltScheme = uiFeltSelect.value;
     });
+    uiPowerMaxRange.addEventListener('input', () => {
+        SETTINGS.maxPower = Number(uiPowerMaxRange.value);
+        uiPowerMaxDisplay.innerText = `${SETTINGS.maxPower}`;
+    });
+    uiFrictionRange.addEventListener('input', () => {
+        SETTINGS.friction = Number(uiFrictionRange.value);
+        uiFrictionDisplay.innerText = SETTINGS.friction.toFixed(3);
+    });
 
     uiApplySettings.addEventListener('click', () => {
         applyCustomSettings();
@@ -698,7 +853,10 @@ function applyCustomSettings() {
     CONFIG.BALL_RADIUS = SETTINGS.ballRadius;
     CONFIG.POCKET_RADIUS = SETTINGS.pocketRadius;
     PALETTE.FELT = FELT_SCHEMES[SETTINGS.feltScheme] || FELT_SCHEMES.midnight;
-    showToast("设置已应用，重新开局");
+    CONFIG.POWER_SCALE = BASE_CONFIG.POWER_SCALE * (BASE_CONFIG.BALL_RADIUS / CONFIG.BALL_RADIUS);
+    CONFIG.MAX_POWER = SETTINGS.maxPower;
+    CONFIG.FRICTION = SETTINGS.friction;
+    showToast("Settings applied — new rack ready");
     resetGame();
 }
 
@@ -714,6 +872,13 @@ function updateDeviceUI() {
 
 // --- Input Handlers ---
 function handleAimStart(e) {
+    if (STATE.gameOver) return;
+    if (STATE.ballInHand && STATE.canShoot) {
+        e.preventDefault();
+        placingBall = true;
+        attemptPlaceCueBall(getEventPos(e));
+        return;
+    }
     if (!STATE.canShoot || STATE.spaceCharging) return;
     if (e.target !== canvas) return;
     e.preventDefault();
@@ -722,11 +887,17 @@ function handleAimStart(e) {
 }
 
 function handleAimMove(e) {
+    if (STATE.gameOver) return;
+    if (STATE.ballInHand && placingBall) {
+        e.preventDefault();
+        attemptPlaceCueBall(getEventPos(e));
+        return;
+    }
     if (!STATE.canShoot || STATE.isCharging || STATE.spaceCharging) return;
     const pos = getEventPos(e);
 
     if (STATE.inputType === 'mouse') {
-        // 鼠标直接以白球到指针的连线作为瞄准方向
+        // Mouse aims along the cue ball to cursor vector
         const angle = Math.atan2(pos.y - whiteBall.pos.y, pos.x - whiteBall.pos.x);
         if (!isNaN(angle)) STATE.aimAngle = angle;
         return;
@@ -739,7 +910,7 @@ function handleAimMove(e) {
 }
 
 function handleKeyDown(e) {
-    if (!STATE.canShoot) return;
+    if (!STATE.canShoot || STATE.gameOver) return;
     STATE.inputType = 'mouse'; updateDeviceUI();
     
     const step = e.shiftKey ? 0.05 : 0.005; // Shift for fast turn
@@ -755,6 +926,7 @@ function handleKeyDown(e) {
 }
 
 function handleKeyUp(e) {
+    if (STATE.gameOver) return;
     if (e.code === 'Space' && STATE.spaceCharging) {
         STATE.spaceCharging = false;
         shoot();
@@ -764,13 +936,13 @@ function handleKeyUp(e) {
 }
 
 function handleWheel(e) {
-    if (!STATE.canShoot) return;
+    if (!STATE.canShoot || STATE.ballInHand || STATE.gameOver) return;
     STATE.aimAngle += e.deltaY * 0.001;
 }
 
 // Power Slider Logic
 function handlePowerStart(e) {
-    if (!STATE.canShoot || STATE.spaceCharging) return;
+    if (!STATE.canShoot || STATE.spaceCharging || STATE.ballInHand || STATE.gameOver) return;
     e.preventDefault();
     STATE.isCharging = true;
     updatePowerUI(0);
@@ -799,6 +971,49 @@ function getEventPos(e) {
     return new Vector(e.clientX, e.clientY);
 }
 
+function clampToTableBounds(pos) {
+    const bound = CONFIG.CUSHION_SIZE + CONFIG.BALL_RADIUS;
+    const x = Math.max(bound, Math.min(logicalWidth - bound, pos.x));
+    const y = Math.max(bound, Math.min(logicalHeight - bound, pos.y));
+    return new Vector(x, y);
+}
+
+function isPlacementValid(pos) {
+    for (let b of balls) {
+        if (b === whiteBall || !b.active) continue;
+        if (pos.dist(b.pos) < CONFIG.BALL_RADIUS * 2) return false;
+    }
+    return true;
+}
+
+function attemptPlaceCueBall(rawPos) {
+    if (!rawPos) return false;
+    const bounded = clampToTableBounds(rawPos);
+    if (!isPlacementValid(bounded)) {
+        if (!placingBall) showToast("Cue ball overlaps another ball");
+        lastPlacementValid = false;
+        return false;
+    }
+    whiteBall.active = true;
+    whiteBall.pos = bounded;
+    whiteBall.vel = new Vector(0,0);
+    lastPlacementValid = true;
+    return true;
+}
+
+function handlePlacementEnd() {
+    if (!STATE.ballInHand || !placingBall) return;
+    placingBall = false;
+    if (lastPlacementValid) {
+        STATE.ballInHand = false;
+        updateBallInHandBanner();
+        showToast("Cue ball locked in");
+    } else {
+        updateBallInHandBanner();
+        showToast("Pick a legal spot");
+    }
+}
+
 // --- Logic ---
 function updatePowerUI(percent) {
     uiPowerFill.style.height = (percent * 100) + "%";
@@ -810,19 +1025,24 @@ function updatePowerUI(percent) {
 }
 
 function shoot() {
+    if (STATE.ballInHand || STATE.gameOver) return;
     STATE.canShoot = false;
     let force = STATE.power * CONFIG.MAX_POWER;
     let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
     whiteBall.vel = dir.mult(force * CONFIG.POWER_SCALE);
     STATE.sunkThisTurn = [];
     STATE.foul = false;
-    if(navigator.vibrate) navigator.vibrate(20); // 震动反馈
+    if(navigator.vibrate) navigator.vibrate(20); // haptic feedback
 }
 
 function resetGame() {
+    hideEndScreen();
     balls = [];
     STATE.turn = 1; STATE.assigned = false; STATE.p1Group = null;
     STATE.foul = false; STATE.gameOver = false; STATE.sunkThisTurn = [];
+    STATE.ballInHand = false; placingBall = false; lastPlacementValid = false;
+    STATE.scores = {1: 0, 2: 0};
+    updateBallInHandBanner();
     trailCtx.clearRect(0,0,logicalWidth,logicalHeight);
 
     whiteBall = new Ball(logicalWidth * 0.25, logicalHeight / 2, TYPE.CUE, '#fff', 0);
@@ -865,14 +1085,17 @@ function resolveTurn() {
     let message = "";
     if (STATE.foul) {
         message = "FOUL! BALL IN HAND";
-        resetWhiteBall();
+        resetWhiteBall(true);
         switchTurn = true;
     } else if (STATE.sunkThisTurn.includes(TYPE.BLACK)) {
         let myType = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
         let myRemaining = countRemaining(myType);
         if (myRemaining > 0 || !STATE.assigned) { message = `PLAYER ${STATE.turn} LOST`; STATE.gameOver = true; }
         else { message = `PLAYER ${STATE.turn} WINS!`; STATE.gameOver = true; }
-        showToast(message); return;
+        STATE.canShoot = false;
+        showToast(message);
+        showEndScreen(message);
+        return;
     } else if (STATE.sunkThisTurn.length > 0) {
         let firstSunk = STATE.sunkThisTurn[0];
         if (!STATE.assigned) {
@@ -888,12 +1111,17 @@ function resolveTurn() {
     if (switchTurn) STATE.turn = STATE.turn === 1 ? 2 : 1;
     if (message) showToast(message);
     updateUI();
+    updateBallInHandBanner();
 }
 
 function countRemaining(type) { return type ? balls.filter(b => b.active && b.type === type).length : 0; }
-function resetWhiteBall() {
+function resetWhiteBall(withBallInHand = false) {
     whiteBall.active = true; whiteBall.vel = new Vector(0,0);
     whiteBall.pos = new Vector(logicalWidth * 0.25, logicalHeight / 2);
+    STATE.ballInHand = withBallInHand;
+    placingBall = false;
+    lastPlacementValid = false;
+    updateBallInHandBanner();
 }
 
 function resolveCollisions() {
@@ -921,7 +1149,13 @@ function resolveCollisions() {
         for (let p of pockets) {
             if (b.pos.dist(p) < CONFIG.POCKET_RADIUS) {
                 if (b.type === TYPE.CUE) { STATE.foul = true; b.active = false; }
-                else { b.active = false; b.vel = new Vector(0,0); STATE.sunkThisTurn.push(b.type); spawnFloatText("+1", p.x, p.y); }
+                else {
+                    b.active = false; b.vel = new Vector(0,0);
+                    STATE.sunkThisTurn.push(b.type);
+                    STATE.scores[STATE.turn] = (STATE.scores[STATE.turn] || 0) + 1;
+                    spawnFloatText("+1", p.x, p.y);
+                    updateUI();
+                }
             }
         }
     }
@@ -934,6 +1168,23 @@ function spawnFloatText(text, x, y) {
     document.body.appendChild(el); setTimeout(() => el.remove(), 800);
 }
 function showToast(msg) { uiToast.innerText = msg; uiToast.style.opacity = "1"; setTimeout(() => uiToast.style.opacity = "0", 2000); }
+function updateBallInHandBanner() {
+    if (!uiBallHandBanner) return;
+    if (STATE.ballInHand && !STATE.gameOver) {
+        uiBallHandBanner.innerText = `Ball in hand — Player ${STATE.turn}, drag the cue ball to place it.`;
+        uiBallHandBanner.classList.add('visible');
+    } else {
+        uiBallHandBanner.classList.remove('visible');
+    }
+}
+function showEndScreen(msg) {
+    if (uiEndMessage) uiEndMessage.innerText = msg;
+    if (uiEndScreen) uiEndScreen.classList.add('visible');
+    updateBallInHandBanner();
+}
+function hideEndScreen() {
+    if (uiEndScreen) uiEndScreen.classList.remove('visible');
+}
 function updateUI() {
     if (STATE.turn === 1) { uiP1.classList.add('active', 'p1-active'); uiP2.classList.remove('active', 'p2-active'); }
     else { uiP1.classList.remove('active', 'p1-active'); uiP2.classList.add('active', 'p2-active'); }
@@ -942,6 +1193,8 @@ function updateUI() {
         uiType1.innerText = STATE.p1Group === TYPE.SOLID ? "SOLIDS ●" : "STRIPES ◎";
         uiType2.innerText = STATE.p1Group === TYPE.SOLID ? "STRIPES ◎" : "SOLIDS ●";
     }
+    if (uiScore1) uiScore1.innerText = STATE.scores[1];
+    if (uiScore2) uiScore2.innerText = STATE.scores[2];
 }
 function adjustBrightness(col, amt) {
     let usePound = false; if (col[0] == "#") { col = col.slice(1); usePound = true; }
@@ -986,7 +1239,7 @@ function loop() {
 
     for(let b of balls) { b.update(); b.draw(ctx); }
     
-    if (STATE.canShoot && !STATE.gameOver) {
+    if (STATE.canShoot && !STATE.gameOver && !STATE.ballInHand) {
         let dir = new Vector(Math.cos(STATE.aimAngle), Math.sin(STATE.aimAngle));
         let start = whiteBall.pos;
         let end = start.add(dir.mult(600));
