@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gemini Pool: Cross-Platform Pro</title>
+    <title>Gemini 台球: 跨平台专业版</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Noto Sans SC for better Chinese rendering -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background-color: #050505;
             touch-action: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
         
-        /* --- Top control stack (embedded into top cushion) --- */
+        /* --- 顶部控制栏 (嵌入顶部库边) --- */
         #ui-shell {
             position: absolute;
             top: 0;
@@ -44,12 +46,13 @@
             border: none;
             background: transparent;
             color: rgba(240,240,255,0.9);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-decoration: none;
             cursor: pointer;
             transition: background 0.2s ease, transform 0.2s ease;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
         }
 
         #settings-toggle {
@@ -65,7 +68,7 @@
             text-shadow: 0 0 6px rgba(255,255,255,0.5);
         }
 
-        /* --- Settings overlay & dialog --- */
+        /* --- 设置面板与遮罩 --- */
         #settings-panel {
             position: fixed;
             inset: 0;
@@ -107,11 +110,12 @@
         }
 
         #settings-panel label {
-            font-size: 12px;
+            font-size: 13px;
             letter-spacing: 0.5px;
             display: flex;
             justify-content: space-between;
             margin-top: 12px;
+            color: #ddd;
         }
 
         #settings-panel input,
@@ -144,7 +148,7 @@
             align-items: center;
             justify-content: space-between;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 13px;
             gap: 8px;
         }
 
@@ -159,10 +163,11 @@
             border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.25);
             padding: 4px 6px;
-            font-size: 11px;
+            font-size: 12px;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
         }
 
-        /* offline simulation preview lines */
+        /* 离线模拟预览线 */
         .offline-preview {
             pointer-events: none;
         }
@@ -206,6 +211,8 @@
             border-radius: 10px;
             border: none;
             font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background: linear-gradient(135deg, #4facfe, #00f2fe);
             cursor: pointer;
         }
@@ -225,77 +232,26 @@
             display: block;
             width: 100%;
             height: 100%;
-            cursor: crosshair; /* desktop crosshair cursor */
-            z-index: 1; /* table & balls under UI overlays */
+            cursor: crosshair; /* 桌面端准星 */
+            z-index: 1; /* 台面与球在 UI 层之下 */
         }
 
-        /* --- Scoreboard strip (embedded on felt) --- */
+        /* --- 计分板 (嵌入台呢) --- */
         #ui-layer {
-            display: none; /* visual scoreboard now drawn directly on canvas */
+            display: none; /* 视觉计分板直接绘制在 Canvas 上 */
         }
 
-        .player-card {
-            background: rgba(20, 20, 30, 0.55);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 4px 12px;
-            display: flex;
-            flex-direction: column;
-            min-width: 80px;
-            transition: all 0.3s ease;
-            opacity: 0.5;
-            transform: scale(0.95);
-        }
-
-        .player-card.active {
-            opacity: 1;
-            transform: scale(1);
-            background: rgba(40, 40, 50, 0.6);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-
-        .target-type {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-            color: #aaa;
-        }
-        
-        .p1-active .target-type { color: #4facfe; }
-        .p2-active .target-type { color: #f093fb; }
-
-        .score-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            color: white;
-            font-weight: 700;
-            font-size: 12px;
-            min-width: 90px;
-        }
-
-        .score-value {
-            font-size: 16px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        /* --- (Legacy) DOM power column: hidden, logic moved into bottom cushion --- */
+        /* --- (Legacy) DOM 力度条: 隐藏, 逻辑移入底部库边 --- */
         #power-control {
             display: none;
         }
 
-        /* --- Mobile fine-tune controls --- */
+        /* --- 移动端微调控制 --- */
         #mobile-controls {
             position: absolute;
             bottom: 30px;
             left: 30px;
-            display: none; /* hidden until touch detected */
+            display: none; /* 触摸检测后显示 */
             gap: 20px;
             z-index: 20;
             pointer-events: auto;
@@ -322,25 +278,25 @@
             transform: scale(0.95);
         }
 
-        /* --- Mobile confirm shot button (offline mode only, embedded in left cushion) --- */
+        /* --- 移动端确认击球按钮 (仅离线模式) --- */
         #confirm-shot-btn {
             position: absolute;
             left: 0;
             top: 50%;
             transform: translateY(-50%) rotate(-90deg);
             transform-origin: center;
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 999px;
             border: none;
             background: transparent;
             color: rgba(240,240,255,0.9);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 1px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
             cursor: pointer;
             z-index: 25;
-            display: none; /* hidden by default, shown only in offline mode on mobile */
+            display: none; /* 默认隐藏 */
             touch-action: manipulation;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -361,20 +317,21 @@
             cursor: not-allowed;
         }
 
-        /* --- Desktop keyboard hint --- */
+        /* --- 桌面端键盘提示 --- */
         #desktop-hint {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 18px;
             border-radius: 20px;
             pointer-events: none;
-            display: none; /* revealed when mouse input detected */
+            display: none; /* 鼠标输入检测后显示 */
             white-space: nowrap;
+            backdrop-filter: blur(4px);
         }
         
         .key-badge {
@@ -385,21 +342,21 @@
             color: white;
             font-weight: 600;
             margin: 0 4px;
-            font-size: 10px;
+            font-size: 11px;
         }
 
-        /* --- Toasts & overlays --- */
+        /* --- 消息提示 & 遮罩 --- */
         #game-toast {
             position: absolute;
             top: 60px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
-            padding: 10px 20px;
+            padding: 10px 24px;
             border-radius: 12px;
             color: white;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             text-align: center;
             pointer-events: none;
@@ -407,6 +364,7 @@
             transition: opacity 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
             z-index: 30;
+            white-space: nowrap;
         }
 
         .float-text {
@@ -437,6 +395,7 @@
             pointer-events: none;
             transition: opacity 0.25s ease;
             z-index: 35;
+            white-space: nowrap;
         }
 
         #ball-hand-banner.visible {
@@ -489,13 +448,14 @@
             color: #fff;
             background: linear-gradient(135deg, #00d2ff, #3a7bd5);
             box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
         }
 
         #restart-btn:hover {
             transform: translateY(-1px);
         }
 
-        /* --- Landscape mobile: compact settings panel --- */
+        /* --- 横屏手机: 紧凑设置面板 --- */
         @media (max-height: 520px) and (max-width: 1024px) {
             .settings-content {
                 width: 70vw;
@@ -510,7 +470,7 @@
             }
 
             #settings-panel label {
-                font-size: 11px;
+                font-size: 12px;
                 margin-top: 8px;
             }
 
@@ -531,56 +491,43 @@
 
 <div id="ui-shell">
     <div id="action-stack">
-        <a id="back-home-btn" href="../index.html">← Back to Hub</a>
-        <button id="settings-toggle">⚙ Settings</button>
+        <a id="back-home-btn" href="../index.html">← 返回主页</a>
+        <button id="settings-toggle">⚙ 设置</button>
     </div>
 </div>
 
 <div id="ui-layer">
-    <div id="p1-card" class="player-card active p1-active">
-        <div class="target-type" id="p1-type">ANY</div>
-        <div class="score-info">
-            <span>PLAYER 1</span>
-            <span class="score-value" id="p1-score">0</span>
-        </div>
-    </div>
-    <div id="p2-card" class="player-card">
-        <div class="target-type" id="p2-type">ANY</div>
-        <div class="score-info">
-            <span>PLAYER 2</span>
-            <span class="score-value" id="p2-score">0</span>
-        </div>
-    </div>
+    <!-- UI 元素直接绘制在 Canvas 上以提高性能 -->
 </div>
 
 <div id="settings-panel">
     <div class="settings-content">
-        <h3>Table Settings <button id="close-settings">×</button></h3>
+        <h3>游戏设置 <button id="close-settings">×</button></h3>
 
-        <button id="apply-settings">Apply &amp; Re-rack</button>
+        <button id="apply-settings">应用并重新开局</button>
 
-        <label>Ball radius <span id="ball-size-display">10px</span></label>
+        <label>球半径 <span id="ball-size-display">10px</span></label>
         <div class="spin-row">
             <button class="spin-btn" data-target="ball-size-input" data-step="1" data-min="6" data-max="100">−</button>
             <input type="range" min="6" max="100" step="1" id="ball-size-input" value="10">
             <button class="spin-btn" data-target="ball-size-input" data-step="1" data-min="6" data-max="100">+</button>
         </div>
         
-        <label>Pocket size <span id="pocket-size-display">22px</span></label>
+        <label>袋口大小 <span id="pocket-size-display">22px</span></label>
         <div class="spin-row">
             <button class="spin-btn" data-target="pocket-size-input" data-step="2" data-min="10" data-max="200">−</button>
             <input type="range" min="10" max="200" step="1" id="pocket-size-input" value="22">
             <button class="spin-btn" data-target="pocket-size-input" data-step="2" data-min="10" data-max="200">+</button>
         </div>
 
-        <label>Max shot power <span id="power-max-display">200</span></label>
+        <label>最大击球力度 <span id="power-max-display">200</span></label>
         <div class="spin-row">
             <button class="spin-btn" data-target="power-max-input" data-step="20" data-min="80" data-max="10000">−</button>
             <input type="range" min="80" max="10000" step="10" id="power-max-input" value="200">
             <button class="spin-btn" data-target="power-max-input" data-step="20" data-min="80" data-max="10000">+</button>
         </div>
 
-        <label>Table friction <span id="friction-display">0.988</span></label>
+        <label>桌台摩擦力 <span id="friction-display">0.988</span></label>
         <div class="spin-row">
             <button class="spin-btn" data-target="friction-input" data-step="0.01" data-min="0" data-max="1">−</button>
             <input type="range" min="0" max="1" step="0.001" id="friction-input" value="0.988">
@@ -588,84 +535,76 @@
         </div>
 
         <div class="select-row">
-            <label for="aim-mode-select">Aiming helper</label>
+            <label for="aim-mode-select">瞄准辅助</label>
             <select id="aim-mode-select">
-                <option value="cue">Cue direction only</option>
-                <option value="basic" selected>Basic guide</option>
-                <option value="advanced">Advanced guide</option>
-                <option value="offline">Offline simulation guide</option>
+                <option value="cue">仅球杆方向</option>
+                <option value="basic" selected>基础引导线</option>
+                <option value="advanced">高级引导线 (反弹预测)</option>
+                <option value="offline">离线模拟 (全路径预测)</option>
             </select>
         </div>
         
-        <label>Felt palette</label>
+        <label>桌呢配色</label>
         <select id="felt-select">
-            <option value="midnight">Midnight Blue</option>
-            <option value="classic">Classic Green</option>
-            <option value="ember">Ember Night</option>
-            <option value="aurora">Aurora Neon</option>
-            <option value="metal_steel">Steel Metal</option>
-            <option value="metal_gold">Gold Metal</option>
-            <option value="metal_copper">Copper Metal</option>
-            <option value="diamond_cyan">Cyan Diamond</option>
-            <option value="diamond_violet">Violet Diamond</option>
-            <option value="plastic_blue">Blue Plastic</option>
-            <option value="plastic_red">Red Plastic</option>
-            <option value="stone_marble">Marble Stone</option>
-            <option value="stone_slate">Slate Stone</option>
+            <option value="midnight">午夜蓝 (Midnight)</option>
+            <option value="classic">经典绿 (Classic)</option>
+            <option value="ember">余烬红 (Ember)</option>
+            <option value="aurora">极光青 (Aurora)</option>
+            <option value="metal_steel">金属钢 (Steel)</option>
+            <option value="metal_gold">金属金 (Gold)</option>
+            <option value="metal_copper">金属铜 (Copper)</option>
+            <option value="diamond_cyan">青钻 (Cyan Diamond)</option>
+            <option value="diamond_violet">紫钻 (Violet Diamond)</option>
+            <option value="plastic_blue">塑胶蓝 (Blue Plastic)</option>
+            <option value="plastic_red">塑胶红 (Red Plastic)</option>
+            <option value="stone_marble">大理石 (Marble)</option>
+            <option value="stone_slate">板岩 (Slate)</option>
         </select>
 
-        <label>Ball material</label>
+        <label>球材质</label>
         <select id="ball-material-select">
-            <option value="classic">Classic</option>
-            <option value="metal_steel">Steel Metal</option>
-            <option value="metal_gold">Gold Metal</option>
-            <option value="metal_copper">Copper Metal</option>
-            <option value="diamond_cyan">Cyan Diamond</option>
-            <option value="diamond_violet">Violet Diamond</option>
-            <option value="plastic_blue">Blue Plastic</option>
-            <option value="plastic_red">Red Plastic</option>
-            <option value="stone_marble">Marble Stone</option>
-            <option value="stone_slate">Slate Stone</option>
+            <option value="classic">经典树脂</option>
+            <option value="metal_steel">钢制金属</option>
+            <option value="metal_gold">黄金金属</option>
+            <option value="metal_copper">红铜金属</option>
+            <option value="diamond_cyan">青色晶体</option>
+            <option value="diamond_violet">紫色晶体</option>
+            <option value="plastic_blue">蓝色塑料</option>
+            <option value="plastic_red">红色塑料</option>
+            <option value="stone_marble">大理石纹</option>
+            <option value="stone_slate">板岩纹路</option>
         </select>
     </div>
 </div>
 
-<div id="ball-hand-banner">Ball in hand — drag the cue ball to place it.</div>
+<div id="ball-hand-banner">自由球 — 拖动白球放置</div>
 
 <div id="end-screen">
     <div class="end-content">
-        <h2 id="end-message">Rack complete</h2>
-        <button id="restart-btn">Start New Rack</button>
+        <h2 id="end-message">本局结束</h2>
+        <button id="restart-btn">开始新的一局</button>
     </div>
 </div>
 
-<!-- Power column -->
-<div id="power-control">
-    <div id="power-track">
-        <div id="power-fill"></div>
-        <div id="power-handle"></div>
-    </div>
-</div>
-
-<!-- Mobile fine tune controls -->
+<!-- 移动端微调控制 -->
 <div id="mobile-controls">
     <div class="fine-tune-btn" id="btn-left">↺</div>
     <div class="fine-tune-btn" id="btn-right">↻</div>
 </div>
 
-<!-- Mobile confirm shot button (only visible in offline mode) -->
-<button id="confirm-shot-btn" style="display: none;">SHOOT</button>
+<!-- 移动端确认击球按钮 (仅在离线模拟模式下可见) -->
+<button id="confirm-shot-btn" style="display: none;">击球</button>
 
-<!-- Desktop hint -->
+<!-- 桌面端操作提示 -->
 <div id="desktop-hint">
-    Use <span class="key-badge">←</span> <span class="key-badge">→</span> to Aim &nbsp;|&nbsp; Hold <span class="key-badge">SPACE</span> to Shoot
+    使用 <span class="key-badge">←</span> <span class="key-badge">→</span> 瞄准 &nbsp;|&nbsp; 按住 <span class="key-badge">空格</span> 击球
 </div>
 
 <div id="game-toast"></div>
 <canvas id="gameCanvas"></canvas>
 
 <script>
-// --- Config ---
+// --- 配置参数 ---
 const CONFIG = {
     BALL_RADIUS: 10,
     POCKET_RADIUS: 22,
@@ -684,7 +623,7 @@ const CONFIG = {
 const TYPE = { CUE: 0, SOLID: 1, STRIPE: 2, BLACK: 3 };
 const PALETTE = {
     BG: '#050505',
-    FELT: ['#0b4d0b', '#062b06'], // default: classic green
+    FELT: ['#0b4d0b', '#062b06'], // 默认：经典绿
     P1_COLOR: '#4facfe',
     P2_COLOR: '#f093fb',
     SOLIDS: ['#FFD700', '#FF6B6B', '#4ECDC4', '#1A535C', '#FF9F1C', '#2E86AB', '#8D99AE'],
@@ -732,20 +671,20 @@ const STATE = {
     aimAngle: Math.PI/2,
     power: 0,
     isCharging: false,
-    spaceCharging: false, // keyboard charging flag
-    spaceChargeDir: 1,    // toggles charge direction
+    spaceCharging: false, // 键盘蓄力标志
+    spaceChargeDir: 1,    // 切换蓄力方向
     sunkThisTurn: [],
     foul: false,
     gameOver: false,
     canShoot: true,
     inputType: 'unknown', // 'mouse' or 'touch'
-    shotCount: 0,         // total shots taken this rack
+    shotCount: 0,         // 本局总杆数
     scores: {1: 0, 2: 0},
     ballInHand: false,
     ballMaterial: 'classic',
-    aimMode: 'basic', // runtime aiming helper mode
-    pendingShot: false, // for offline mode: shot ready but waiting for confirmation
-    savedPower: 0 // saved power value when pendingShot is set
+    aimMode: 'basic',
+    pendingShot: false, // 离线模式：等待确认
+    savedPower: 0 // pendingShot 时的保存力度
 };
 
 class Vector {
@@ -757,7 +696,7 @@ class Vector {
     normalize() { let m = this.mag(); return m === 0 ? new Vector(0,0) : new Vector(this.x / m, this.y / m); }
     dist(v) { return Math.sqrt((this.x - v.x) ** 2 + (this.y - v.y) ** 2); }
     
-    // Added missing dot-product helper
+    // 点积辅助函数
     static dot(v1, v2) { return v1.x * v2.x + v1.y * v2.y; }
 }
 
@@ -808,28 +747,30 @@ class Ball {
         ctx.fillStyle = "rgba(0,0,0,0.4)";
         ctx.beginPath(); ctx.arc(x + r*0.3, y + r*0.3, r, 0, Math.PI * 2); ctx.fill();
 
-        // Cue ball rendering
+        // 绘制母球
         if (this.type === TYPE.CUE) {
             if (material.startsWith('metal_')) {
-                // metallic cue
+                // 金属
                 let grad = ctx.createRadialGradient(x-r*0.4, y-r*0.4, r*0.2, x, y, r);
                 grad.addColorStop(0, '#ffffff');
                 grad.addColorStop(0.4, '#d0d0d0');
                 grad.addColorStop(1, '#7f7f7f');
                 ctx.fillStyle = grad;
             } else if (material.startsWith('diamond_')) {
+                // 钻石
                 let grad = ctx.createRadialGradient(x-r*0.5, y-r*0.5, r*0.1, x, y, r);
                 grad.addColorStop(0, 'rgba(255,255,255,0.9)');
                 grad.addColorStop(0.4, 'rgba(230,230,255,0.7)');
                 grad.addColorStop(1, 'rgba(180,190,255,0.2)');
                 ctx.fillStyle = grad;
             } else if (material.startsWith('stone_')) {
+                // 石头
                 let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
                 grad.addColorStop(0, '#e0e0e0');
                 grad.addColorStop(1, '#8b8b8b');
                 ctx.fillStyle = grad;
             } else {
-                // classic / plastic
+                // 经典/塑料
             let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
             grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc');
                 ctx.fillStyle = grad;
@@ -838,7 +779,7 @@ class Ball {
             return;
         }
 
-        // Generic helpers for materials
+        // 材质辅助函数
         const drawSolidClassic = () => {
             let grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.2, x, y, r);
             grad.addColorStop(0, adjustBrightness(this.color, 60));
@@ -847,10 +788,10 @@ class Ball {
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
         };
         const drawStripeClassic = () => {
-            // dark base
+            // 深色基底
             ctx.fillStyle = "#111";
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            // central horizontal band
+            // 中间色带
             ctx.save();
             ctx.beginPath();
             ctx.rect(x - r, y - r*0.45, r*2, r*0.9);
@@ -862,7 +803,7 @@ class Ball {
             ctx.fillStyle = bandGrad;
             ctx.beginPath(); ctx.arc(x, y, r*0.95, 0, Math.PI*2); ctx.fill();
             ctx.restore();
-            // subtle glare
+            // 细微反光
             let glare = ctx.createLinearGradient(x-r, y-r, x+r, y+r);
             glare.addColorStop(0, "rgba(255,255,255,0.4)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
             ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
@@ -878,7 +819,7 @@ class Ball {
             grad.addColorStop(1, adjustBrightness(base, -40));
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            // specular streak
+            // 高光
             ctx.strokeStyle = "rgba(255,255,255,0.6)";
             ctx.lineWidth = r * 0.18;
             ctx.beginPath();
@@ -894,7 +835,7 @@ class Ball {
             grad.addColorStop(1, "rgba(10,10,20,0.9)");
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            // simple facet lines
+            // 切面线条
             ctx.strokeStyle = "rgba(255,255,255,0.4)";
             ctx.lineWidth = 0.7;
             ctx.beginPath();
@@ -913,7 +854,7 @@ class Ball {
             grad.addColorStop(1, adjustBrightness(base, -30));
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-            // speckle effect
+            // 斑点效果
             ctx.fillStyle = "rgba(255,255,255,0.15)";
             for (let i = 0; i < 6; i++) {
                 let angle = Math.random() * Math.PI * 2;
@@ -928,7 +869,7 @@ class Ball {
             if (material.startsWith('metal_')) {
                 drawMetal();
             } else if (material.startsWith('diamond_')) {
-                // black diamond uses dark tinted gradient
+                // 黑钻
                 let grad = ctx.createRadialGradient(x-r*0.4, y-r*0.4, r*0.1, x, y, r);
                 grad.addColorStop(0, "rgba(255,255,255,0.8)");
                 grad.addColorStop(0.3, "#444");
@@ -942,7 +883,7 @@ class Ball {
             grad.addColorStop(0, '#444'); grad.addColorStop(1, '#000');
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             }
-            // 8 label
+            // 8号字样
             ctx.fillStyle = "#fff"; ctx.font = "bold 10px Inter";
             ctx.textAlign = "center"; ctx.textBaseline="middle"; ctx.fillText("8", x, y+0.5);
         } else if (this.type === TYPE.SOLID) {
@@ -957,7 +898,7 @@ class Ball {
             }
         } else if (this.type === TYPE.STRIPE) {
             if (material.startsWith('metal_')) {
-                // metallic base with clear colored band
+                // 金属条纹
                 ctx.fillStyle = "#050509"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
                 ctx.save();
                 ctx.beginPath();
@@ -974,7 +915,7 @@ class Ball {
                 glare.addColorStop(0, "rgba(255,255,255,0.55)"); glare.addColorStop(0.5, "rgba(255,255,255,0)");
             ctx.fillStyle = glare; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
             } else if (material.startsWith('diamond_')) {
-                // dark crystal base with luminous band
+                // 钻石条纹
                 ctx.fillStyle = "rgba(8,8,18,0.98)"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
                 ctx.save();
                 ctx.beginPath();
@@ -988,7 +929,7 @@ class Ball {
                 ctx.beginPath(); ctx.arc(x, y, r*0.95, 0, Math.PI*2); ctx.fill();
                 ctx.restore();
             } else if (material.startsWith('stone_')) {
-                // stone ball with carved band
+                // 石头条纹
                 drawStone();
                 ctx.save();
                 ctx.beginPath();
@@ -1005,16 +946,12 @@ class Ball {
     }
 }
 
-// --- Globals ---
+// --- 全局变量 ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const trailCanvas = document.createElement('canvas');
 const trailCtx = trailCanvas.getContext('2d');
 
-const uiP1 = document.getElementById('p1-card');
-const uiP2 = document.getElementById('p2-card');
-const uiType1 = document.getElementById('p1-type');
-const uiType2 = document.getElementById('p2-type');
 const uiPowerControl = document.getElementById('power-control');
 const uiPowerFill = document.getElementById('power-fill');
 const uiPowerHandle = document.getElementById('power-handle');
@@ -1034,8 +971,6 @@ const uiPowerMaxRange = document.getElementById('power-max-input');
 const uiPowerMaxDisplay = document.getElementById('power-max-display');
 const uiFrictionRange = document.getElementById('friction-input');
 const uiFrictionDisplay = document.getElementById('friction-display');
-const uiScore1 = document.getElementById('p1-score');
-const uiScore2 = document.getElementById('p2-score');
 const uiBallHandBanner = document.getElementById('ball-hand-banner');
 const uiEndScreen = document.getElementById('end-screen');
 const uiEndMessage = document.getElementById('end-message');
@@ -1060,7 +995,7 @@ let aimAngleStart = 0;
 let placingBall = false;
 let lastPlacementValid = false;
 
-// --- Init ---
+// --- 初始化 ---
 function resize() {
     const dpr = window.devicePixelRatio || 1;
     logicalWidth = window.innerWidth;
@@ -1094,7 +1029,7 @@ function isInPowerBarArea(pos) {
 }
 
 function setupInputs() {
-    // Canvas Touch / Mouse: decide between aim vs power by position
+    // 触摸/鼠标输入：根据位置判断是瞄准还是调整力度
     canvas.addEventListener('touchstart', e => {
         STATE.inputType = 'touch'; updateDeviceUI();
         const pos = getEventPos(e);
@@ -1112,7 +1047,7 @@ function setupInputs() {
         }
     }, {passive: false});
     
-    // Mouse Aim / Power
+    // 鼠标输入
     canvas.addEventListener('mousedown', e => {
         STATE.inputType = 'mouse'; updateDeviceUI();
         const pos = getEventPos(e);
@@ -1131,17 +1066,17 @@ function setupInputs() {
         }
     });
 
-    // Mobile Fine Tune Buttons
+    // 移动端微调按钮
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');
     const fineTune = (dir) => {
         if(!STATE.canShoot) return;
-        STATE.aimAngle += dir * 0.005; // Small step (reduced to 1/10 of original 0.05)
+        STATE.aimAngle += dir * 0.005; // 微调步进
         if(navigator.vibrate) navigator.vibrate(5);
     };
     btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); fineTune(-1); });
     btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); fineTune(1); });
-    // Also support click for testing
+    
     btnLeft.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(-1); });
     btnRight.addEventListener('mousedown', (e) => { e.preventDefault(); fineTune(1); });
 
@@ -1150,23 +1085,21 @@ function setupInputs() {
     window.addEventListener('touchend', handlePowerEnd);
     window.addEventListener('touchend', handlePlacementEnd);
 
-    // Keyboard
+    // 键盘控制
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('wheel', handleWheel); // Mouse wheel support
+    window.addEventListener('wheel', handleWheel);
 
-    // Confirm shot button (mobile, offline mode only)
+    // 确认击球按钮 (移动端离线模式)
     if (uiConfirmShotBtn) {
         let touchStartedOnButton = false;
         
-        // Handle touchstart to prevent it from triggering canvas events
         uiConfirmShotBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
             touchStartedOnButton = true;
         }, {passive: false});
         
-        // Handle touchend to trigger shot on mobile
         uiConfirmShotBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1176,10 +1109,9 @@ function setupInputs() {
             }
         }, {passive: false});
         
-        // Handle click for desktop/fallback
         uiConfirmShotBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation(); // Prevent event from bubbling to canvas
+            e.stopPropagation();
             confirmShot();
         });
     }
@@ -1237,7 +1169,7 @@ function setupSettingsPanel() {
         });
     }
 
-    // +/- buttons for easier tap control
+    // +/- 按钮控制
     const spinButtons = document.querySelectorAll('.spin-btn');
     spinButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1255,7 +1187,6 @@ function setupSettingsPanel() {
             if (next < min) next = min;
             if (next > max) next = max;
             input.value = String(next);
-            // trigger original input handlers so UI text & SETTINGS are updated
             const ev = new Event('input', { bubbles: true });
             input.dispatchEvent(ev);
         });
@@ -1278,7 +1209,7 @@ function applyCustomSettings() {
     STATE.aimMode = SETTINGS.aimMode || 'basic';
     STATE.pendingShot = false;
     updateConfirmButton();
-    showToast("Settings applied — new rack ready");
+    showToast("设置已应用 — 已重置球局");
     resetGame();
 }
 
@@ -1305,74 +1236,39 @@ function updateConfirmButton() {
 }
 
 function confirmShot() {
-    console.log('confirmShot called', {
-        pendingShot: STATE.pendingShot,
-        canShoot: STATE.canShoot,
-        gameOver: STATE.gameOver,
-        ballInHand: STATE.ballInHand,
-        savedPower: STATE.savedPower,
-        currentPower: STATE.power
-    });
-    
-    // Check if button is visible and not disabled (button visibility means conditions were met)
     const buttonVisible = uiConfirmShotBtn && uiConfirmShotBtn.style.display !== 'none' && !uiConfirmShotBtn.disabled;
     
-    // If button is visible, allow shot even if pendingShot was somehow cleared
-    if (!buttonVisible && !STATE.pendingShot) {
-        console.log('confirmShot: Button not visible or pendingShot false');
-        return;
-    }
+    if (!buttonVisible && !STATE.pendingShot) return;
+    if (!STATE.canShoot) return;
+    if (STATE.gameOver) return;
+    if (STATE.ballInHand) return;
     
-    // Final safety checks
-    if (!STATE.canShoot) {
-        console.log('confirmShot: canShoot is false');
-        return;
-    }
-    if (STATE.gameOver) {
-        console.log('confirmShot: gameOver is true');
-        return;
-    }
-    if (STATE.ballInHand) {
-        console.log('confirmShot: ballInHand is true');
-        return;
-    }
-    
-    // Clear pending shot state immediately
     STATE.pendingShot = false;
     
-    // Use saved power value (saved when pendingShot was set) or current power, with minimum
+    // 使用保存的力度或当前力度
     const shotPower = Math.max(0.1, STATE.savedPower || STATE.power || 0.1);
-    console.log('confirmShot: Shooting with power', shotPower);
     
-    // Temporarily set power for shoot()
     const originalPower = STATE.power;
     STATE.power = shotPower;
     
-    // Hide button immediately to prevent multiple clicks and clear active state
     if (uiConfirmShotBtn) {
         uiConfirmShotBtn.style.display = 'none';
         uiConfirmShotBtn.disabled = true;
-        // Force remove active state by blurring
         uiConfirmShotBtn.blur();
     }
     
-    // Execute shot
-    console.log('confirmShot: Calling shoot() with power', STATE.power, 'aimAngle', STATE.aimAngle);
     shoot();
-    console.log('confirmShot: shoot() completed, whiteBall.vel', whiteBall.vel);
     
-    // Clear saved power and reset state
     STATE.savedPower = 0;
     STATE.power = 0;
     updatePowerUI(0);
     updateConfirmButton();
 }
 
-// --- Input Handlers ---
+// --- 输入处理 ---
 function handleAimStart(e) {
     if (STATE.gameOver) return;
     
-    // Don't update aim if clicking on the confirm shot button
     if (e.target === uiConfirmShotBtn || (e.target && e.target.closest && e.target.closest('#confirm-shot-btn'))) {
         return;
     }
@@ -1384,7 +1280,7 @@ function handleAimStart(e) {
         return;
     }
     
-    // In offline mode on desktop: if pending shot and mouse click, confirm shot
+    // 离线模式桌面端：如果有待确认的击球，点击鼠标左键确认
     if (STATE.aimMode === 'offline' && STATE.inputType === 'mouse' && STATE.pendingShot && e.button === 0) {
         e.preventDefault();
         confirmShot();
@@ -1405,16 +1301,15 @@ function handleAimMove(e) {
         attemptPlaceCueBall(getEventPos(e));
         return;
     }
-    // In offline mode, allow aim adjustment even when pending shot (desktop only)
+    
     if (STATE.aimMode === 'offline' && STATE.pendingShot && STATE.inputType === 'mouse') {
-        // Allow mouse to adjust aim even with pending shot
+        // 允许在待确认时微调瞄准
     } else if (!STATE.canShoot || STATE.isCharging || STATE.spaceCharging) {
         return;
     }
     const pos = getEventPos(e);
 
     if (STATE.inputType === 'mouse') {
-        // Mouse aims along the cue ball to cursor vector
         const angle = Math.atan2(pos.y - whiteBall.pos.y, pos.x - whiteBall.pos.x);
         if (!isNaN(angle)) STATE.aimAngle = angle;
         return;
@@ -1430,23 +1325,20 @@ function handleKeyDown(e) {
     if (!STATE.canShoot || STATE.gameOver) return;
     STATE.inputType = 'mouse'; updateDeviceUI();
     
-    const step = e.shiftKey ? 0.05 : 0.005; // Shift for fast turn
+    const step = e.shiftKey ? 0.05 : 0.005;
 
     if (e.code === 'ArrowLeft') STATE.aimAngle -= step;
     if (e.code === 'ArrowRight') STATE.aimAngle += step;
     
     if (e.code === 'Space' && !STATE.spaceCharging && !e.repeat) {
-        // In offline mode, clear pending shot if exists
         if (STATE.aimMode === 'offline' && STATE.pendingShot) {
             STATE.pendingShot = false;
             updateConfirmButton();
         }
         STATE.spaceCharging = true;
-        // In offline mode, keep previous power instead of resetting to 0
         if (STATE.aimMode !== 'offline') {
-            STATE.power = 0;
+        STATE.power = 0;
         }
-        // Set direction based on current power: if power > 0.5, start decreasing
         STATE.spaceChargeDir = (STATE.power > 0.5) ? -1 : 1;
     }
 }
@@ -1456,18 +1348,16 @@ function handleKeyUp(e) {
     if (e.code === 'Space' && STATE.spaceCharging) {
         STATE.spaceCharging = false;
         
-        // In offline mode: don't shoot on space release, wait for mouse click
         if (STATE.aimMode === 'offline') {
             if (STATE.power > 0.1) {
                 STATE.pendingShot = true;
-                STATE.savedPower = STATE.power; // Save power value for later use
+                STATE.savedPower = STATE.power;
             } else {
                 STATE.power = 0;
                 STATE.savedPower = 0;
                 updatePowerUI(0);
             }
         } else {
-            // Other modes: shoot immediately as before
         shoot();
         STATE.power = 0;
         updatePowerUI(0);
@@ -1477,14 +1367,13 @@ function handleKeyUp(e) {
 
 function handleWheel(e) {
     if (!STATE.canShoot || STATE.ballInHand || STATE.gameOver) return;
-    STATE.aimAngle += e.deltaY * 0.001;
+    STATE.aimAngle += e.deltaY * 0.0001; 
 }
 
-// Power Slider Logic
+// 力度条逻辑
 function handlePowerStart(e) {
     if (!STATE.canShoot || STATE.spaceCharging || STATE.ballInHand || STATE.gameOver) return;
     e.preventDefault();
-    // In offline mode, clear pending shot if exists
     if (STATE.aimMode === 'offline' && STATE.pendingShot) {
         STATE.pendingShot = false;
         updateConfirmButton();
@@ -1499,7 +1388,7 @@ function handlePowerMove(e) {
     const c = CONFIG.CUSHION_SIZE;
     const top = c;
     const bottom = logicalHeight - c;
-    // vertical bar on right cushion: from bottom (0) to top (1)
+    // 右侧库边力度条
     let t = (bottom - pos.y) / (bottom - top);
     let percent = Math.max(0, Math.min(1, t));
     STATE.power = percent;
@@ -1510,11 +1399,10 @@ function handlePowerEnd(e) {
     if (!STATE.isCharging) return;
     STATE.isCharging = false;
     
-    // In offline mode: don't shoot immediately, wait for confirmation
     if (STATE.aimMode === 'offline') {
         if (STATE.power > 0.1) {
             STATE.pendingShot = true;
-            STATE.savedPower = STATE.power; // Save power value for later use
+            STATE.savedPower = STATE.power;
             updateConfirmButton();
         } else {
             STATE.power = 0;
@@ -1522,10 +1410,9 @@ function handlePowerEnd(e) {
             updatePowerUI(0);
         }
     } else {
-        // Other modes: shoot immediately as before
-    if (STATE.power > 0.1) shoot();
-    STATE.power = 0;
-    updatePowerUI(0);
+        if (STATE.power > 0.1) shoot();
+        STATE.power = 0;
+        updatePowerUI(0);
     }
 }
 
@@ -1553,7 +1440,7 @@ function attemptPlaceCueBall(rawPos) {
     if (!rawPos) return false;
     const bounded = clampToTableBounds(rawPos);
     if (!isPlacementValid(bounded)) {
-        if (!placingBall) showToast("Cue ball overlaps another ball");
+        if (!placingBall) showToast("白球位置重叠");
         lastPlacementValid = false;
         return false;
     }
@@ -1570,16 +1457,16 @@ function handlePlacementEnd() {
     if (lastPlacementValid) {
         STATE.ballInHand = false;
         updateBallInHandBanner();
-        showToast("Cue ball locked in");
+        showToast("白球已放置");
     } else {
         updateBallInHandBanner();
-        showToast("Pick a legal spot");
+        showToast("请选择合法位置");
     }
 }
 
-// --- Logic ---
+// --- 游戏逻辑 ---
 function updatePowerUI(percent) {
-    // Legacy DOM slider is hidden; logic now rendered into bottom cushion via canvas
+    // 绘制在 Canvas 上
 }
 
 function computeShotVelocity(dir, power) {
@@ -1597,7 +1484,7 @@ function shoot() {
     whiteBall.vel = computeShotVelocity(dir, STATE.power);
     STATE.sunkThisTurn = [];
     STATE.foul = false;
-    if(navigator.vibrate) navigator.vibrate(20); // haptic feedback
+    if(navigator.vibrate) try { navigator.vibrate(20); } catch(e){}
 }
 
 function resetGame() {
@@ -1645,7 +1532,7 @@ function resetGame() {
     }
     updateUI();
     updatePowerUI(0);
-    showToast("GAME START");
+    showToast("游戏开始");
 }
 
 function checkTurn() {
@@ -1663,22 +1550,20 @@ function resolveTurn() {
     const sunkBlack = STATE.sunkThisTurn.includes(TYPE.BLACK);
     const cueScratch = STATE.foul;
 
-    // Black ball logic takes highest priority
     if (sunkBlack) {
         const isBreakShot = (STATE.shotCount === 1 && !STATE.assigned);
         if (isBreakShot && !cueScratch) {
-            // Clean break pot on black: immediate win for breaker
-            message = `PLAYER ${STATE.turn} WINS! (break pot)`;
+            message = `玩家 ${STATE.turn} 获胜! (开球进黑八)`;
         } else {
             let myType = (STATE.turn === 1)
                 ? STATE.p1Group
                 : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
             let myRemaining = countRemaining(myType);
-            // If player still has group balls left OR groups not assigned OR cue scratched with black → loss
+            
             if (myRemaining > 0 || !STATE.assigned || cueScratch) {
-                message = `PLAYER ${STATE.turn} LOST`;
+                message = `玩家 ${STATE.turn} 输了 (违规进黑八)`;
             } else {
-                message = `PLAYER ${STATE.turn} WINS!`;
+                message = `玩家 ${STATE.turn} 获胜!`;
             }
         }
         STATE.gameOver = true;
@@ -1689,42 +1574,37 @@ function resolveTurn() {
     }
 
     if (STATE.foul) {
-        message = "FOUL! BALL IN HAND";
+        message = "犯规! 自由球";
         resetWhiteBall(true);
         switchTurn = true;
     } else if (STATE.sunkThisTurn.length > 0) {
         let firstSunk = STATE.sunkThisTurn[0];
         if (!STATE.assigned) {
-            // First legal object ball of the game: lock in groups based on shooter
             if (firstSunk === TYPE.SOLID || firstSunk === TYPE.STRIPE) {
                 if (STATE.turn === 1) {
-                    // Shooter is P1: P1 gets what they potted
                     STATE.p1Group = firstSunk;
                 } else {
-                    // Shooter is P2: P1 gets the opposite group
                     STATE.p1Group = (firstSunk === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
                 }
                 STATE.assigned = true;
                 const p1IsSolids = STATE.p1Group === TYPE.SOLID;
                 message = p1IsSolids
-                    ? "Groups set: P1 solids / P2 stripes"
-                    : "Groups set: P1 stripes / P2 solids";
-                // Shooter continues after a good opening pot
+                    ? "花色已定: P1 实色 / P2 花色"
+                    : "花色已定: P1 花色 / P2 实色";
                 switchTurn = false;
             }
         } else {
             let myGroup = (STATE.turn === 1) ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
-            if (STATE.sunkThisTurn.includes(myGroup)) { switchTurn = false; message = "GOOD SHOT"; }
-            else { switchTurn = true; message = "WRONG BALL"; }
+            if (STATE.sunkThisTurn.includes(myGroup)) { switchTurn = false; message = "好球"; }
+            else { switchTurn = true; message = "击错球"; }
         }
     } else { switchTurn = true; }
 
-    // Fallback: if somehow all object balls are gone, treat as rack finished (draw)
     const remainingSolids = countRemaining(TYPE.SOLID);
     const remainingStripes = countRemaining(TYPE.STRIPE);
     const remainingBlack = countRemaining(TYPE.BLACK);
     if (!STATE.gameOver && remainingSolids === 0 && remainingStripes === 0 && remainingBlack === 0) {
-        const drawMsg = "Rack cleared — no balls remaining";
+        const drawMsg = "清台 — 平局";
         STATE.gameOver = true;
         STATE.canShoot = false;
         showToast(drawMsg);
@@ -1748,7 +1628,78 @@ function resetWhiteBall(withBallInHand = false) {
     updateBallInHandBanner();
 }
 
+// 物理更新函数：可供主循环和预测器使用
+// 将物理逻辑从 resolveCollisions 和 Ball.update 中提取，确保预测与实际运行完全一致
+// collisionPredicate: 可选，用于预测模式下筛选碰撞 (return true/false)
+function stepPhysics(ballsList, collisionPredicate) {
+    let collisions = []; 
+
+    // 1. 球与球碰撞
+    for (let i = 0; i < ballsList.length; i++) {
+        for (let j = i + 1; j < ballsList.length; j++) {
+            let b1 = ballsList[i], b2 = ballsList[j];
+            if (!b1.active || !b2.active) continue;
+            
+            let dist = b1.pos.dist(b2.pos);
+            if (dist < CONFIG.BALL_RADIUS * 2) {
+                // 如果提供了过滤条件且返回false，则跳过（用于预测模式的“幽灵”逻辑）
+                if(collisionPredicate && !collisionPredicate(b1, b2)) continue;
+
+                let normal = b2.pos.sub(b1.pos).normalize();
+                let overlap = CONFIG.BALL_RADIUS * 2 - dist;
+                b1.pos = b1.pos.sub(normal.mult(overlap * 0.5));
+                b2.pos = b2.pos.add(normal.mult(overlap * 0.5));
+                
+                let relVel = b1.vel.sub(b2.vel);
+                let sepVel = Vector.dot(relVel, normal);
+                
+                // 移除了 sepVel < 0 检查，恢复原始手感
+                let newSepVel = -sepVel * CONFIG.BALL_BOUNCE;
+                let sepVelVec = normal.mult(newSepVel - sepVel);
+                b1.vel = b1.vel.add(sepVelVec.mult(0.5));
+                b2.vel = b2.vel.sub(sepVelVec.mult(0.5));
+                
+                collisions.push({b1, b2});
+            }
+        }
+    }
+
+    // 2. 移动与墙壁反弹
+    for(let b of ballsList) {
+        if(!b.active) continue;
+        
+        // 简单欧拉积分
+        b.pos = b.pos.add(b.vel);
+        b.vel = b.vel.mult(CONFIG.FRICTION);
+        
+        if(b.vel.mag() < CONFIG.STOP_VELOCITY) b.vel = new Vector(0,0);
+
+        const bound = CONFIG.CUSHION_SIZE + CONFIG.BALL_RADIUS;
+        if (b.pos.x < bound) { b.pos.x = bound; b.vel.x *= -CONFIG.WALL_BOUNCE; }
+        else if (b.pos.x > logicalWidth - bound) { b.pos.x = logicalWidth - bound; b.vel.x *= -CONFIG.WALL_BOUNCE; }
+        if (b.pos.y < bound) { b.pos.y = bound; b.vel.y *= -CONFIG.WALL_BOUNCE; }
+        else if (b.pos.y > logicalHeight - bound) { b.pos.y = logicalHeight - bound; b.vel.y *= -CONFIG.WALL_BOUNCE; }
+    }
+    
+    // 3. 进袋检测 (预测模式下通常不移除球，为了简单，若进袋则停止)
+    // 注意：这里仅标记停止，不实际移除，以免影响后续渲染逻辑
+    for(let b of ballsList) {
+        if (!b.active) continue;
+        for (let p of pockets) {
+            if (b.pos.dist(p) < CONFIG.POCKET_RADIUS) {
+                b.vel = new Vector(0,0);
+                // 预测模式下可能需要标记为"已进袋"以便特殊处理
+            }
+        }
+    }
+
+    // 返回碰撞对供预测逻辑分析
+    return collisions;
+}
+
 function resolveCollisions() {
+    // 主循环使用与预测相同的逻辑核心
+    // 1. 球与球碰撞
     for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i]; let b2 = balls[j];
@@ -1761,6 +1712,8 @@ function resolveCollisions() {
                 b2.pos = b2.pos.add(normal.mult(overlap * 0.5));
                 let relVel = b1.vel.sub(b2.vel);
                 let sepVel = Vector.dot(relVel, normal);
+                
+                // 恢复无条件反弹，以匹配旧版本手感
                 let newSepVel = -sepVel * CONFIG.BALL_BOUNCE;
                 let sepVelVec = normal.mult(newSepVel - sepVel);
                 b1.vel = b1.vel.add(sepVelVec.mult(0.5));
@@ -1768,6 +1721,8 @@ function resolveCollisions() {
             }
         }
     }
+    
+    // 2. 进袋检测 (主循环特有逻辑：计分、移除)
     for (let b of balls) {
         if (!b.active) continue;
         for (let p of pockets) {
@@ -1780,47 +1735,6 @@ function resolveCollisions() {
                     spawnFloatText("+1", p.x, p.y);
                     updateUI();
                 }
-            }
-        }
-    }
-}
-
-// Lightweight physics step for offline aiming simulation (no UI / scores / fouls)
-function simulateStep(simBalls) {
-    // pairwise collisions
-    for (let i = 0; i < simBalls.length; i++) {
-        for (let j = i + 1; j < simBalls.length; j++) {
-            let b1 = simBalls[i]; let b2 = simBalls[j];
-            if (!b1.active || !b2.active) continue;
-            let dist = b1.pos.dist(b2.pos);
-            if (dist < CONFIG.BALL_RADIUS * 2) {
-                let normal = b2.pos.sub(b1.pos).normalize();
-                let overlap = CONFIG.BALL_RADIUS * 2 - dist;
-                b1.pos = b1.pos.sub(normal.mult(overlap * 0.5));
-                b2.pos = b2.pos.add(normal.mult(overlap * 0.5));
-                let relVel = b1.vel.sub(b2.vel);
-                let sepVel = Vector.dot(relVel, normal);
-                let newSepVel = -sepVel * CONFIG.BALL_BOUNCE;
-                let sepVelVec = normal.mult(newSepVel - sepVel);
-                b1.vel = b1.vel.add(sepVelVec.mult(0.5));
-                b2.vel = b2.vel.sub(sepVelVec.mult(0.5));
-            }
-        }
-    }
-    // integrate + cushions
-    for (let b of simBalls) {
-        if (!b.active) continue;
-        b.update(true); // skip trail drawing
-    }
-
-    // simple pocket removal so preview stops在袋口
-    for (let b of simBalls) {
-        if (!b.active) continue;
-        for (let p of pockets) {
-            if (b.pos.dist(p) < CONFIG.POCKET_RADIUS) {
-                b.active = false;
-                b.vel = new Vector(0, 0);
-                break;
             }
         }
     }
@@ -1848,7 +1762,6 @@ function showToast(msg) {
     uiToast.innerText = msg;
     uiToast.style.opacity = "1";
     setTimeout(() => {
-        // 防止在新消息刚显示时被旧定时器误关掉
         if (uiToast.innerText === msg) {
             uiToast.style.opacity = "0";
         }
@@ -1860,7 +1773,7 @@ function hideToast() {
 function updateBallInHandBanner() {
     if (!uiBallHandBanner) return;
     if (STATE.ballInHand && !STATE.gameOver) {
-        uiBallHandBanner.innerText = `Ball in hand — Player ${STATE.turn}, drag the cue ball to place it.`;
+        uiBallHandBanner.innerText = `自由球 — 玩家 ${STATE.turn}，拖动白球放置`;
         uiBallHandBanner.classList.add('visible');
     } else {
         uiBallHandBanner.classList.remove('visible');
@@ -1875,15 +1788,7 @@ function hideEndScreen() {
     if (uiEndScreen) uiEndScreen.classList.remove('visible');
 }
 function updateUI() {
-    if (STATE.turn === 1) { uiP1.classList.add('active', 'p1-active'); uiP2.classList.remove('active', 'p2-active'); }
-    else { uiP1.classList.remove('active', 'p1-active'); uiP2.classList.add('active', 'p2-active'); }
-    if (!STATE.assigned) { uiType1.innerText = "ANY"; uiType2.innerText = "ANY"; }
-    else {
-        uiType1.innerText = STATE.p1Group === TYPE.SOLID ? "SOLIDS ●" : "STRIPES ◎";
-        uiType2.innerText = STATE.p1Group === TYPE.SOLID ? "STRIPES ◎" : "SOLIDS ●";
-    }
-    if (uiScore1) uiScore1.innerText = STATE.scores[1];
-    if (uiScore2) uiScore2.innerText = STATE.scores[2];
+    // 计分板已移至 Canvas 绘制，旧 DOM 逻辑移除
 }
 
 function buildTargetsForPlayer(isP1) {
@@ -1891,14 +1796,12 @@ function buildTargetsForPlayer(isP1) {
     const myGroup = isP1 ? STATE.p1Group : (STATE.p1Group === TYPE.SOLID ? TYPE.STRIPE : TYPE.SOLID);
     if (myGroup !== TYPE.SOLID && myGroup !== TYPE.STRIPE) return [];
 
-    // All balls that originally belong to this group (by type), excluding black/cue
     const groupBalls = balls
         .filter(b => b.type === myGroup && typeof b.id === 'number' && b.id !== 8)
         .sort((a, b) => (a.id || 0) - (b.id || 0));
 
     const remainingCount = groupBalls.filter(b => b.active).length;
 
-    // 如果己方目标球都清空，且黑球仍在台面，则目标只剩黑球
     const blackRemaining = countRemaining(TYPE.BLACK) > 0;
     if (remainingCount === 0 && blackRemaining) {
         return [{ id: 8, isRemaining: true, isBlack: true, color: '#000' }];
@@ -1926,7 +1829,6 @@ function drawScoreboard(ctx) {
         ctx.save();
         const cardRadius = 12;
 
-        // background
         ctx.beginPath();
         ctx.moveTo(x + cardRadius, y);
         ctx.lineTo(x + cardWidth - cardRadius, y);
@@ -1945,14 +1847,12 @@ function drawScoreboard(ctx) {
         ctx.lineWidth = isActive ? 2 : 1;
         ctx.stroke();
 
-        // group text
-        ctx.font = "10px Inter";
+        ctx.font = "11px 'Noto Sans SC', sans-serif";
         ctx.textBaseline = "top";
         ctx.textAlign = "left";
         ctx.fillStyle = isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
         ctx.fillText(label, x + 10, y + 6);
 
-        // target balls row
         const rowY = y + 20;
         const maxPerRow = 8;
         const dotRadius = 7;
@@ -1976,7 +1876,7 @@ function drawScoreboard(ctx) {
                 } else if (isRem) {
                     ctx.fillStyle = t.color || (isP1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR);
                 } else {
-                    ctx.fillStyle = "rgba(80,80,90,0.9)"; // fully gray for potted balls
+                    ctx.fillStyle = "rgba(80,80,90,0.9)";
                 }
                 ctx.arc(cx, cy, dotRadius, 0, Math.PI*2);
                 ctx.fill();
@@ -1985,7 +1885,6 @@ function drawScoreboard(ctx) {
                 ctx.lineWidth = 0.8;
                 ctx.stroke();
 
-                // text label
                 const textColor = isRem ? "#ffffff" : "rgba(180,180,190,0.9)";
                 ctx.fillStyle = textColor;
                 ctx.fillText(String(t.id), cx, cy+0.5);
@@ -2003,8 +1902,8 @@ function drawScoreboard(ctx) {
     let p2Targets = [];
     if (STATE.assigned) {
         const p1Solids = STATE.p1Group === TYPE.SOLID;
-        p1Label = p1Solids ? "SOLIDS ●" : "STRIPES ◎";
-        p2Label = p1Solids ? "STRIPES ◎" : "SOLIDS ●";
+        p1Label = p1Solids ? "实色球 ●" : "花色球 ◎";
+        p2Label = p1Solids ? "花色球 ◎" : "实色球 ●";
         p1Targets = buildTargetsForPlayer(true);
         p2Targets = buildTargetsForPlayer(false);
     }
@@ -2022,9 +1921,8 @@ function adjustBrightness(col, amt) {
 function loop() {
     ctx.clearRect(0, 0, logicalWidth, logicalHeight);
     
-    // Space Charging Logic
+    // 键盘蓄力逻辑
     if (STATE.spaceCharging) {
-        // In offline mode, use slower charging speed (1/10 of normal)
         const chargeSpeed = STATE.aimMode === 'offline' ? 0.008 : 0.02;
         STATE.power += chargeSpeed * STATE.spaceChargeDir;
         if (STATE.power >= 1) { STATE.power = 1; STATE.spaceChargeDir = -1; }
@@ -2052,7 +1950,7 @@ function loop() {
     ctx.fillStyle = "#000";
     for(let p of pockets) { ctx.beginPath(); ctx.arc(p.x, p.y, CONFIG.POCKET_RADIUS, 0, Math.PI*2); ctx.fill(); }
 
-    // Right-cushion vertical power bar (bright base)
+    // 右侧库边垂直力度条
     const barC = CONFIG.CUSHION_SIZE;
     const barWidth = 8;
     const barTop = barC + 16;
@@ -2061,7 +1959,6 @@ function loop() {
     const barX = logicalWidth - barC + (barC - barWidth) * 0.5;
 
     ctx.save();
-    // bright translucent base
     const baseGrad = ctx.createLinearGradient(barX, barTop, barX, barBottom);
     baseGrad.addColorStop(0, "rgba(255,255,255,0.65)");
     baseGrad.addColorStop(1, "rgba(230,230,230,0.65)");
@@ -2083,7 +1980,6 @@ function loop() {
     }
     ctx.restore();
 
-    // Draw embedded scoreboard on felt, below balls
     drawScoreboard(ctx);
 
     resolveCollisions();
@@ -2100,31 +1996,25 @@ function loop() {
         let hitBall = null;
         let baseEnd = start.add(dir.mult(maxDist * 0.9));
 
-        // --- aiming helpers by mode ---
         const mode = STATE.aimMode || 'basic';
 
         if (mode === 'basic' || mode === 'advanced') {
-            // Find first collision with any active object ball (not cue)
-            // using precise circle–ray intersection for equal-radius balls:
-            // cue center moves along 'dir', object ball is a circle of radius 2R
             let hitDist = maxDist;
-            const R = CONFIG.BALL_RADIUS * 2; // center-to-center distance at first contact
+            const R = CONFIG.BALL_RADIUS * 2;
             for (let b of balls) {
                 if (!b.active || b === whiteBall) continue;
 
-                // Ray-sphere intersection: |(start + dir*t) - b.pos| = R
-                const f = start.sub(b.pos);              // from ball center to cue center
-                const a = 1;                             // dir is normalized
+                const f = start.sub(b.pos);
+                const a = 1;
                 const bCoef = 2 * Vector.dot(dir, f);
                 const cTerm = f.mag() * f.mag() - R*R;
                 const disc = bCoef*bCoef - 4*a*cTerm;
-                if (disc < 0) continue;                  // no intersection
+                if (disc < 0) continue;
 
                 const sqrtD = Math.sqrt(disc);
                 let t1 = (-bCoef - sqrtD) / (2*a);
                 let t2 = (-bCoef + sqrtD) / (2*a);
 
-                // pick smallest positive t as first contact
                 let tHit = Number.POSITIVE_INFINITY;
                 if (t1 > 0 && t1 < tHit) tHit = t1;
                 if (t2 > 0 && t2 < tHit) tHit = t2;
@@ -2140,96 +2030,199 @@ function loop() {
                 baseEnd = start.add(dir.mult(hitDist));
             }
         } else if (mode === 'offline') {
-            // Use a short offline simulation with same shot model as real shoot()
+            // 离线预测模式逻辑
             const simBalls = cloneBallsForSim();
             const simWhite = simBalls.find(b => b.type === TYPE.CUE);
+            const cueId = simWhite ? simWhite.id : -1;
+            
             if (simWhite) {
                 const rawP = (STATE.power == null ? 0 : STATE.power);
-                const previewPower = rawP > 0 ? rawP : 0.6; // 未蓄力时给一个中等预览力度
+                const previewPower = rawP > 0 ? rawP : 0.6;
                 simWhite.vel = computeShotVelocity(dir, previewPower);
             }
-            const cuePath = [];
-            const objPaths = {}; // id -> points[]
-            let firstHitId = null;
 
-            // up to 1000 preview steps (or until balls are pocketed/inactive)
-            const maxSteps = 120;
+            const cuePathBefore = []; // 碰撞前白球轨迹
+            const cuePathAfter = [];  // 碰撞后白球轨迹
+            const targetPath = [];    // 目标球轨迹
+            let firstHitFound = false;
+            let targetId = -1;
+
+            const maxSteps = 1200; 
+            let allStopped = false;
+
+            // 如果一开始就记录当前位置
+            if(simWhite) cuePathBefore.push({x:simWhite.pos.x, y:simWhite.pos.y});
+
             for (let step = 0; step < maxSteps; step++) {
-                simulateStep(simBalls);
+                // 碰撞过滤器逻辑
+                const collisionPredicate = (b1, b2) => {
+                    const isCue = (b1.id === cueId || b2.id === cueId);
+                    
+                    if (!firstHitFound) {
+                        // 阶段一：寻找第一次碰撞，只关心涉及白球的碰撞
+                        return isCue;
+                    } else {
+                        // 阶段二：碰撞后，禁止所有球与球的碰撞
+                        return false; 
+                    }
+                };
 
-                // record cue and object paths AFTER physics step
-                if (simWhite && simWhite.active) {
-                    cuePath.push({x: simWhite.pos.x, y: simWhite.pos.y});
-                }
-                for (let sb of simBalls) {
-                    if (!sb.active || sb.type === TYPE.CUE) continue;
-                    if (!objPaths[sb.id]) objPaths[sb.id] = [];
-                    objPaths[sb.id].push({x: sb.pos.x, y: sb.pos.y});
-                }
+                // 使用与主循环完全一致的 stepPhysics 进行模拟，不再使用子步
+                const collisions = stepPhysics(simBalls, collisionPredicate);
 
-                // detect first ball actually hit by cue in this offline run
-                if (simWhite && simWhite.active && firstHitId === null) {
-                    for (let sb of simBalls) {
-                        if (!sb.active || sb.type === TYPE.CUE) continue;
-                        if (simWhite.pos.dist(sb.pos) <= CONFIG.BALL_RADIUS * 2 + 0.5) {
-                            firstHitId = sb.id;
+                // 检查是否发生第一次碰撞
+                if (!firstHitFound && simWhite) {
+                    for(let c of collisions) {
+                        let other = null;
+                        if(c.b1.id === cueId) other = c.b2;
+                        else if(c.b2.id === cueId) other = c.b1;
+
+                        if(other && other.type !== TYPE.CUE) {
+                            firstHitFound = true;
+                            targetId = other.id;
+                            // 记录碰撞点，作为轨迹的分界
+                            cuePathBefore.push({x:simWhite.pos.x, y:simWhite.pos.y});
+                            cuePathAfter.push({x:simWhite.pos.x, y:simWhite.pos.y});
+                            targetPath.push({x:other.pos.x, y:other.pos.y});
                             break;
                         }
                     }
                 }
+
+                // 记录轨迹点
+                if (simWhite) {
+                    if (!firstHitFound) {
+                        cuePathBefore.push({x: simWhite.pos.x, y: simWhite.pos.y});
+                    } else {
+                        cuePathAfter.push({x: simWhite.pos.x, y: simWhite.pos.y});
+                    }
+                }
+
+                if (firstHitFound && targetId !== -1) {
+                    const target = simBalls.find(b => b.id === targetId);
+                    if (target) {
+                        targetPath.push({x: target.pos.x, y: target.pos.y});
+                    }
+                }
+                
+                // 提前结束检查
+                if (step > 10) {
+                    let moving = false;
+                    if(simWhite && simWhite.vel.mag() > CONFIG.STOP_VELOCITY) moving = true;
+                    if(targetId !== -1) {
+                        const t = simBalls.find(b => b.id === targetId);
+                        if(t && t.vel.mag() > CONFIG.STOP_VELOCITY) moving = true;
+                    }
+                    if(!moving) break;
+                }
             }
 
-            // draw cue path (use player color tint)
-            if (cuePath.length > 1) {
+            // 绘制：碰撞前白球 (含通道宽度)
+            if (cuePathBefore.length > 1) {
+                // 1. 宽半透明色带（表示球体直径）
                 ctx.beginPath();
-                ctx.moveTo(cuePath[0].x, cuePath[0].y);
-                for (let i = 1; i < cuePath.length; i++) {
-                    ctx.lineTo(cuePath[i].x, cuePath[i].y);
+                ctx.moveTo(cuePathBefore[0].x, cuePathBefore[0].y);
+                for (let i = 1; i < cuePathBefore.length; i++) {
+                    ctx.lineTo(cuePathBefore[i].x, cuePathBefore[i].y);
                 }
-                const cueColor = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
-                ctx.strokeStyle = adjustBrightness(cueColor, 30) + "AA"; // slightly bright, semi-transparent
-                ctx.lineWidth = 1.8;
-                ctx.setLineDash([3,4]);
+                ctx.strokeStyle = "rgba(255,255,255,0.12)"; // 非常淡的背景带
+                ctx.lineWidth = CONFIG.BALL_RADIUS * 2; // 球体直径
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                // 2. 细中心线
+                ctx.beginPath();
+                ctx.moveTo(cuePathBefore[0].x, cuePathBefore[0].y);
+                for (let i = 1; i < cuePathBefore.length; i++) {
+                    ctx.lineTo(cuePathBefore[i].x, cuePathBefore[i].y);
+                }
+                ctx.strokeStyle = "rgba(255,255,255,0.5)";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 6]); 
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
 
-            // draw only the FIRST ball hit by cue ball (pure white)
-            if (firstHitId != null && objPaths[firstHitId] && objPaths[firstHitId].length > 1) {
-                const pts = objPaths[firstHitId];
+            // 绘制：碰撞后白球 (含通道宽度)
+            if (cuePathAfter.length > 1) {
+                // 1. 宽半透明色带
                 ctx.beginPath();
-                ctx.moveTo(pts[0].x, pts[0].y);
-                for (let i = 1; i < pts.length; i++) {
-                    ctx.lineTo(pts[i].x, pts[i].y);
+                ctx.moveTo(cuePathAfter[0].x, cuePathAfter[0].y);
+                for (let i = 1; i < cuePathAfter.length; i++) {
+                    ctx.lineTo(cuePathAfter[i].x, cuePathAfter[i].y);
                 }
-                ctx.strokeStyle = "rgba(255,255,255,0.9)";
-                ctx.lineWidth = 1.6;
-                ctx.setLineDash([6,6]);
+                ctx.strokeStyle = "rgba(255,255,255,0.08)";
+                ctx.lineWidth = CONFIG.BALL_RADIUS * 2;
+                ctx.lineCap = 'round';
                 ctx.stroke();
-                ctx.setLineDash([]);
+
+                // 2. 细实线
+                ctx.beginPath();
+                ctx.moveTo(cuePathAfter[0].x, cuePathAfter[0].y);
+                for (let i = 1; i < cuePathAfter.length; i++) {
+                    ctx.lineTo(cuePathAfter[i].x, cuePathAfter[i].y);
+                }
+                ctx.strokeStyle = "rgba(255,255,255,0.9)"; 
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            // 绘制：目标球轨迹 (含通道宽度)
+            if (targetPath.length > 1) {
+                const pColor = STATE.turn === 1 ? PALETTE.P1_COLOR : PALETTE.P2_COLOR;
+                
+                // 1. 宽半透明色带
+                ctx.beginPath();
+                ctx.moveTo(targetPath[0].x, targetPath[0].y);
+                for (let i = 1; i < targetPath.length; i++) {
+                    ctx.lineTo(targetPath[i].x, targetPath[i].y);
+                }
+                // 将颜色转为 rgba 以设置透明度
+                // 简单 hack: 假设 pColor 是 hex，我们用一个通用的半透明色或者尝试解析
+                // 这里直接用白色半透明叠加，或者手动写死一点颜色
+                ctx.strokeStyle = "rgba(255,255,255,0.1)"; 
+                ctx.lineWidth = CONFIG.BALL_RADIUS * 2;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                // 2. 细实线
+                ctx.beginPath();
+                ctx.moveTo(targetPath[0].x, targetPath[0].y);
+                for (let i = 1; i < targetPath.length; i++) {
+                    ctx.lineTo(targetPath[i].x, targetPath[i].y);
+                }
+                ctx.strokeStyle = pColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 终点圆点
+                const last = targetPath[targetPath.length-1];
+                ctx.beginPath();
+                ctx.arc(last.x, last.y, 4, 0, Math.PI*2);
+                ctx.fillStyle = pColor;
+                ctx.fill();
             }
         }
 
-        // Soft outer halo around cue ball
+        // 母球光晕
         ctx.beginPath();
         ctx.arc(start.x, start.y, CONFIG.BALL_RADIUS + 16, 0, Math.PI*2);
         ctx.strokeStyle = "rgba(255,255,255,0.12)";
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Main aiming ray (long, faint dashed)
+        // 基础瞄准虚线 (总是显示，作为参考)
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(start.x + dir.x * maxDist, start.y + dir.y * maxDist);
-        ctx.strokeStyle = "rgba(255,255,255,0.18)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 10]);
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 8]); // 很淡的虚线
         ctx.stroke();
         ctx.restore();
 
         if (hitBall && STATE.aimMode !== 'cue') {
-            // Solid segment up to first impact
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
             ctx.lineTo(baseEnd.x, baseEnd.y);
@@ -2239,25 +2232,19 @@ function loop() {
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Mark expected contact point
             ctx.beginPath();
             ctx.arc(baseEnd.x, baseEnd.y, 4, 0, Math.PI*2);
             ctx.fillStyle = color;
             ctx.fill();
 
             if (STATE.aimMode === 'advanced') {
-                // Predict post-collision paths (simple equal-mass elastic model)
-                // impact normal from cue impact point to object center
                 const impactPoint = baseEnd;
                 const n = hitBall.pos.sub(impactPoint).normalize();
-                const v = dir; // cue ball incoming direction
+                const v = dir;
                 const vDotN = Vector.dot(v, n);
 
-                // For very thin, "extreme" cuts the simple model is unreliable:
-                // only show contact preview and skip post-collision guides.
                 const approach = Math.abs(vDotN);
 
-                // Object ball leaves roughly along impact normal
                 const objDir = n;
                 const objStart = hitBall.pos;
                 const travelLen = CONFIG.BALL_RADIUS * 8;
@@ -2272,13 +2259,11 @@ function loop() {
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Cue ball loses its normal component, keeps tangential component
                 if (approach >= 0.18) {
                     let cueDir = v.sub(n.mult(vDotN));
                     if (cueDir.mag() > 0.0001) {
                         cueDir = cueDir.normalize();
                     } else {
-                        // fallback: slight reflection if nearly head-on
                         cueDir = v.sub(n.mult(2 * vDotN)).normalize();
                     }
 
