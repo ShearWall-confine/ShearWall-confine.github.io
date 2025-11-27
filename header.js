@@ -103,6 +103,8 @@ function loadInlineHeader() {
                         <li><a href="login.html"><i class="fas fa-tasks"></i> 课题进度管理</a></li>
                         <li><a href="german_20251031/german_index.html"><i class="fas fa-language"></i> 德语学习工具</a></li>
                         <li><a href="table/pool.html"><i class="fas fa-bullseye"></i> 台球游戏</a></li>
+                        <li><a href="table/cs.html"><i class="fas fa-crosshairs"></i> 终极火力演练场</a></li>
+                        <li><a href="table/mambarun.html"><i class="fas fa-running"></i> 曼巴狂奔跑道</a></li>
                     </ul>
                 </li>
                 <li><a href="#">交流合作</a></li>
@@ -174,6 +176,8 @@ function loadFallbackHeader() {
                         <li><a href="login.html"><i class="fas fa-tasks"></i> 课题进度管理</a></li>
                         <li><a href="german_20251031/german_index.html"><i class="fas fa-language"></i> 德语学习工具</a></li>
                         <li><a href="table/pool.html"><i class="fas fa-bullseye"></i> 台球游戏</a></li>
+                        <li><a href="table/cs.html"><i class="fas fa-crosshairs"></i> 终极火力演练场</a></li>
+                        <li><a href="table/mambarun.html"><i class="fas fa-running"></i> 曼巴狂奔跑道</a></li>
                     </ul>
                 </li>
                 <li><a href="#">交流合作</a></li>
